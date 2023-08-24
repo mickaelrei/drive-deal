@@ -1,15 +1,16 @@
+import '../database/vehicle_table.dart';
 import 'partner_store.dart';
 
-/// Vehicle class
+/// Vehicle entity
 class Vehicle {
   /// Constructor
   Vehicle({
-    required this.id,
+    this.id,
     required this.storeId,
     required this.modelId,
     required this.brandId,
-    required this.creationYear,
-    required this.vehicleYear,
+    required this.yearId,
+    required this.modelYear,
     required this.vehicleImage,
     required this.plate,
     required this.price,
@@ -17,7 +18,7 @@ class Vehicle {
   });
 
   /// ID for database identification
-  final int id;
+  final int? id;
 
   /// Reference to [PartnerStore] in database
   final int storeId;
@@ -28,9 +29,11 @@ class Vehicle {
   /// Used to get info on Fipe API
   final int brandId;
 
-  /// ANO DE FABRICAÇÃO VS ANO MODELO
-  final int creationYear;
-  final int vehicleYear;
+  /// Manufacture year, used on Fipe API
+  final String yearId;
+
+  /// Model year
+  final int modelYear;
 
   /// Name of image file for this vehicle
   final String vehicleImage;
@@ -41,5 +44,24 @@ class Vehicle {
   /// Vehicle price
   final double price;
 
+  /// Date on which this vehicle was purchased by the [PartnerStore]
   final DateTime purchaseDate;
+
+  /// Map representation of [Vehicle]
+  Map<String, dynamic> toMap() {
+    final map = <String, dynamic>{};
+
+    map[VehicleTable.id] = id;
+    map[VehicleTable.storeId] = storeId;
+    map[VehicleTable.modelId] = modelId;
+    map[VehicleTable.brandId] = brandId;
+    map[VehicleTable.yearId] = yearId;
+    map[VehicleTable.modelYear] = modelYear;
+    map[VehicleTable.vehicleImage] = vehicleImage;
+    map[VehicleTable.plate] = plate;
+    map[VehicleTable.price] = price;
+    map[VehicleTable.purchaseDate] = purchaseDate.millisecondsSinceEpoch;
+
+    return map;
+  }
 }

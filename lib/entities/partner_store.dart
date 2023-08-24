@@ -1,30 +1,18 @@
-/// Level of autonomy for a partner store
-enum AutonomyLevel {
-  /// Beginner
-  beginner,
-
-  /// Intermediate
-  intermediate,
-
-  /// Advanced
-  advanced,
-
-  /// Special
-  special
-}
+import '../database/partner_store_table.dart';
+import 'autonomy_level.dart';
 
 /// PartnerStore entity
 class PartnerStore {
   /// Constructor
   PartnerStore({
-    required this.id,
+    this.id,
     required this.cnpj,
     required this.name,
-    required this.autonomyLevel,
+    required this.autonomyLevelId,
   });
 
   /// ID for database identification
-  final int id;
+  final int? id;
 
   /// CNPJ, 14 chars
   final String cnpj;
@@ -32,6 +20,18 @@ class PartnerStore {
   /// Store name, 120 chars max
   final String name;
 
-  /// Autonomy level
-  final AutonomyLevel autonomyLevel;
+  /// Reference to [AutonomyLevel] table
+  final int autonomyLevelId;
+
+  /// Map representation of [PartnerStore]
+  Map<String, dynamic> toMap() {
+    final map = <String, dynamic>{};
+
+    map[PartnerStoreTable.id] = id;
+    map[PartnerStoreTable.cnpj] = cnpj;
+    map[PartnerStoreTable.name] = name;
+    map[PartnerStoreTable.autonomyLevelId] = autonomyLevelId;
+
+    return map;
+  }
 }
