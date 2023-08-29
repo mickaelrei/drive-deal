@@ -17,7 +17,7 @@ class AutonomyLevelRepository {
   Future<List<AutonomyLevel>> select() async {
     final database = await getDatabase();
 
-    // Query all users
+    // Query all items
     final List<Map<String, dynamic>> result = await database.query(
       AutonomyLevelTable.tableName,
     );
@@ -33,8 +33,17 @@ class AutonomyLevelRepository {
       ));
     }
 
-    // TODO: Remove this, not needed besides testing
-    await Future.delayed(const Duration(seconds: 2));
     return list;
+  }
+
+  /// Method to delete a specific [AutonomyLevel] from database
+  Future<void> delete(AutonomyLevel autonomyLevel) async {
+    final database = await getDatabase();
+
+    await database.delete(
+      AutonomyLevelTable.tableName,
+      where: '${AutonomyLevelTable.id} = ?',
+      whereArgs: [autonomyLevel.id],
+    );
   }
 }

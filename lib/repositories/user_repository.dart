@@ -34,4 +34,15 @@ class UserRepository {
 
     return list;
   }
+
+  /// Method to delete a specific [User] from database
+  Future<void> delete(User user) async {
+    final database = await getDatabase();
+
+    await database.delete(
+      UserTable.tableName,
+      where: '${UserTable.id} = ?',
+      whereArgs: [user.id],
+    );
+  }
 }
