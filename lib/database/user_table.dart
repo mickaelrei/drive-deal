@@ -6,9 +6,10 @@ class UserTable {
   /// Used on table creation
   static const String createTable = '''
   CREATE TABLE $tableName(
-    $id           INTEGER    PRIMARY KEY AUTOINCREMENT,
-    $isAdmin      INTEGER    NOT NULL,
-    $password     TEXT       NOT NULL,
+    $id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    $isAdmin      INTEGER NOT NULL,
+    $password     TEXT    NOT NULL,
+    $name         TEXT,
     $storeId      INTEGER
   )
   ''';
@@ -18,6 +19,9 @@ class UserTable {
 
   /// ID for database identification
   static const String id = 'id';
+
+  /// Name for admin login
+  static const String name = 'name';
 
   /// If this user is an admin
   static const String isAdmin = 'is_admin';

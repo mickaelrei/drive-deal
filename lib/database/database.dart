@@ -29,8 +29,9 @@ Future<Database> getDatabase() async {
         'INSERT INTO ${UserTable.tableName}'
         '(${UserTable.isAdmin},'
         ' ${UserTable.storeId},'
+        ' ${UserTable.name},'
         ' ${UserTable.password}) '
-        'VALUES(1, NULL, "admin123")',
+        'VALUES(1, NULL, \'anderson\', \'admin123\')',
       );
 
       // Create autonomy levels
@@ -40,7 +41,7 @@ Future<Database> getDatabase() async {
         '(${AutonomyLevelTable.label},'
         ' ${AutonomyLevelTable.networkPercent},'
         ' ${AutonomyLevelTable.storePercent}) '
-        'VALUES("Beginner", 25, 74)',
+        'VALUES(\'Beginner\', 25, 74)',
       );
 
       // Intermediate
@@ -49,7 +50,7 @@ Future<Database> getDatabase() async {
         '(${AutonomyLevelTable.label},'
         ' ${AutonomyLevelTable.networkPercent},'
         ' ${AutonomyLevelTable.storePercent}) '
-        'VALUES("Intermediate", 20, 79)',
+        'VALUES(\'Intermediate\', 20, 79)',
       );
 
       // Advanced
@@ -58,7 +59,7 @@ Future<Database> getDatabase() async {
         '(${AutonomyLevelTable.label},'
         ' ${AutonomyLevelTable.networkPercent},'
         ' ${AutonomyLevelTable.storePercent}) '
-        'VALUES("Advanced", 15, 84)',
+        'VALUES(\'Advanced\', 15, 84)',
       );
 
       // Special
@@ -67,7 +68,7 @@ Future<Database> getDatabase() async {
         '(${AutonomyLevelTable.label},'
         ' ${AutonomyLevelTable.networkPercent},'
         ' ${AutonomyLevelTable.storePercent}) '
-        'VALUES("Special", 5, 94)',
+        'VALUES(\'Special\', 5, 94)',
       );
     },
     version: 1,

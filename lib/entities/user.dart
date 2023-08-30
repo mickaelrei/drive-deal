@@ -6,6 +6,7 @@ class User {
   /// Constructor
   User({
     this.id,
+    this.name,
     this.isAdmin = false,
     this.storeId,
     required this.password,
@@ -13,6 +14,9 @@ class User {
 
   /// ID for database identification
   final int? id;
+
+  /// Name for admin login
+  final String? name;
 
   /// If this user is an admin, by default false
   final bool isAdmin;
@@ -31,7 +35,14 @@ class User {
     map[UserTable.isAdmin] = isAdmin ? '1' : '0';
     map[UserTable.password] = password;
     map[UserTable.storeId] = storeId;
+    map[UserTable.name] = name;
 
     return map;
+  }
+
+  @override
+  String toString() {
+    return 'ID: $id, name; $name, IsAdmin: $isAdmin, '
+        'StoreID: $storeId, Password: $password';
   }
 }

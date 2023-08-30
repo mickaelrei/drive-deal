@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'repositories/autonomy_level_repository.dart';
+import 'view/admin_home.dart';
+import 'view/login.dart';
+import 'view/partner_home.dart';
 
-void main() async {
+void main() {
   runApp(const MyApp());
 }
 
@@ -13,53 +15,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Teste de listagem de niveis de autonomia
-    final autonomyLevelRepository = AutonomyLevelRepository();
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Drive Deal')),
-        body: Center(
-          child: FutureBuilder(
-            future: autonomyLevelRepository.select(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Row(
-                  children: [
-                    CircularProgressIndicator(),
-                    Padding(
-                      padding: EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Loading...',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              }
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/home': (context) {
+          // Get args to decide whether to open admin or partner home page
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
 
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  final autonomyLevel = snapshot.data![index];
-
-                  return ListTile(
-                    leading: Text(autonomyLevel.id.toString()),
-                    title: Text(autonomyLevel.label),
-                    subtitle: Text(
-                      'Store percent: ${autonomyLevel.storePercent}\n'
-                      'Network percet: ${autonomyLevel.networkPercent}',
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ),
+          if (args['isAdmin']) {
+            return const AdminHomePage();
+          } else {
+            return const PartnerHomePage();
+          }
+        },
+      },
     );
   }
 }

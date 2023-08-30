@@ -29,6 +29,7 @@ class UserRepository {
         storeId: item[UserTable.storeId],
         isAdmin: item[UserTable.isAdmin] == 1,
         password: item[UserTable.password],
+        name: item[UserTable.name],
       ));
     }
 
