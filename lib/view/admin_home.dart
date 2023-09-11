@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'register_store.dart';
+
 /// Provider for admin home page
 class AdminHomeState with ChangeNotifier {
   /// Which page is selected in the navigation bar
@@ -28,14 +30,40 @@ class AdminHomePage extends StatelessWidget {
       },
       child: Consumer<AdminHomeState>(
         builder: (context, state, child) {
+          // Get page based on current selected index
+          late Widget page;
+          switch (state.navigationBarSelectedIndex) {
+            case 0:
+              page = const Center(
+                child: Text('Welcome to the Home Page, Admin!'),
+              );
+              break;
+            case 1:
+              page = const RegisterStorePage();
+              break;
+            case 2:
+              page = const Center(
+                child: Text('Statistics'),
+              );
+              break;
+            case 3:
+              page = const Center(
+                child: Text('Sales'),
+              );
+              break;
+            default:
+              page = const Center(
+                child: Text('Error: Unknown page'),
+              );
+              break;
+          }
+
           return Scaffold(
-            backgroundColor: Colors.grey,
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: const Text('Drive Deal'),
             ),
-            body: const Center(
-              child: Text('Welcome to the Home Page, Admin!'),
-            ),
+            body: page,
             bottomNavigationBar: NavigationBar(
               onDestinationSelected: (index) {
                 state.changePage(index);
