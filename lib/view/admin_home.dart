@@ -1,19 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../entities/partner_store.dart';
+
+import '../repositories/partner_store_repository.dart';
+
+import '../usecases/partner_store_use_case.dart';
+
 import 'register_store.dart';
 
 /// Provider for admin home page
 class AdminHomeState with ChangeNotifier {
+  /// Constructor
+  AdminHomeState() {
+    getLists();
+  }
+
+  /// For [PartnerStore] operations
+  final PartnerStoreUseCase partnerStoreUseCase = PartnerStoreUseCase(
+    PartnerStoreRepository(),
+  );
+
+  /// List of all [PartnerStore]s
+  final partnerStores = <PartnerStore>[];
+
   /// Which page is selected in the navigation bar
   int navigationBarSelectedIndex = 0;
 
   /// Method to change NavBar selected item
-  void changePage(int index) {
+  Future<void> changePage(int index) async {
     navigationBarSelectedIndex = index;
+
+    // Update lists
+    await getLists();
 
     // Update widget
     notifyListeners();
+  }
+
+  /// Method to update variables
+  Future<void> getLists() async {
+    final items = await partnerStoreUseCase.select();
+    partnerStores
+      ..clear()
+      ..addAll(items);
   }
 }
 
@@ -29,14 +59,12 @@ class AdminHomePage extends StatelessWidget {
         return AdminHomeState();
       },
       child: Consumer<AdminHomeState>(
-        builder: (context, state, child) {
+        builder: (_, state, __) {
           // Get page based on current selected index
           late Widget page;
           switch (state.navigationBarSelectedIndex) {
             case 0:
-              page = const Center(
-                child: Text('Welcome to the Home Page, Admin!'),
-              );
+              page = PartnerStoreListView(items: state.partnerStores);
               break;
             case 1:
               page = const RegisterStorePage();
@@ -59,15 +87,14 @@ class AdminHomePage extends StatelessWidget {
           }
 
           return Scaffold(
+            resizeToAvoidBottomInset: false,
             backgroundColor: Colors.white,
             appBar: AppBar(
               title: const Text('Drive Deal'),
             ),
             body: page,
             bottomNavigationBar: NavigationBar(
-              onDestinationSelected: (index) {
-                state.changePage(index);
-              },
+              onDestinationSelected: state.changePage,
               animationDuration: const Duration(milliseconds: 1000),
               backgroundColor: Colors.grey.shade200,
               indicatorColor: Colors.blue.shade300,
@@ -108,6 +135,40 @@ class AdminHomePage extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// Listing of [PartnerStore]
+class PartnerStoreListView extends StatelessWidget {
+  /// Constructor
+  const PartnerStoreListView({required this.items, super.key});
+
+  /// List of [PartnerStore]
+  final List<PartnerStore> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final partnerStore = items[index];
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListTile(
+            title: Text('Name: ${partnerStore.name}'),
+            subtitle: Text(
+              'CNPJ: ${partnerStore.cnpj}\n'
+              'Autonomy Level: ${partnerStore.autonomyLevelId}',
+            ),
+            isThreeLine: true,
+            tileColor: Colors.grey[300],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+          ),
+        );
+      },
     );
   }
 }

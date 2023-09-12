@@ -35,4 +35,10 @@ class AutonomyLevel {
 
     return map;
   }
+
+  @override
+  String toString() {
+    return 'ID: $id, Label: $label, StorePercent: $storePercent, '
+        'NetworkPercent: $networkPercent';
+  }
 }

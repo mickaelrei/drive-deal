@@ -98,7 +98,7 @@ class LoginForm extends StatelessWidget {
         return LoginState();
       },
       child: Consumer<LoginState>(
-        builder: (context, state, child) {
+        builder: (_, state, __) {
           return Form(
             key: state.formKey,
             child: Column(
@@ -137,7 +137,7 @@ class LoginForm extends StatelessWidget {
                         case LoginType.admin:
                         case LoginType.nonAdmin:
                           // ignore: use_build_context_synchronously
-                          Navigator.of(context).pushNamed(
+                          Navigator.of(context).pushReplacementNamed(
                             '/home',
                             arguments: {
                               'isAdmin': loginType == LoginType.admin

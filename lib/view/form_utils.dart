@@ -37,7 +37,7 @@ class FormTextEntry extends StatelessWidget {
         obscureText: hidden,
         decoration: InputDecoration(
           hintText: label,
-          prefixIcon: Icon(prefixIcon),
+          prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
           ),

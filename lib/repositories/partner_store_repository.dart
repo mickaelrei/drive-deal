@@ -36,6 +36,31 @@ class PartnerStoreRepository {
     return list;
   }
 
+  /// Select from given CNPJ
+  Future<List<PartnerStore>> selectFromCNPJ(String cnpj) async {
+    final database = await getDatabase();
+
+    // Query all items with given CNPJ
+    final List<Map<String, dynamic>> result = await database.query(
+      PartnerStoreTable.tableName,
+      where: '${PartnerStoreTable.cnpj} = ?',
+      whereArgs: [cnpj],
+    );
+
+    // Convert query items to [PartnerStore] objects
+    final list = <PartnerStore>[];
+    for (final item in result) {
+      list.add(PartnerStore(
+        id: item[PartnerStoreTable.id],
+        cnpj: item[PartnerStoreTable.cnpj],
+        name: item[PartnerStoreTable.name],
+        autonomyLevelId: item[PartnerStoreTable.autonomyLevelId],
+      ));
+    }
+
+    return list;
+  }
+
   /// Method to delete a specific [PartnerStore] from database
   Future<void> delete(PartnerStore partnerStore) async {
     final database = await getDatabase();

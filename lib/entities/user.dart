@@ -42,7 +42,7 @@ class User {
 
   @override
   String toString() {
-    return 'ID: $id, name; $name, IsAdmin: $isAdmin, '
+    return 'ID: $id, name: $name, IsAdmin: $isAdmin, '
         'StoreID: $storeId, Password: $password';
   }
 }

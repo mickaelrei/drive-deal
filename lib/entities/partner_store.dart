@@ -34,4 +34,9 @@ class PartnerStore {
 
     return map;
   }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }

@@ -13,6 +13,11 @@ class UserUseCase {
     return _userRepository.select();
   }
 
+  /// Method to insert a [User] in the database
+  Future<void> insert(User user) async {
+    await _userRepository.insert(user);
+  }
+
   /// Method to get [User] from given name and password
   Future<User?> getUser({
     required String name,
