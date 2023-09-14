@@ -6,11 +6,11 @@ import '../entities/autonomy_level.dart';
 /// Class for [AutonomyLevel] table operations
 class AutonomyLevelRepository {
   /// Insert a [AutonomyLevel] on the database [AutonomyLevelTable] table
-  Future<void> insert(AutonomyLevel autonomyLevel) async {
+  Future<int> insert(AutonomyLevel autonomyLevel) async {
     final database = await getDatabase();
     final map = autonomyLevel.toMap();
 
-    await database.insert(AutonomyLevelTable.tableName, map);
+    return await database.insert(AutonomyLevelTable.tableName, map);
   }
 
   /// Method to get all [AutonomyLevel] objects in [AutonomyLevelTable]

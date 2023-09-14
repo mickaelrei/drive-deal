@@ -6,11 +6,11 @@ import '../entities/vehicle.dart';
 /// Class for [Vehicle] table operations
 class VehicleRepository {
   /// Insert a [Vehicle] on the database [VehicleTable] table
-  Future<void> insert(Vehicle vehicle) async {
+  Future<int> insert(Vehicle vehicle) async {
     final database = await getDatabase();
     final map = vehicle.toMap();
 
-    await database.insert(VehicleTable.tableName, map);
+    return await database.insert(VehicleTable.tableName, map);
   }
 
   /// Method to get all [Vehicle] objects in [VehicleTable]

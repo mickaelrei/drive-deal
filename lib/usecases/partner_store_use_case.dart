@@ -17,14 +17,9 @@ class PartnerStoreUseCase {
     return _partnerStoreRepository.select();
   }
 
-  /// Method to select with given CNPJ
-  Future<List<PartnerStore>> selectFromCNPJ(String cnpj) async {
-    return _partnerStoreRepository.selectFromCNPJ(cnpj);
-  }
-
   /// Method to insert a [PartnerStore] in the database
-  Future<void> insert(PartnerStore partnerStore) async {
-    await _partnerStoreRepository.insert(partnerStore);
+  Future<int> insert(PartnerStore partnerStore) async {
+    return await _partnerStoreRepository.insert(partnerStore);
   }
 
   /// Method to generate a random password

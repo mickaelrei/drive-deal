@@ -5,11 +5,11 @@ import '../entities/user.dart';
 /// Class for [User] table operations
 class UserRepository {
   /// Insert a [User] on the database [UserTable] table
-  Future<void> insert(User user) async {
+  Future<int> insert(User user) async {
     final database = await getDatabase();
     final map = user.toMap();
 
-    await database.insert(UserTable.tableName, map);
+    return await database.insert(UserTable.tableName, map);
   }
 
   /// Method to get all [User] objects in [UserTable]

@@ -6,11 +6,11 @@ import '../entities/sale.dart';
 /// Class for [Sale] table operations
 class SaleRepository {
   /// Insert a [Sale] on the database [SaleTable] table
-  Future<void> insert(Sale sale) async {
+  Future<int> insert(Sale sale) async {
     final database = await getDatabase();
     final map = sale.toMap();
 
-    await database.insert(SaleTable.tableName, map);
+    return await database.insert(SaleTable.tableName, map);
   }
 
   /// Method to get all [Sale] objects in [SaleTable]
