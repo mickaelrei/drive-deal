@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../database/exceptions.dart';
-import '../database/partner_store_table.dart';
+
 import '../entities/autonomy_level.dart';
 import '../entities/partner_store.dart';
-
 import '../entities/user.dart';
+
 import '../repositories/autonomy_level_repository.dart';
 import '../repositories/partner_store_repository.dart';
-
 import '../repositories/user_repository.dart';
+
 import '../usecases/autonomy_level_use_case.dart';
 import '../usecases/partner_store_use_case.dart';
-
 import '../usecases/user_use_case.dart';
+
 import 'form_utils.dart';
 
 /// Provider for register store form
@@ -101,17 +101,8 @@ class RegisterStoreState with ChangeNotifier {
       name: nameController.text,
       autonomyLevelId: chosenAutonomyLevel!.id!,
     );
-    await partnerStoreUseCase.insert(partnerStore);
-
-    // Get ID from partnerStore that just got added
-    final result = await partnerStoreUseCase.selectFromCNPJ(cnpj);
-    if (result.isEmpty) {
-      // If result is empty, then no partner store was added with the given cnpj
-      // This really shouldn't happen
-      throw DatabaseInsertFailException('Insert on table '
-          '${PartnerStoreTable.tableName} failed');
-    }
-    final storeId = result.first.id;
+    // Get id of inserted row
+    final storeId = await partnerStoreUseCase.insert(partnerStore);
 
     // Create user with storeId and password and insert to database
     final user = User(
