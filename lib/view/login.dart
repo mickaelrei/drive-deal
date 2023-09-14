@@ -9,6 +9,14 @@ import 'form_utils.dart';
 
 /// Provider for login page
 class LoginState with ChangeNotifier {
+  LoginState() {
+    log();
+  }
+
+  Future<void> log() async {
+    print(await _userUseCase.select());
+  }
+
   /// Use case for [User] operations
   final UserUseCase _userUseCase = UserUseCase(UserRepository());
 

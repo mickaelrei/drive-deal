@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../entities/partner_store.dart';
-
 import '../repositories/partner_store_repository.dart';
-
 import '../usecases/partner_store_use_case.dart';
 
 import 'register_store.dart';
@@ -64,7 +62,11 @@ class AdminHomePage extends StatelessWidget {
           late Widget page;
           switch (state.navigationBarSelectedIndex) {
             case 0:
-              page = PartnerStoreListView(items: state.partnerStores);
+              page = state.partnerStores.isEmpty
+                  ? const Center(
+                      child: Text('No partner stores found!'),
+                    )
+                  : PartnerStoreListView(items: state.partnerStores);
               break;
             case 1:
               page = const RegisterStorePage();
