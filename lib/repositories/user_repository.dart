@@ -4,6 +4,9 @@ import '../entities/user.dart';
 
 /// Class for [User] table operations
 class UserRepository {
+  /// Default constructor
+  const UserRepository();
+
   /// Insert a [User] on the database [UserTable] table
   Future<int> insert(User user) async {
     final database = await getDatabase();

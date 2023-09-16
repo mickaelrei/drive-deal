@@ -1,3 +1,5 @@
+import 'package:drive_deal/entities/vehicle.dart';
+
 import '../database/partner_store_table.dart';
 import 'autonomy_level.dart';
 
@@ -8,7 +10,7 @@ class PartnerStore {
     this.id,
     required this.cnpj,
     required this.name,
-    required this.autonomyLevelId,
+    required this.autonomyLevel,
   });
 
   /// ID for database identification
@@ -21,7 +23,20 @@ class PartnerStore {
   final String name;
 
   /// Reference to [AutonomyLevel] table
-  final int autonomyLevelId;
+  final AutonomyLevel autonomyLevel;
+
+  /// List of all [Vehicle]s for this store
+  final _vehicles = <Vehicle>[];
+
+  /// Getter for vehicles
+  List<Vehicle> get vehicles => List.unmodifiable(_vehicles);
+
+  /// Method to set vehicles
+  void setVehicles(List<Vehicle> items) {
+    _vehicles
+      ..clear()
+      ..addAll(items);
+  }
 
   /// Map representation of [PartnerStore]
   Map<String, dynamic> toMap() {
@@ -30,7 +45,7 @@ class PartnerStore {
     map[PartnerStoreTable.id] = id;
     map[PartnerStoreTable.cnpj] = cnpj;
     map[PartnerStoreTable.name] = name;
-    map[PartnerStoreTable.autonomyLevelId] = autonomyLevelId;
+    map[PartnerStoreTable.autonomyLevelId] = autonomyLevel.id;
 
     return map;
   }

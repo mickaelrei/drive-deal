@@ -5,6 +5,9 @@ import '../entities/autonomy_level.dart';
 
 /// Class for [AutonomyLevel] table operations
 class AutonomyLevelRepository {
+  /// Default constructor
+  const AutonomyLevelRepository();
+
   /// Insert a [AutonomyLevel] on the database [AutonomyLevelTable] table
   Future<int> insert(AutonomyLevel autonomyLevel) async {
     final database = await getDatabase();
@@ -34,6 +37,32 @@ class AutonomyLevelRepository {
     }
 
     return list;
+  }
+
+  /// Method to get a [AutonomyLevel] by given id
+  Future<AutonomyLevel?> selectById(int id) async {
+    final database = await getDatabase();
+
+    // Query all items
+    final List<Map<String, dynamic>> result = await database.query(
+      AutonomyLevelTable.tableName,
+      where: '${AutonomyLevelTable.id} = ?',
+      whereArgs: [id],
+    );
+
+    // Check if exists
+    if (result.isNotEmpty) {
+      final item = result.first;
+      return AutonomyLevel(
+        id: item[AutonomyLevelTable.id],
+        label: item[AutonomyLevelTable.label],
+        storePercent: item[AutonomyLevelTable.storePercent],
+        networkPercent: item[AutonomyLevelTable.networkPercent],
+      );
+    }
+
+    // If no result, return null
+    return null;
   }
 
   /// Method to delete a specific [AutonomyLevel] from database

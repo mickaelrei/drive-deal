@@ -13,21 +13,22 @@ import 'form_utils.dart';
 
 /// Provider for login page
 class LoginState with ChangeNotifier {
-  /// Use case for [User] operations
-  final UserUseCase _userUseCase = UserUseCase(UserRepository());
+  final UserUseCase _userUseCase = UserUseCase(const UserRepository());
 
-  /// Use case for [PartnerStore] object
-  final PartnerStoreUseCase _partnerStoreUseCase = PartnerStoreUseCase(
+  final PartnerStoreUseCase _partnerStoreUseCase = const PartnerStoreUseCase(
     PartnerStoreRepository(),
   );
 
   /// Name or CNPJ text controller
-  final TextEditingController nameOrCnpjController = TextEditingController();
+  final TextEditingController nameOrCnpjController = TextEditingController(
+    text: '12345678901234',
+  );
 
   /// Password text controller
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController(
+    text: 'senhauser',
+  );
 
-  /// Form key
   final _formKey = GlobalKey<FormState>();
 
   /// Form key getter
@@ -44,7 +45,7 @@ class LoginState with ChangeNotifier {
     if (_userUseCase.isCNPJ(loginText)) {
       // Its a CNPJ
       // Try to find store with same CNPJ
-      final store = await _partnerStoreUseCase.selectFromCNPJ(loginText);
+      final store = await getPartnerStore(loginText);
       if (store == null) {
         // No store with this CNPJ
         return LoginType.invalid;
@@ -74,6 +75,11 @@ class LoginState with ChangeNotifier {
     } else {
       return LoginType.nonAdmin;
     }
+  }
+
+  /// Method to get partner store
+  Future<PartnerStore?> getPartnerStore([String? cnpj]) async {
+    return _partnerStoreUseCase.selectByCNPJ(cnpj ?? nameOrCnpjController.text);
   }
 
   @override
@@ -163,18 +169,30 @@ class LoginForm extends StatelessWidget {
                       final loginType = await state.login();
                       switch (loginType) {
                         case LoginType.invalid:
-                          // ignore: use_build_context_synchronously
-                          invalidLoginDialog(context);
+                          if (context.mounted) {
+                            invalidLoginDialog(context);
+                          }
                           break;
                         case LoginType.admin:
+                          if (context.mounted) {
+                            Navigator.of(context).pushNamed(
+                              '/home',
+                              arguments: {
+                                'isAdmin': true,
+                              },
+                            );
+                          }
+
                         case LoginType.nonAdmin:
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pushReplacementNamed(
-                            '/home',
-                            arguments: {
-                              'isAdmin': loginType == LoginType.admin
-                            },
-                          );
+                          if (context.mounted) {
+                            Navigator.of(context).pushNamed(
+                              '/home',
+                              arguments: {
+                                'isAdmin': false,
+                                'partnerStore': await state.getPartnerStore(),
+                              },
+                            );
+                          }
                       }
                     },
                   ),

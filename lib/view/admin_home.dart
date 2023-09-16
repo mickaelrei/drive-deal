@@ -15,12 +15,12 @@ class AdminHomeState with ChangeNotifier {
   }
 
   /// For [PartnerStore] operations
-  final PartnerStoreUseCase partnerStoreUseCase = PartnerStoreUseCase(
+  final PartnerStoreUseCase partnerStoreUseCase = const PartnerStoreUseCase(
     PartnerStoreRepository(),
   );
 
   /// List of all [PartnerStore]s
-  final partnerStores = <PartnerStore>[];
+  late Future<List<PartnerStore>> partnerStores;
 
   /// Which page is selected in the navigation bar
   int navigationBarSelectedIndex = 0;
@@ -28,7 +28,11 @@ class AdminHomeState with ChangeNotifier {
   /// Method to change NavBar selected item
   Future<void> changePage(int index) async {
     navigationBarSelectedIndex = index;
+    notifyListeners();
+  }
 
+  /// Called when a PartnerStore gets registered
+  Future<void> onRegister() async {
     // Update lists
     await getLists();
 
@@ -38,10 +42,7 @@ class AdminHomeState with ChangeNotifier {
 
   /// Method to update variables
   Future<void> getLists() async {
-    final items = await partnerStoreUseCase.select();
-    partnerStores
-      ..clear()
-      ..addAll(items);
+    partnerStores = partnerStoreUseCase.select();
   }
 }
 
@@ -62,26 +63,34 @@ class AdminHomePage extends StatelessWidget {
           late Widget page;
           switch (state.navigationBarSelectedIndex) {
             case 0:
-              page = state.partnerStores.isEmpty
-                  ? const Center(
-                      child: Text('No partner stores found!'),
-                    )
-                  : PartnerStoreListView(items: state.partnerStores);
+              // Listing of partner stores
+              page = PartnerStoreListView(items: state.partnerStores);
               break;
             case 1:
-              page = const RegisterStorePage();
+              // Register a new partner store
+              page = RegisterStorePage(onRegister: state.onRegister);
               break;
             case 2:
+              // Statistics
               page = const Center(
                 child: Text('Statistics'),
               );
               break;
             case 3:
+              // Sales
               page = const Center(
                 child: Text('Sales'),
               );
               break;
+            case 4:
+              // Settings
+              page = const Center(child: Text('Settings'));
+            case 5:
+              // Logout
+              // Navigator.of(context).pushReplacementNamed('/login');
+              page = const Center(child: Text('Logout'));
             default:
+              // Error
               page = const Center(
                 child: Text('Error: Unknown page'),
               );
@@ -132,6 +141,20 @@ class AdminHomePage extends StatelessWidget {
                   ),
                   label: 'Sales',
                 ),
+                NavigationDestination(
+                  icon: Icon(
+                    Icons.settings,
+                    color: Color.fromRGBO(13, 71, 161, 1),
+                  ),
+                  label: 'Settings',
+                ),
+                NavigationDestination(
+                  icon: Icon(
+                    Icons.logout,
+                    color: Color.fromRGBO(13, 71, 161, 1),
+                  ),
+                  label: 'Logout',
+                ),
               ],
             ),
           );
@@ -147,28 +170,59 @@ class PartnerStoreListView extends StatelessWidget {
   const PartnerStoreListView({required this.items, super.key});
 
   /// List of [PartnerStore]
-  final List<PartnerStore> items;
+  final Future<List<PartnerStore>> items;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final partnerStore = items[index];
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListTile(
-            title: Text('Name: ${partnerStore.name}'),
-            subtitle: Text(
-              'CNPJ: ${partnerStore.cnpj}\n'
-              'Autonomy Level: ${partnerStore.autonomyLevelId}',
-            ),
-            isThreeLine: true,
-            tileColor: Colors.grey[300],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-          ),
+    return FutureBuilder<List<PartnerStore>>(
+      future: items,
+      builder: (context, snapshot) {
+        // Still waiting
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+
+        // No data
+        if (!snapshot.hasData) {
+          return const Center(
+            child: Text('No data found!'),
+          );
+        }
+
+        // No items in list
+        if (snapshot.data!.isEmpty) {
+          const Center(
+            child: Text('No partner stores found!'),
+          );
+        }
+
+        // List of items
+        return ListView.builder(
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            // Get partner store object
+            final partnerStore = snapshot.data![index];
+
+            // Get autonomy level object from id
+            // final autonomyLevel = _autonomyLevelUseCase.selectById(
+            //   partnerStore.autonomyLevelId,
+            // );
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                title: Text('Name: ${partnerStore.name}'),
+                subtitle: Text(
+                  'CNPJ: ${partnerStore.cnpj}\n'
+                  'Autonomy Level: ${partnerStore.autonomyLevel.label}',
+                ),
+                isThreeLine: true,
+                tileColor: Colors.grey[300],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            );
+          },
         );
       },
     );

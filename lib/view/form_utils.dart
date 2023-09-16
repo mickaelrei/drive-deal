@@ -5,10 +5,12 @@ class FormTextEntry extends StatelessWidget {
   /// Constructor
   const FormTextEntry({
     required this.label,
-    required this.controller,
+    this.controller,
     this.prefixIcon,
     this.validator,
+    this.onTap,
     this.hidden = false,
+    this.enabled = true,
     super.key,
   });
 
@@ -16,7 +18,7 @@ class FormTextEntry extends StatelessWidget {
   final String label;
 
   /// Search text controller
-  final TextEditingController controller;
+  final TextEditingController? controller;
 
   /// Optional prefix icon
   final IconData? prefixIcon;
@@ -24,14 +26,21 @@ class FormTextEntry extends StatelessWidget {
   /// Optional validator function
   final String? Function(String?)? validator;
 
+  /// Optional on tap function
+  final void Function()? onTap;
+
   /// Whether the written text should be hidden (like for a password)
   final bool hidden;
+
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        readOnly: enabled,
+        onTap: onTap,
         validator: validator,
         controller: controller,
         obscureText: hidden,

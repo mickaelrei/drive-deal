@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'exceptions.dart';
 import 'view/admin_home.dart';
 import 'view/login.dart';
 import 'view/partner_home.dart';
@@ -25,10 +26,19 @@ class MyApp extends StatelessWidget {
           final args = ModalRoute.of(context)!.settings.arguments
               as Map<String, dynamic>;
 
+          // Check if it's for admin
           if (args['isAdmin']) {
             return const AdminHomePage();
           } else {
-            return const PartnerHomePage();
+            // If no partnerStore, something went wrong
+            if (args['partnerStore'] == null) {
+              throw InvalidPartnerStoreException('field "partnerStore" '
+                  'not included in args');
+            }
+
+            return PartnerHomePage(
+              partnerStore: args['partnerStore']!,
+            );
           }
         },
       },

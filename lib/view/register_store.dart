@@ -1,42 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../database/exceptions.dart';
-
 import '../entities/autonomy_level.dart';
 import '../entities/partner_store.dart';
 import '../entities/user.dart';
-
+import '../exceptions.dart';
 import '../repositories/autonomy_level_repository.dart';
 import '../repositories/partner_store_repository.dart';
 import '../repositories/user_repository.dart';
-
 import '../usecases/autonomy_level_use_case.dart';
 import '../usecases/partner_store_use_case.dart';
 import '../usecases/user_use_case.dart';
-
 import 'form_utils.dart';
 
 /// Provider for register store form
 class RegisterStoreState with ChangeNotifier {
   /// Constructor
-  RegisterStoreState() {
+  RegisterStoreState({required this.onRegister}) {
     init();
   }
 
+  /// Callback function to when a [PartnerStore] gets registered
+  final Future<void> Function()? onRegister;
+
   /// To insert a new [PartnerStore] in database
-  final PartnerStoreUseCase _partnerStoreUseCase = PartnerStoreUseCase(
+  final PartnerStoreUseCase _partnerStoreUseCase = const PartnerStoreUseCase(
     PartnerStoreRepository(),
   );
 
   /// To get all [AutonomyLevel]s from database
-  final AutonomyLevelUseCase _autonomyLevelUseCase = AutonomyLevelUseCase(
+  final AutonomyLevelUseCase _autonomyLevelUseCase = const AutonomyLevelUseCase(
     AutonomyLevelRepository(),
   );
 
   /// To insert a new [User] in database when the [PartnerStore] gets created
   final UserUseCase _userUseCase = UserUseCase(
-    UserRepository(),
+    const UserRepository(),
   );
 
   /// Controller for name field
@@ -99,7 +98,7 @@ class RegisterStoreState with ChangeNotifier {
     final partnerStore = PartnerStore(
       cnpj: cnpj,
       name: nameController.text,
-      autonomyLevelId: chosenAutonomyLevel!.id!,
+      autonomyLevel: chosenAutonomyLevel!,
     );
     // Get id of inserted row
     final storeId = await _partnerStoreUseCase.insert(partnerStore);
@@ -111,7 +110,10 @@ class RegisterStoreState with ChangeNotifier {
     );
     await _userUseCase.insert(user);
 
-    // If no errors, return null meaning success
+    // If no errors, call onRegister callback and return null meaning success
+    if (onRegister != null) {
+      onRegister!();
+    }
     return null;
   }
 
@@ -127,13 +129,16 @@ class RegisterStoreState with ChangeNotifier {
 /// Class for admins for registering a partner store
 class RegisterStorePage extends StatelessWidget {
   /// Constructor
-  const RegisterStorePage({super.key});
+  const RegisterStorePage({required this.onRegister, super.key});
+
+  /// Callback to be called when a [PartnerStore] gets registered
+  final Future<void> Function()? onRegister;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        Padding(
+        const Padding(
           padding: EdgeInsets.symmetric(vertical: 15.0),
           child: Text(
             'Register',
@@ -143,7 +148,7 @@ class RegisterStorePage extends StatelessWidget {
             ),
           ),
         ),
-        RegisterStoreForm(),
+        RegisterStoreForm(onRegister: onRegister),
       ],
     );
   }
@@ -152,13 +157,16 @@ class RegisterStorePage extends StatelessWidget {
 /// Form for registering a partner store
 class RegisterStoreForm extends StatelessWidget {
   /// Constructor
-  const RegisterStoreForm({super.key});
+  const RegisterStoreForm({required this.onRegister, super.key});
+
+  /// Callback to be called when a [PartnerStore] gets registered
+  final Future<void> Function()? onRegister;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<RegisterStoreState>(
       create: (context) {
-        return RegisterStoreState();
+        return RegisterStoreState(onRegister: onRegister);
       },
       child: Consumer<RegisterStoreState>(
         builder: (_, state, __) {
@@ -219,8 +227,9 @@ class RegisterStoreForm extends StatelessWidget {
                     final result = await state.register();
 
                     // Show dialog with register result
-                    // ignore: use_build_context_synchronously
-                    registerDialog(context, result);
+                    if (context.mounted) {
+                      registerDialog(context, result);
+                    }
                   },
                 ),
               )

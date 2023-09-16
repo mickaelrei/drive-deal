@@ -5,6 +5,9 @@ import '../entities/vehicle.dart';
 
 /// Class for [Vehicle] table operations
 class VehicleRepository {
+  /// Default constructor
+  const VehicleRepository();
+
   /// Insert a [Vehicle] on the database [VehicleTable] table
   Future<int> insert(Vehicle vehicle) async {
     final database = await getDatabase();

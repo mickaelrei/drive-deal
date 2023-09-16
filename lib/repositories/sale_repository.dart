@@ -2,9 +2,16 @@ import '../database/database.dart';
 import '../database/sale_table.dart';
 
 import '../entities/sale.dart';
+import 'partner_store_repository.dart';
 
 /// Class for [Sale] table operations
 class SaleRepository {
+  /// Default constructor
+  const SaleRepository();
+
+  final PartnerStoreRepository _partnerStoreRepository =
+      const PartnerStoreRepository();
+
   /// Insert a [Sale] on the database [SaleTable] table
   Future<int> insert(Sale sale) async {
     final database = await getDatabase();
@@ -25,9 +32,15 @@ class SaleRepository {
     // Convert query items to [Sale] objects
     final list = <Sale>[];
     for (final item in result) {
+      // Get partner store
+      final partnerStore = await _partnerStoreRepository.selectById(
+        item[SaleTable.storeId],
+      );
+
+      // Add object to list
       list.add(Sale(
         id: item[SaleTable.id],
-        storeId: item[SaleTable.storeId],
+        store: partnerStore!,
         customerCpf: item[SaleTable.customerCpf],
         customerName: item[SaleTable.customerName],
         saleDate: DateTime.fromMillisecondsSinceEpoch(item[SaleTable.saleDate]),

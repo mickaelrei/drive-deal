@@ -6,7 +6,7 @@ class Sale {
   /// Constructor
   Sale({
     this.id,
-    required this.storeId,
+    required this.store,
     required this.customerCpf,
     required this.customerName,
     required this.saleDate,
@@ -17,7 +17,7 @@ class Sale {
   final int? id;
 
   /// For [PartnerStore] reference in database
-  final int storeId;
+  final PartnerStore store;
 
   /// CPF of customer, 11 chars
   final String customerCpf;
@@ -36,7 +36,7 @@ class Sale {
     final map = <String, dynamic>{};
 
     map[SaleTable.id] = id;
-    map[SaleTable.storeId] = storeId;
+    map[SaleTable.storeId] = store.id;
     map[SaleTable.customerCpf] = customerCpf;
     map[SaleTable.customerName] = customerName;
     map[SaleTable.saleDate] = saleDate.millisecondsSinceEpoch;
@@ -47,13 +47,13 @@ class Sale {
 
   /// Get [PartnerStore]'s profit on this sale
   Future<double> getStoreProfit() async {
-    // TODO: Get store percent on [PartnerStore.autonomyLevelId]
+    // TODO: Get store percent on [PartnerStore.autonomyLevel]
     return 0;
   }
 
   /// Get network's profit on this sale
   Future<double> getNetworkProfit() async {
-    // TODO: Get network percent on [PartnerStore.autonomyLevelId]
+    // TODO: Get network percent on [PartnerStore.autonomyLevel]
     return 0;
   }
 
