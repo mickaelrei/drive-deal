@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../entities/partner_store.dart';
 import '../entities/user.dart';
+
+import '../repositories/partner_store_repository.dart';
 import '../repositories/user_repository.dart';
+import '../usecases/partner_store_use_case.dart';
 import '../usecases/user_use_case.dart';
 
 import 'form_utils.dart';
 
 /// Provider for login page
 class LoginState with ChangeNotifier {
-  LoginState() {
-    log();
-  }
-
-  Future<void> log() async {
-    print(await _userUseCase.select());
-  }
-
   /// Use case for [User] operations
   final UserUseCase _userUseCase = UserUseCase(UserRepository());
 
-  /// Name text controller
-  final TextEditingController nameController = TextEditingController();
+  /// Use case for [PartnerStore] object
+  final PartnerStoreUseCase _partnerStoreUseCase = PartnerStoreUseCase(
+    PartnerStoreRepository(),
+  );
+
+  /// Name or CNPJ text controller
+  final TextEditingController nameOrCnpjController = TextEditingController();
 
   /// Password text controller
   final TextEditingController passwordController = TextEditingController();
@@ -34,10 +35,33 @@ class LoginState with ChangeNotifier {
 
   /// Method for login attempt
   Future<LoginType> login() async {
-    final user = await _userUseCase.getUser(
-      name: nameController.text,
-      password: passwordController.text,
-    );
+    // User object that will be either an admin or normal user (or null
+    // in case of invalid login)
+    late User? user;
+
+    // Check if login was a name or a CNPJ
+    final loginText = nameOrCnpjController.text;
+    if (_userUseCase.isCNPJ(loginText)) {
+      // Its a CNPJ
+      // Try to find store with same CNPJ
+      final store = await _partnerStoreUseCase.selectFromCNPJ(loginText);
+      if (store == null) {
+        // No store with this CNPJ
+        return LoginType.invalid;
+      }
+
+      // Get normal user
+      user = await _userUseCase.getUser(
+        storeId: store.id!,
+        password: passwordController.text,
+      );
+    } else {
+      // Its a name, so get admin user
+      user = await _userUseCase.getAdmin(
+        name: loginText,
+        password: passwordController.text,
+      );
+    }
 
     // Invalid user
     if (user == null) {
@@ -56,7 +80,7 @@ class LoginState with ChangeNotifier {
   void dispose() {
     super.dispose();
 
-    nameController.dispose();
+    nameOrCnpjController.dispose();
     passwordController.dispose();
   }
 }
@@ -112,10 +136,10 @@ class LoginForm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const FormTextHeader(label: 'Name'),
+                const FormTextHeader(label: 'Name or CNPJ'),
                 FormTextEntry(
-                  controller: state.nameController,
-                  label: 'Name',
+                  controller: state.nameOrCnpjController,
+                  label: 'Name or CNPJ',
                   prefixIcon: Icons.person,
                 ),
                 const FormTextHeader(label: 'Password'),

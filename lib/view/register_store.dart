@@ -25,17 +25,17 @@ class RegisterStoreState with ChangeNotifier {
   }
 
   /// To insert a new [PartnerStore] in database
-  final PartnerStoreUseCase partnerStoreUseCase = PartnerStoreUseCase(
+  final PartnerStoreUseCase _partnerStoreUseCase = PartnerStoreUseCase(
     PartnerStoreRepository(),
   );
 
   /// To get all [AutonomyLevel]s from database
-  final AutonomyLevelUseCase autonomyLevelUseCase = AutonomyLevelUseCase(
+  final AutonomyLevelUseCase _autonomyLevelUseCase = AutonomyLevelUseCase(
     AutonomyLevelRepository(),
   );
 
   /// To insert a new [User] in database when the [PartnerStore] gets created
-  final UserUseCase userUseCase = UserUseCase(
+  final UserUseCase _userUseCase = UserUseCase(
     UserRepository(),
   );
 
@@ -57,7 +57,7 @@ class RegisterStoreState with ChangeNotifier {
   /// Method to init variables
   void init() async {
     // Get all autonomy levels
-    final items = await autonomyLevelUseCase.select();
+    final items = await _autonomyLevelUseCase.select();
     autonomyLevels
       ..clear()
       ..addAll(items);
@@ -85,10 +85,10 @@ class RegisterStoreState with ChangeNotifier {
     }
 
     // Generate random 15 chars password
-    final password = partnerStoreUseCase.generatePassword();
+    final password = _userUseCase.generatePassword();
 
     // Check if store is unique (unique CNPJ)
-    final partnerStores = await partnerStoreUseCase.select();
+    final partnerStores = await _partnerStoreUseCase.select();
     for (final store in partnerStores) {
       if (store.cnpj == cnpj) {
         return 'CNPJ is already in use';
@@ -102,14 +102,14 @@ class RegisterStoreState with ChangeNotifier {
       autonomyLevelId: chosenAutonomyLevel!.id!,
     );
     // Get id of inserted row
-    final storeId = await partnerStoreUseCase.insert(partnerStore);
+    final storeId = await _partnerStoreUseCase.insert(partnerStore);
 
     // Create user with storeId and password and insert to database
     final user = User(
       storeId: storeId,
       password: password,
     );
-    await userUseCase.insert(user);
+    await _userUseCase.insert(user);
 
     // If no errors, return null meaning success
     return null;

@@ -7,6 +7,15 @@ class PartnerHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Partner Home'),
+      ),
+      body: const Center(
+        child: Text('Welcome to Partner Home!'),
+      ),
+    );
   }
 }
