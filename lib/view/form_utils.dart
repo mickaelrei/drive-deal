@@ -10,10 +10,10 @@ class FormTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15.0),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 15.0),
+      child: Align(
+        alignment: Alignment.center,
         child: Text(
           title,
           style: const TextStyle(
@@ -30,20 +30,25 @@ class FormTitle extends StatelessWidget {
 class FormTextEntry extends StatelessWidget {
   /// Constructor
   const FormTextEntry({
-    required this.label,
+    this.label,
     this.controller,
+    this.text,
     this.prefixIcon,
     this.validator,
     this.onTap,
     this.hidden = false,
+    this.enabled = true,
     super.key,
   });
 
   /// What is this form entry supposed to represent
-  final String label;
+  final String? label;
 
-  /// Search text controller
+  /// Optional text controller
   final TextEditingController? controller;
+
+  /// Optional initial text
+  final String? text;
 
   /// Optional prefix icon
   final IconData? prefixIcon;
@@ -57,11 +62,16 @@ class FormTextEntry extends StatelessWidget {
   /// Whether the written text should be hidden (like for a password)
   final bool hidden;
 
+  /// Whether the text field is enabled or not
+  final bool? enabled;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        enabled: enabled,
+        initialValue: text,
         onTap: onTap,
         validator: validator,
         controller: controller,
@@ -170,6 +180,9 @@ class DatePicker extends StatelessWidget {
           ),
           child: Text(
             initialDate != null ? getDateString(initialDate!) : 'Purchase date',
+            style: TextStyle(
+              color: initialDate != null ? Colors.black : Colors.grey[700],
+            ),
           ),
         ),
         onTap: () async {
@@ -223,12 +236,33 @@ class FutureDropdown<T> extends StatelessWidget {
         builder: (context, snapshot) {
           // Check for connection state
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 12.0,
+              ),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
           }
 
           // Check if data is null
           if (snapshot.data == null) {
-            return noData ?? const _DefaultDropdownNoData();
+            if (noData != null) {
+              return noData!;
+            }
+
+            return DropdownButtonFormField<T>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              items: const [],
+              onChanged: onChanged,
+            );
           }
 
           // Build dropdown items
@@ -240,7 +274,6 @@ class FutureDropdown<T> extends StatelessWidget {
             ));
           }
 
-          // Create dropdown
           return DropdownButtonFormField<T>(
             isExpanded: true,
             decoration: InputDecoration(
@@ -257,16 +290,16 @@ class FutureDropdown<T> extends StatelessWidget {
   }
 }
 
-/// Default [Widget] for when [FutureDropdown] gets no data
-class _DefaultDropdownNoData extends StatelessWidget {
-  const _DefaultDropdownNoData();
+/// Default [Widget] for a [Form] entry with no data
+class DefaultFormEntryNoData extends StatelessWidget {
+  /// Constructor
+  const DefaultFormEntryNoData({super.key});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       child: InputDecorator(
         decoration: InputDecoration(
-          hintText: 'Purchase date',
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
           ),

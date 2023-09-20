@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../entities/partner_store.dart';
 import '../repositories/partner_store_repository.dart';
 import '../usecases/partner_store_use_case.dart';
+import 'logout.dart';
 import 'register_store.dart';
 
 /// Provider for admin home page
@@ -86,8 +87,7 @@ class AdminHomePage extends StatelessWidget {
               page = const Center(child: Text('Settings'));
             case 5:
               // Logout
-              // Navigator.of(context).pushReplacementNamed('/login');
-              page = const Center(child: Text('Logout'));
+              page = const LogoutPage();
             default:
               // Error
               page = const Center(

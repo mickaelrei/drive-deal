@@ -88,7 +88,7 @@ class FipeUseCase {
   }
 
   /// Method to get all extra info of a vehicle by given brand, model and year
-  Future<List<FipeVehicleInfo>?> getInfoByModel(
+  Future<FipeVehicleInfo?> getInfoByModel(
     FipeBrand brand,
     FipeModel model,
     FipeModelYear modelYear,
@@ -98,8 +98,9 @@ class FipeUseCase {
       '/$vehicleType/$brands'
       '/${brand.code}/$models'
       '/${model.code}/$years'
-      '${modelYear.code}',
+      '/${modelYear.code}',
     );
+    print('[InfoByModel url]: $url');
     final response = await http.get(url);
 
     // Error
@@ -108,14 +109,7 @@ class FipeUseCase {
     }
 
     final json = jsonDecode(response.body);
-    final items = <FipeVehicleInfo>[];
-    for (final item in json) {
-      items.add(
-        FipeVehicleInfo.fromJson(item),
-      );
-    }
-
-    return items;
+    return FipeVehicleInfo.fromJson(json);
   }
 }
 
@@ -240,11 +234,11 @@ class FipeVehicleInfo {
         ),
         brand = json['brand'],
         model = json['model'],
-        modelYear = int.parse(json['modelYear']),
+        modelYear = json['modelYear'],
         fuel = json['fuel'],
         fipeCode = json['codeFipe'],
         referenceMonth = json['referenceMonth'],
-        vehicleType = int.parse(json['vehicleType']),
+        vehicleType = json['vehicleType'],
         fuelAcronym = json['fuelAcronym'];
 
   /// Vehicle price

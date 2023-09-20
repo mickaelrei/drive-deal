@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../entities/vehicle.dart';
 import '../usecases/fipe_use_case.dart';
 import 'form_utils.dart';
-
-/// TODO: Utilize FipeUseCase on register vehicle form
-/// TODO: Replace [TextEditingController]s with [DropdownButton]s
-/// TODO: Make [FutureBuilder]s for each field to change when needed
 
 /// Provider for register vehicle page
 class RegisterVehicleState with ChangeNotifier {
@@ -36,18 +33,12 @@ class RegisterVehicleState with ChangeNotifier {
   FipeModel? _currentModel;
   FipeModelYear? _currentModelYear;
 
-  /// Controller for vehicle brand
-  final TextEditingController brandController = TextEditingController();
-
-  /// Controller for vehicle model
-  final TextEditingController modelController = TextEditingController();
+  /// Info about currently chosen vehicle
+  Future<FipeVehicleInfo?>? currentVehicleInfo;
 
   /// Controller for vehicle manufacture year
   final TextEditingController manufactureYearController =
       TextEditingController();
-
-  /// Controller for vehicle model year
-  final TextEditingController modelYearController = TextEditingController();
 
   /// Controller for vehicle plate
   final TextEditingController plateController = TextEditingController();
@@ -75,6 +66,7 @@ class RegisterVehicleState with ChangeNotifier {
     _currentBrand = null;
     _currentModel = null;
     _currentModelYear = null;
+    currentVehicleInfo = null;
   }
 
   /// Method to set new chosen brand
@@ -93,6 +85,7 @@ class RegisterVehicleState with ChangeNotifier {
     _currentBrand = brand;
     _currentModel = null;
     _currentModelYear = null;
+    currentVehicleInfo = null;
 
     // Update screen
     notifyListeners();
@@ -114,6 +107,7 @@ class RegisterVehicleState with ChangeNotifier {
     // Update current info
     _currentModel = model;
     _currentModelYear = null;
+    currentVehicleInfo = null;
 
     // Update screen
     notifyListeners();
@@ -132,7 +126,15 @@ class RegisterVehicleState with ChangeNotifier {
     // Update current info
     _currentModelYear = modelYear;
 
-    // TODO: Create vehicle with Fipe Code
+    // Update current vehicle info
+    currentVehicleInfo = fipeUseCase.getInfoByModel(
+      _currentBrand!,
+      _currentModel!,
+      _currentModelYear!,
+    );
+
+    // Update screen
+    notifyListeners();
   }
 
   /// Method to set new chosen plate
@@ -194,6 +196,33 @@ class RegisterVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
+                const FormTextHeader(label: 'FIPE Price'),
+                FutureBuilder(
+                  future: state.currentVehicleInfo,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 12.0,
+                        ),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    if (snapshot.data == null) {
+                      // Empty text entry
+                      return const FormTextEntry();
+                    }
+
+                    return FormTextEntry(
+                      text: formatPrice(snapshot.data!.price),
+                      enabled: false,
+                    );
+                  },
+                ),
                 const FormTextHeader(label: 'Manufacture Year'),
                 FormTextEntry(
                   label: 'Manufacture year',
@@ -209,6 +238,8 @@ class RegisterVehicleForm extends StatelessWidget {
                   initialDate: state.purchaseDate,
                   onDatePicked: state.setDate,
                 ),
+                const FormTextHeader(label: 'Add images (TODO)'),
+                const FormTextEntry(label: 'Images (make this a button)'),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SubmitButton(
@@ -233,7 +264,18 @@ class RegisterVehicleForm extends StatelessWidget {
   }
 }
 
-/// Show invalid register dialog
+/// Format price in brazil's currency
+String formatPrice(double price) {
+  final priceFormat = NumberFormat.currency(
+    locale: 'pt_BR',
+    symbol: 'R\$',
+    decimalDigits: 2,
+  );
+
+  return priceFormat.format(price);
+}
+
+/// Show register dialog
 void registerDialog(BuildContext context, String? result) {
   showDialog(
     context: context,

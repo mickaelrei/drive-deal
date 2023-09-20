@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../entities/partner_store.dart';
+import 'logout.dart';
 import 'register_vehicle.dart';
 
 /// Provider for partner home page
@@ -59,7 +60,7 @@ class PartnerHomePage extends StatelessWidget {
               break;
             case 4:
               // Logout
-              page = const Center(child: Text('Logout'));
+              page = const LogoutPage();
             default:
               // Error
               page = const Center(

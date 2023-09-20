@@ -267,7 +267,7 @@ class AutonomyLevelDropdown extends StatelessWidget {
   }
 }
 
-/// Show invalid register dialog
+/// Show register dialog
 void registerDialog(BuildContext context, String? result) {
   showDialog(
     context: context,

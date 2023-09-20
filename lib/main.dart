@@ -32,8 +32,10 @@ class MyApp extends StatelessWidget {
           } else {
             // If no partnerStore, something went wrong
             if (args['partnerStore'] == null) {
-              throw InvalidPartnerStoreException('field "partnerStore" '
-                  'not included in args');
+              throw InvalidPartnerStoreException(
+                'field "partnerStore" '
+                'not included in args',
+              );
             }
 
             return PartnerHomePage(
