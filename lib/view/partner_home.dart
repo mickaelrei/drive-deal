@@ -43,7 +43,7 @@ class PartnerHomePage extends StatelessWidget {
               break;
             case 1:
               // Register vehicle
-              page = const RegisterVehiclePage();
+              page = const RegisterVehicleForm();
               break;
             case 2:
               // Register sale
@@ -67,8 +67,9 @@ class PartnerHomePage extends StatelessWidget {
               );
               break;
           }
+
           return Scaffold(
-            resizeToAvoidBottomInset: false,
+            // resizeToAvoidBottomInset: false,
             backgroundColor: Colors.white,
             appBar: AppBar(
               title: const Text('Partner Home'),

@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../entities/partner_store.dart';
 import '../repositories/partner_store_repository.dart';
 import '../usecases/partner_store_use_case.dart';
-
 import 'register_store.dart';
 
 /// Provider for admin home page
@@ -68,7 +67,7 @@ class AdminHomePage extends StatelessWidget {
               break;
             case 1:
               // Register a new partner store
-              page = RegisterStorePage(onRegister: state.onRegister);
+              page = RegisterStoreForm(onRegister: state.onRegister);
               break;
             case 2:
               // Statistics
@@ -203,10 +202,6 @@ class PartnerStoreListView extends StatelessWidget {
             // Get partner store object
             final partnerStore = snapshot.data![index];
 
-            // Get autonomy level object from id
-            // final autonomyLevel = _autonomyLevelUseCase.selectById(
-            //   partnerStore.autonomyLevelId,
-            // );
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListTile(

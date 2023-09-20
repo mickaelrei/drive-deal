@@ -126,34 +126,6 @@ class RegisterStoreState with ChangeNotifier {
   }
 }
 
-/// Class for admins for registering a partner store
-class RegisterStorePage extends StatelessWidget {
-  /// Constructor
-  const RegisterStorePage({required this.onRegister, super.key});
-
-  /// Callback to be called when a [PartnerStore] gets registered
-  final Future<void> Function()? onRegister;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 15.0),
-          child: Text(
-            'Register',
-            style: TextStyle(
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        RegisterStoreForm(onRegister: onRegister),
-      ],
-    );
-  }
-}
-
 /// Form for registering a partner store
 class RegisterStoreForm extends StatelessWidget {
   /// Constructor
@@ -172,6 +144,9 @@ class RegisterStoreForm extends StatelessWidget {
         builder: (_, state, __) {
           return Column(
             children: [
+              const FormTitle(
+                title: 'Register',
+              ),
               const FormTextHeader(label: 'Name'),
               FormTextEntry(
                 label: 'Name',

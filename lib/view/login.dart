@@ -26,7 +26,7 @@ class LoginState with ChangeNotifier {
 
   /// Password text controller
   final TextEditingController passwordController = TextEditingController(
-    text: 'senhauser',
+    text: 'user123',
   );
 
   final _formKey = GlobalKey<FormState>();
@@ -104,21 +104,7 @@ class LoginPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: const Center(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 15.0),
-              child: Text(
-                'Sign In',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            LoginForm(),
-          ],
-        ),
+        child: LoginForm(),
       ),
     );
   }
@@ -142,6 +128,9 @@ class LoginForm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const FormTitle(
+                  title: 'Login',
+                ),
                 const FormTextHeader(label: 'Name or CNPJ'),
                 FormTextEntry(
                   controller: state.nameOrCnpjController,
@@ -177,9 +166,7 @@ class LoginForm extends StatelessWidget {
                           if (context.mounted) {
                             Navigator.of(context).pushNamed(
                               '/home',
-                              arguments: {
-                                'isAdmin': true,
-                              },
+                              arguments: {'isAdmin': true},
                             );
                           }
 

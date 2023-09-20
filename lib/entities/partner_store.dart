@@ -1,7 +1,7 @@
-import 'package:drive_deal/entities/vehicle.dart';
-
 import '../database/partner_store_table.dart';
+
 import 'autonomy_level.dart';
+import 'vehicle.dart';
 
 /// PartnerStore entity
 class PartnerStore {

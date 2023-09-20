@@ -70,6 +70,25 @@ Future<Database> getDatabase() async {
         ' ${AutonomyLevelTable.storePercent}) '
         'VALUES(\'Special\', 5, 94)',
       );
+
+      // Create testing partner store
+      final storeId = await db.rawInsert(
+        'INSERT INTO ${PartnerStoreTable.tableName}'
+        '(${PartnerStoreTable.cnpj},'
+        ' ${PartnerStoreTable.name},'
+        ' ${PartnerStoreTable.autonomyLevelId}) '
+        'VALUES(\'12345678901234\', \'daniel automoveis\', 1)',
+      );
+
+      // Create user for partner store
+      await db.rawInsert(
+        'INSERT INTO ${UserTable.tableName}'
+        '(${UserTable.isAdmin},'
+        ' ${UserTable.storeId},'
+        ' ${UserTable.name},'
+        ' ${UserTable.password}) '
+        'VALUES(0, $storeId, NULL, \'user123\')',
+      );
     },
     version: 1,
   );

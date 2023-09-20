@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 /// Use case for FIPE api requests
@@ -39,8 +40,11 @@ class FipeUseCase {
   }
 
   /// Method to get all models by given brand
-  Future<List<FipeModel>?> getModelsByBrand(int brandCode) async {
-    final url = Uri.parse('$apiEntry/$vehicleType/$brands/$brandCode/$models');
+  Future<List<FipeModel>?> getModelsByBrand(FipeBrand brand) async {
+    final url = Uri.parse(
+      '$apiEntry/$vehicleType/$brands/'
+      '${brand.code}/$models',
+    );
     final response = await http.get(url);
 
     // Error
@@ -59,13 +63,13 @@ class FipeUseCase {
 
   /// Method to get all model years by given brand and model
   Future<List<FipeModelYear>?> getModelYears(
-    int brandCode,
-    int modelCode,
+    FipeBrand brand,
+    FipeModel model,
   ) async {
     final url = Uri.parse(
       '$apiEntry/$vehicleType/$brands'
-      '/$brandCode/$models'
-      '/$modelCode/$years',
+      '/${brand.code}/$models'
+      '/${model.code}/$years',
     );
     final response = await http.get(url);
 
@@ -85,16 +89,16 @@ class FipeUseCase {
 
   /// Method to get all extra info of a vehicle by given brand, model and year
   Future<List<FipeVehicleInfo>?> getInfoByModel(
-    int brandCode,
-    int modelCode,
-    int yearCode,
+    FipeBrand brand,
+    FipeModel model,
+    FipeModelYear modelYear,
   ) async {
     final url = Uri.parse(
       '$apiEntry'
       '/$vehicleType/$brands'
-      '/$brandCode/$models'
-      '/$modelCode/$years'
-      '$yearCode',
+      '/${brand.code}/$models'
+      '/${model.code}/$years'
+      '${modelYear.code}',
     );
     final response = await http.get(url);
 
@@ -116,9 +120,10 @@ class FipeUseCase {
 }
 
 /// Wrapper for vehicle brand in FIPE api
+@immutable
 class FipeBrand {
   /// Constructor
-  FipeBrand({required this.code, required this.name});
+  const FipeBrand({required this.code, required this.name});
 
   /// Constructor from json
   FipeBrand.fromJson(Map<String, dynamic> json)
@@ -135,12 +140,21 @@ class FipeBrand {
   String toString() {
     return 'Code: $code, Name: $name';
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FipeBrand && code == other.code && name == other.name;
+  }
+
+  @override
+  int get hashCode => code.hashCode ^ name.hashCode;
 }
 
 /// Wrapper for vehicle model in FIPE api
+@immutable
 class FipeModel {
   /// Constructor
-  FipeModel({required this.code, required this.name});
+  const FipeModel({required this.code, required this.name});
 
   /// Constructor from json
   FipeModel.fromJson(Map<String, dynamic> json)
@@ -157,12 +171,21 @@ class FipeModel {
   String toString() {
     return 'Code: $code, Name: $name';
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FipeModel && code == other.code && name == other.name;
+  }
+
+  @override
+  int get hashCode => code.hashCode ^ name.hashCode;
 }
 
 /// Wrappre for model year in FIPE api
+@immutable
 class FipeModelYear {
   /// Constructor
-  FipeModelYear({required this.code, required this.name});
+  const FipeModelYear({required this.code, required this.name});
 
   /// Constructor from json
   FipeModelYear.fromJson(Map<String, dynamic> json)
@@ -179,12 +202,21 @@ class FipeModelYear {
   String toString() {
     return 'Code: $code, Name: $name';
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FipeModelYear && code == other.code && name == other.name;
+  }
+
+  @override
+  int get hashCode => code.hashCode ^ name.hashCode;
 }
 
 /// Wrapper for vehicle info in FIPE api
+@immutable
 class FipeVehicleInfo {
   /// Constructor
-  FipeVehicleInfo({
+  const FipeVehicleInfo({
     required this.price,
     required this.brand,
     required this.model,
@@ -249,4 +281,30 @@ class FipeVehicleInfo {
         ' reference month: $referenceMonth, fuel: $fuel,'
         ' fuel acronym: $fuelAcronym';
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FipeVehicleInfo &&
+        price == other.price &&
+        brand == other.brand &&
+        model == other.model &&
+        modelYear == other.modelYear &&
+        fuel == other.fuel &&
+        fipeCode == other.fipeCode &&
+        referenceMonth == other.referenceMonth &&
+        vehicleType == other.vehicleType &&
+        fuelAcronym == other.fuelAcronym;
+  }
+
+  @override
+  int get hashCode =>
+      price.hashCode ^
+      brand.hashCode ^
+      model.hashCode ^
+      modelYear.hashCode ^
+      fuel.hashCode ^
+      fipeCode.hashCode ^
+      referenceMonth.hashCode ^
+      vehicleType.hashCode ^
+      fuelAcronym.hashCode;
 }
