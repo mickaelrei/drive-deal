@@ -15,8 +15,8 @@ class AdminHomeState with ChangeNotifier {
   }
 
   /// For [PartnerStore] operations
-  final PartnerStoreUseCase partnerStoreUseCase = const PartnerStoreUseCase(
-    PartnerStoreRepository(),
+  final PartnerStoreUseCase partnerStoreUseCase = PartnerStoreUseCase(
+    const PartnerStoreRepository(),
   );
 
   /// List of all [PartnerStore]s

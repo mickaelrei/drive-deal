@@ -7,8 +7,6 @@ import 'register_vehicle.dart';
 
 /// Provider for partner home page
 class PartnerHomeState with ChangeNotifier {
-  // NavBar: Home, Vehicles, Sales, Settings
-
   /// Which page is selected in the navigation bar
   int navigationBarSelectedIndex = 0;
 

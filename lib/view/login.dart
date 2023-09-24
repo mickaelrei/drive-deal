@@ -15,8 +15,8 @@ import 'form_utils.dart';
 class LoginState with ChangeNotifier {
   final UserUseCase _userUseCase = UserUseCase(const UserRepository());
 
-  final PartnerStoreUseCase _partnerStoreUseCase = const PartnerStoreUseCase(
-    PartnerStoreRepository(),
+  final PartnerStoreUseCase _partnerStoreUseCase = PartnerStoreUseCase(
+    const PartnerStoreRepository(),
   );
 
   /// Name or CNPJ text controller
