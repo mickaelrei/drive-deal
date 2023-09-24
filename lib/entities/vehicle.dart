@@ -1,5 +1,6 @@
 import '../database/vehicle_table.dart';
 import 'partner_store.dart';
+import 'vehicle_image.dart';
 
 /// Vehicle entity
 class Vehicle {
@@ -34,6 +35,19 @@ class Vehicle {
 
   /// Model year
   final int modelYear;
+
+  /// List of all [VehicleImage]s for this vehicle
+  final _images = <VehicleImage>[];
+
+  /// Getter for list of [VehicleImage]s
+  List<VehicleImage> get images => List.unmodifiable(_images);
+
+  /// Method to set vehicles
+  set images(List<VehicleImage> items) {
+    _images
+      ..clear()
+      ..addAll(items);
+  }
 
   /// Name of image file for this vehicle
   final String vehicleImage;

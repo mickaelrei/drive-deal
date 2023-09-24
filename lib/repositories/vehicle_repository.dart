@@ -2,11 +2,15 @@ import '../database/database.dart';
 import '../database/vehicle_table.dart';
 
 import '../entities/vehicle.dart';
+import 'vehicle_image_repository.dart';
 
 /// Class for [Vehicle] table operations
 class VehicleRepository {
   /// Default constructor
   const VehicleRepository();
+
+  final VehicleImageRepository _vehicleImageRepository =
+      const VehicleImageRepository();
 
   /// Insert a [Vehicle] on the database [VehicleTable] table
   Future<int> insert(Vehicle vehicle) async {
@@ -28,7 +32,8 @@ class VehicleRepository {
     // Convert query items to [Vehicle] objects
     final list = <Vehicle>[];
     for (final item in result) {
-      list.add(Vehicle(
+      // Create vehicle object
+      final vehicle = Vehicle(
         id: item[VehicleTable.id],
         storeId: item[VehicleTable.storeId],
         modelId: item[VehicleTable.modelId],
@@ -41,7 +46,15 @@ class VehicleRepository {
         purchaseDate: DateTime.fromMillisecondsSinceEpoch(
           item[VehicleTable.purchaseDate],
         ),
-      ));
+      );
+
+      // Get all images from this vehicle
+      final images = await _vehicleImageRepository.select();
+      images.removeWhere((image) => image.vehicleId != vehicle.id);
+      vehicle.images = images;
+
+      // Add to list
+      list.add(vehicle);
     }
 
     return list;

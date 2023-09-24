@@ -5,6 +5,7 @@ import 'autonomy_level_table.dart';
 import 'partner_store_table.dart';
 import 'sale_table.dart';
 import 'user_table.dart';
+import 'vehicle_image_table.dart';
 import 'vehicle_table.dart';
 
 /// Get [Database] reference for operations
@@ -23,6 +24,7 @@ Future<Database> getDatabase() async {
       await db.execute(SaleTable.createTable);
       await db.execute(UserTable.createTable);
       await db.execute(VehicleTable.createTable);
+      await db.execute(VehicleImageTable.createTable);
 
       // Create admin user
       await db.rawInsert(
