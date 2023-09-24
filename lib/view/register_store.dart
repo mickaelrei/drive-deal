@@ -24,8 +24,8 @@ class RegisterStoreState with ChangeNotifier {
   final Future<void> Function()? onRegister;
 
   /// To insert a new [PartnerStore] in database
-  final PartnerStoreUseCase _partnerStoreUseCase = const PartnerStoreUseCase(
-    PartnerStoreRepository(),
+  final PartnerStoreUseCase _partnerStoreUseCase = PartnerStoreUseCase(
+    const PartnerStoreRepository(),
   );
 
   /// To get all [AutonomyLevel]s from database
@@ -100,15 +100,10 @@ class RegisterStoreState with ChangeNotifier {
       name: nameController.text,
       autonomyLevel: chosenAutonomyLevel!,
     );
-    // Get id of inserted row
-    final storeId = await _partnerStoreUseCase.insert(partnerStore);
-
-    // Create user with storeId and password and insert to database
-    final user = User(
-      storeId: storeId,
+    await _partnerStoreUseCase.insert(
+      partnerStore: partnerStore,
       password: password,
     );
-    await _userUseCase.insert(user);
 
     // If no errors, call onRegister callback and return null meaning success
     if (onRegister != null) {

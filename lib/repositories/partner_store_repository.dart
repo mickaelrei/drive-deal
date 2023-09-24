@@ -46,13 +46,13 @@ class PartnerStoreRepository {
         name: item[PartnerStoreTable.name],
         autonomyLevel: autonomyLevel!,
       );
-      
+
       // Get all vehicles from this store
       final vehicles = await _vehicleRepository.select();
       vehicles.removeWhere((vehicle) => vehicle.storeId != store.id);
 
       // Add vehicles to list
-      store.setVehicles(vehicles);
+      store.vehicles = vehicles;
 
       // Add object to list
       list.add(store);

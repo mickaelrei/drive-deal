@@ -32,7 +32,7 @@ class PartnerStore {
   List<Vehicle> get vehicles => List.unmodifiable(_vehicles);
 
   /// Method to set vehicles
-  void setVehicles(List<Vehicle> items) {
+  set vehicles(List<Vehicle> items) {
     _vehicles
       ..clear()
       ..addAll(items);
