@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../entities/vehicle.dart';
+import '../entities/vehicle_image.dart';
+import '../repositories/local_image_repository.dart';
 import '../usecases/fipe_use_case.dart';
 import 'form_utils.dart';
 
@@ -18,6 +24,10 @@ class RegisterVehicleState with ChangeNotifier {
 
   /// Operations on FIPE api
   final FipeUseCase fipeUseCase = FipeUseCase();
+
+  /// To save [VehicleImage]s
+  final LocalImageRepository _localImageRepository =
+      const LocalImageRepository();
 
   /// List of vehicle brands
   late Future<List<FipeBrand>?> brands;
@@ -46,14 +56,6 @@ class RegisterVehicleState with ChangeNotifier {
   /// Input vehicle purchase date
   DateTime? purchaseDate;
 
-  /// Method to set purchase date
-  void setDate(DateTime date) {
-    purchaseDate = date;
-
-    // Update to show new picked date
-    notifyListeners();
-  }
-
   /// Initialize some lists
   void init() {
     brands = fipeUseCase.getBrands();
@@ -67,6 +69,30 @@ class RegisterVehicleState with ChangeNotifier {
     _currentModel = null;
     _currentModelYear = null;
     currentVehicleInfo = null;
+  }
+
+  /// Method to add images using [ImagePicker]
+  Future<void> addImages() async {
+    try {
+      // Wait for picked images
+      final images = await ImagePicker().pickMultiImage();
+
+      // Add to list of image paths
+      for (final file in images) {
+        _localImageRepository.saveImage(File(file.path));
+      }
+    } on PlatformException {
+      /// Happens when trying to use ImagePicker while already being used
+      /// (usually on a double click from the user)
+    }
+  }
+
+  /// Method to set purchase date
+  void setDate(DateTime date) {
+    purchaseDate = date;
+
+    // Update to show new picked date
+    notifyListeners();
   }
 
   /// Method to set new chosen brand
@@ -238,8 +264,27 @@ class RegisterVehicleForm extends StatelessWidget {
                   initialDate: state.purchaseDate,
                   onDatePicked: state.setDate,
                 ),
-                const FormTextHeader(label: 'Add images (TODO)'),
-                const FormTextEntry(label: 'Images (make this a button)'),
+                const FormTextHeader(label: 'Images'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: state.addImages,
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        hintText: 'Add images',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: Text(
+                        'Add images',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SubmitButton(
