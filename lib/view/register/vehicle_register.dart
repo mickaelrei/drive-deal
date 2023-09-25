@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -104,6 +106,7 @@ class RegisterVehicleState with ChangeNotifier {
 
         imagePaths.add(file.path);
       }
+      notifyListeners();
     } on PlatformException {
       /// Happens when trying to use ImagePicker while already being used
       /// (usually on a double click from the user)
@@ -286,6 +289,20 @@ class RegisterVehicleForm extends StatelessWidget {
       },
       child: Consumer<RegisterVehicleState>(
         builder: (_, state, __) {
+          // Create preview images
+          final previewImages = <Widget>[];
+          for (final path in state.imagePaths) {
+            previewImages.add(Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: CircleAvatar(
+                radius: 25,
+                backgroundImage: FileImage(
+                  File(path),
+                ),
+              ),
+            ));
+          }
+
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
@@ -366,18 +383,25 @@ class RegisterVehicleForm extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
                     onTap: state.addImages,
-                    child: InputDecorator(
-                      decoration: InputDecoration(
-                        hintText: 'Add images',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: Text(
-                        'Add images',
-                        style: TextStyle(
-                          color: Colors.grey[700],
-                        ),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: CircleAvatar(
+                              radius: 25,
+                              child: IconButton(
+                                splashRadius: 25,
+                                onPressed: state.addImages,
+                                icon: const Icon(
+                                  Icons.add,
+                                ),
+                              ),
+                            ),
+                          ),
+                          ...previewImages,
+                        ],
                       ),
                     ),
                   ),

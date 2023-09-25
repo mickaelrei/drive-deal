@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/vehicle.dart';
 import '../../repositories/vehicle_image_repository.dart';
-import '../../usecases/vehicle_image_use_case.dart';
 
 /// Widget for listing [Vehicle]s
 class VehicleListPage extends StatelessWidget {
@@ -64,12 +63,14 @@ class VehicleTile extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.edit, color: Colors.cyan),
+              splashRadius: 25,
               onPressed: () {
                 print('Edit');
               },
             ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
+              splashRadius: 25,
               onPressed: () {
                 print('Remove');
               },

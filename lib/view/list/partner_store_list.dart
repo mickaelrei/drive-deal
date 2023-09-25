@@ -43,22 +43,36 @@ class PartnerStoreListPage extends StatelessWidget {
 
             return Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ListTile(
-                title: Text('Name: ${partnerStore.name}'),
-                subtitle: Text(
-                  'CNPJ: ${partnerStore.cnpj}\n'
-                  'Autonomy Level: ${partnerStore.autonomyLevel.label}',
-                ),
-                isThreeLine: true,
-                tileColor: Colors.grey[300],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
+              child: PartnerStoreTile(partnerStore: partnerStore),
             );
           },
         );
       },
+    );
+  }
+}
+
+/// Widget for displaying a [PartnerStore] in a [ListView]
+class PartnerStoreTile extends StatelessWidget {
+  /// Constructor
+  const PartnerStoreTile({required this.partnerStore, super.key});
+
+  /// [PartnerStore] object to show
+  final PartnerStore partnerStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      shadowColor: Colors.grey,
+      child: ListTile(
+        title: Text('Name: ${partnerStore.name}'),
+        subtitle: Text(
+          'CNPJ: ${partnerStore.cnpj}\n'
+          'Autonomy Level: ${partnerStore.autonomyLevel.label}',
+        ),
+        isThreeLine: true,
+      ),
     );
   }
 }

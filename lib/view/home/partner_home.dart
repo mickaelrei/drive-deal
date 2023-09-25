@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/vehicle.dart';
-import '../list/sales_list.dart';
-import '../list/vehicles_list.dart';
+import '../list/sale_list.dart';
+import '../list/vehicle_list.dart';
 import '../logout.dart';
 
 /// Provider for partner home page

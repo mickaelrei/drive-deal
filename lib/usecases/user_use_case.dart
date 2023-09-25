@@ -64,17 +64,15 @@ class UserUseCase {
 
   /// Method to generate a random password
   String generatePassword([int length = 15]) {
-    // // Generate password
-    // var password = '';
-    // for (var i = 0; i < 15; i++) {
-    //   final code = _random.nextInt(42) + 40;
-    //   password += String.fromCharCode(code);
-    // }
+    // Generate password
+    var password = '';
+    for (var i = 0; i < 15; i++) {
+      final code = _random.nextInt(42) + 40;
+      password += String.fromCharCode(code);
+    }
 
-    // return password;
-
-    // Return hardcoded password for testing
-    return 'senhauser';
+    print('Generated password: $password');
+    return password;
   }
 
   /// Method that returns whether a text is considered a CNPJ

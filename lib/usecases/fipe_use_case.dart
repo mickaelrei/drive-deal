@@ -100,7 +100,6 @@ class FipeUseCase {
       '/${model.code}/$years'
       '/${modelYear.code}',
     );
-    print('[InfoByModel url]: $url');
     final response = await http.get(url);
 
     // Error

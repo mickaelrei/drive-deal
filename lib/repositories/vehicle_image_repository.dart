@@ -91,7 +91,6 @@ class VehicleImageRepository {
 
     // If doesn't exist, create
     if (!await imagesDir.exists()) {
-      print('Creating folder for image repository: $imagesDirName');
       imagesDir = await imagesDir.create();
     }
 
@@ -107,7 +106,6 @@ class VehicleImageRepository {
     final file = File('$savePath/$imageName');
 
     // Write image to path
-    print('Writing to path ${file.path}');
     await file.writeAsBytes(await image.readAsBytes());
   }
 
