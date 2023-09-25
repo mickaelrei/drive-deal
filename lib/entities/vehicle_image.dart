@@ -6,15 +6,15 @@ class VehicleImage {
   /// Constructor
   VehicleImage({
     this.id,
-    required this.path,
+    required this.name,
     required this.vehicleId,
   });
 
   /// ID for database identification
   final int? id;
 
-  /// Image path
-  final String path;
+  /// Image name
+  final String name;
 
   /// Reference to [Vehicle] in database
   int vehicleId;
@@ -24,9 +24,14 @@ class VehicleImage {
     final map = <String, dynamic>{};
 
     map[VehicleImageTable.id] = id;
-    map[VehicleImageTable.path] = path;
+    map[VehicleImageTable.name] = name;
     map[VehicleImageTable.vehicleId] = vehicleId;
 
     return map;
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }

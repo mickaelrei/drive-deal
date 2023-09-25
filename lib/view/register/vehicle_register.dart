@@ -1,42 +1,48 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../entities/vehicle.dart';
-import '../entities/vehicle_image.dart';
-import '../repositories/local_image_repository.dart';
-import '../usecases/fipe_use_case.dart';
-import 'form_utils.dart';
+import '../../entities/partner_store.dart';
+import '../../entities/vehicle.dart';
+import '../../repositories/vehicle_repository.dart';
+import '../../usecases/fipe_use_case.dart';
+import '../../usecases/vehicle_use_case.dart';
+import '../form_utils.dart';
 
 /// Provider for register vehicle page
 class RegisterVehicleState with ChangeNotifier {
   /// Constructor
-  RegisterVehicleState({this.onRegister}) {
+  RegisterVehicleState({required this.partnerStore, this.onRegister}) {
     init();
   }
 
+  /// What [PartnerStore] is this provider linked to
+  final PartnerStore partnerStore;
+
   /// Callback function for when a vehicle gets registered
-  final void Function()? onRegister;
+  final void Function(Vehicle)? onRegister;
 
   /// Operations on FIPE api
   final FipeUseCase fipeUseCase = FipeUseCase();
 
-  /// To save [VehicleImage]s
-  final LocalImageRepository _localImageRepository =
-      const LocalImageRepository();
+  /// Operations on [Vehicle] database table
+  final VehicleUseCase _vehicleUseCase = const VehicleUseCase(
+    VehicleRepository(),
+  );
+
+  /// List of path of images to be linked to the [Vehicle]
+  final imagePaths = <String>[];
 
   /// List of vehicle brands
   late Future<List<FipeBrand>?> brands;
 
   /// List of models
-  late Future<List<FipeModel>?> models;
+  late Future<List<FipeModel>?>? models;
 
   /// List of model years
-  late Future<List<FipeModelYear>?> modelYears;
+  late Future<List<FipeModelYear>?>? modelYears;
 
   /// Currently chosen info
   FipeBrand? _currentBrand;
@@ -59,16 +65,31 @@ class RegisterVehicleState with ChangeNotifier {
   /// Initialize some lists
   void init() {
     brands = fipeUseCase.getBrands();
+    clear();
+  }
 
+  /// Method to clear everything for a new register
+  void clear() {
     // Reset lists
-    models = Future.value(null);
-    modelYears = Future.value(null);
+    models = null;
+    modelYears = null;
 
     // Reset current info
     _currentBrand = null;
     _currentModel = null;
     _currentModelYear = null;
-    currentVehicleInfo = null;
+    currentVehicleInfo = Future.value(null);
+
+    // Reset dropdown lists
+    models = Future.value(null);
+    modelYears = Future.value(null);
+
+    // Reset controllers
+    manufactureYearController.clear();
+    plateController.clear();
+    purchaseDate = null;
+
+    notifyListeners();
   }
 
   /// Method to add images using [ImagePicker]
@@ -79,7 +100,9 @@ class RegisterVehicleState with ChangeNotifier {
 
       // Add to list of image paths
       for (final file in images) {
-        _localImageRepository.saveImage(File(file.path));
+        if (imagePaths.contains(file.path)) continue;
+
+        imagePaths.add(file.path);
       }
     } on PlatformException {
       /// Happens when trying to use ImagePicker while already being used
@@ -111,7 +134,7 @@ class RegisterVehicleState with ChangeNotifier {
     _currentBrand = brand;
     _currentModel = null;
     _currentModelYear = null;
-    currentVehicleInfo = null;
+    currentVehicleInfo = Future.value(null);
 
     // Update screen
     notifyListeners();
@@ -133,7 +156,7 @@ class RegisterVehicleState with ChangeNotifier {
     // Update current info
     _currentModel = model;
     _currentModelYear = null;
-    currentVehicleInfo = null;
+    currentVehicleInfo = Future.value(null);
 
     // Update screen
     notifyListeners();
@@ -169,24 +192,97 @@ class RegisterVehicleState with ChangeNotifier {
   }
 
   /// Method to try registering a vehicle
-  Future<String> register() async {
-    return 'Not implemented';
+  Future<String?> register() async {
+    // Check if all inputs are set
+    if (_currentBrand == null) {
+      return 'Choose a brand';
+    }
+    if (_currentModel == null) {
+      return 'Choose a model';
+    }
+    if (_currentModelYear == null) {
+      return 'Choose a model year';
+    }
+    if (currentVehicleInfo == null) {
+      return 'Vehicle info not retrieved yet. Try again';
+    }
+
+    // Check if manufacture year input is a valid number
+    final manufactureYear = int.tryParse(manufactureYearController.text);
+    if (manufactureYear == null) {
+      return 'Manufacture year must be a valid number';
+    }
+
+    // Check if plate is in valid format
+    final plate = plateController.text.toUpperCase();
+    final plateRegex = RegExp(r'[A-Z]{3}\d[A-Z]\d{2}');
+    if (!plateRegex.hasMatch(plate)) {
+      return 'Plate needs to be in AAA0A00 format';
+    }
+
+    // Check for purchase date
+    if (purchaseDate == null) {
+      return 'Choose a purchase date';
+    }
+
+    // Get price
+    final vehicleInfo = await currentVehicleInfo;
+    if (vehicleInfo == null) {
+      return 'No vehicle info. Try again later';
+    }
+    final currentPrice = vehicleInfo.price;
+
+    // Create vehicle object and insert into database
+    final vehicle = Vehicle(
+      storeId: partnerStore.id!,
+      model: _currentModel!.name,
+      brand: _currentBrand!.name,
+      modelYear: _currentModelYear!.name,
+      fipePrice: currentPrice,
+      year: manufactureYear,
+      plate: plate,
+      purchaseDate: purchaseDate!,
+    );
+    final vehicleId = await _vehicleUseCase.insert(vehicle, imagePaths);
+
+    // Set id
+    vehicle.id = vehicleId;
+    if (onRegister != null) {
+      onRegister!(vehicle);
+    }
+
+    // Success
+    return null;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    manufactureYearController.dispose();
+    plateController.dispose();
   }
 }
 
 /// Form for [Vehicle] registering
 class RegisterVehicleForm extends StatelessWidget {
   /// Constructor
-  const RegisterVehicleForm({this.onRegister, super.key});
+  const RegisterVehicleForm(
+      {required this.partnerStore, this.onRegister, super.key});
+
+  /// Which [PartnerStore] will the registered vehicle be linked to
+  final PartnerStore partnerStore;
 
   /// Callback function for when a vehicle gets registered
-  final void Function()? onRegister;
+  final void Function(Vehicle)? onRegister;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<RegisterVehicleState>(
       create: (context) {
-        return RegisterVehicleState(onRegister: onRegister);
+        return RegisterVehicleState(
+          partnerStore: partnerStore,
+          onRegister: onRegister,
+        );
       },
       child: Consumer<RegisterVehicleState>(
         builder: (_, state, __) {
@@ -200,6 +296,7 @@ class RegisterVehicleForm extends StatelessWidget {
                 ),
                 const FormTextHeader(label: 'Brand'),
                 FutureDropdown<FipeBrand>(
+                  initialSelected: state._currentBrand,
                   future: state.brands,
                   onChanged: state.setBrand,
                   dropdownBuilder: (item) {
@@ -295,7 +392,12 @@ class RegisterVehicleForm extends StatelessWidget {
 
                       // Show dialog with register result
                       if (context.mounted) {
-                        registerDialog(context, result);
+                        await registerDialog(context, result);
+                      }
+
+                      // Clear inputs
+                      if (result == null) {
+                        state.clear();
                       }
                     },
                   ),
@@ -321,8 +423,8 @@ String formatPrice(double price) {
 }
 
 /// Show register dialog
-void registerDialog(BuildContext context, String? result) {
-  showDialog(
+Future<void> registerDialog(BuildContext context, String? result) async {
+  await showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(

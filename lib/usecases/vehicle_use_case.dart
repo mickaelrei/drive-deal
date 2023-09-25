@@ -1,3 +1,5 @@
+import 'package:path/path.dart';
+
 import '../entities/vehicle.dart';
 import '../entities/vehicle_image.dart';
 import '../repositories/vehicle_image_repository.dart';
@@ -28,12 +30,15 @@ class VehicleUseCase {
 
     // Insert all images
     for (final path in imagePaths) {
-      // Create [VehicleImage] object
+      // Create object
       final vehicleImage = VehicleImage(
-        path: path,
+        name: basename(path),
         vehicleId: vehicleId,
       );
-      await _vehicleImageUseCase.insert(vehicleImage);
+      vehicle.images.add(vehicleImage);
+
+      // Insert on database
+      await _vehicleImageUseCase.insert(vehicleImage, originalPath: path);
     }
 
     return vehicleId;

@@ -81,12 +81,22 @@ class PartnerStoreRepository {
         item[PartnerStoreTable.autonomyLevelId],
       );
 
-      return PartnerStore(
+      // Create partner store object
+      final store = PartnerStore(
         id: item[PartnerStoreTable.id],
         cnpj: item[PartnerStoreTable.cnpj],
         name: item[PartnerStoreTable.name],
         autonomyLevel: autonomyLevel!,
       );
+
+      // Get all vehicles from this store
+      final vehicles = await _vehicleRepository.select();
+      vehicles.removeWhere((vehicle) => vehicle.storeId != store.id);
+
+      // Add vehicles to list
+      store.vehicles = vehicles;
+
+      return store;
     }
 
     // If no result, return null
@@ -113,12 +123,22 @@ class PartnerStoreRepository {
         item[PartnerStoreTable.autonomyLevelId],
       );
 
-      return PartnerStore(
+      // Create partner store object
+      final store = PartnerStore(
         id: item[PartnerStoreTable.id],
         cnpj: item[PartnerStoreTable.cnpj],
         name: item[PartnerStoreTable.name],
         autonomyLevel: autonomyLevel!,
       );
+
+      // Get all vehicles from this store
+      final vehicles = await _vehicleRepository.select();
+      vehicles.removeWhere((vehicle) => vehicle.storeId != store.id);
+
+      // Add vehicles to list
+      store.vehicles = vehicles;
+
+      return store;
     }
 
     // If no result, return null

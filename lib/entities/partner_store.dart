@@ -29,7 +29,7 @@ class PartnerStore {
   final _vehicles = <Vehicle>[];
 
   /// Getter for vehicles
-  List<Vehicle> get vehicles => List.unmodifiable(_vehicles);
+  List<Vehicle> get vehicles => _vehicles;
 
   /// Method to set vehicles
   set vehicles(List<Vehicle> items) {

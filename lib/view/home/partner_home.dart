@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../entities/partner_store.dart';
-import 'logout.dart';
-import 'register_vehicle.dart';
+import '../../entities/partner_store.dart';
+import '../../entities/vehicle.dart';
+import '../list/sales_list.dart';
+import '../list/vehicles_list.dart';
+import '../logout.dart';
 
 /// Provider for partner home page
 class PartnerHomeState with ChangeNotifier {
+  /// Constructor
+  PartnerHomeState({required this.partnerStore});
+
+  /// What [PartnerStore] is this provider linked to
+  final PartnerStore partnerStore;
+
   /// Which page is selected in the navigation bar
   int navigationBarSelectedIndex = 0;
 
   /// Method to change NavBar selected item
   Future<void> changePage(int index) async {
     navigationBarSelectedIndex = index;
+    notifyListeners();
+  }
+
+  /// Callback for when a vehicle gets registered
+  void onVehicleRegister(Vehicle vehicle) {
+    // Add to list of vehicles
+    partnerStore.vehicles.add(vehicle);
     notifyListeners();
   }
 }
@@ -29,25 +44,54 @@ class PartnerHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PartnerHomeState>(
       create: (context) {
-        return PartnerHomeState();
+        return PartnerHomeState(partnerStore: partnerStore);
       },
       child: Consumer<PartnerHomeState>(
         builder: (_, state, __) {
-          // Get page based on current selected index
+          // Get page and floating action button based on current selected index
           late Widget page;
+          FloatingActionButton? actionButton;
           switch (state.navigationBarSelectedIndex) {
             case 0:
               // Home
               page = PartnerInfo(partnerStore: partnerStore);
+              actionButton = FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    '/store_edit',
+                    arguments: partnerStore,
+                  );
+                },
+                child: const Icon(Icons.edit),
+              );
               break;
             case 1:
               // Register vehicle
-              page = const RegisterVehicleForm();
+              page = VehicleListPage(partnerStore: partnerStore);
+              actionButton = FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    '/vehicle_register',
+                    arguments: {
+                      'partner_store': partnerStore,
+                      'on_register': state.onVehicleRegister,
+                    },
+                  );
+                },
+                child: const Icon(Icons.add),
+              );
               break;
             case 2:
               // Register sale
-              page = const Center(
-                child: Text('Register Sale'),
+              page = SaleListPage(partnerStore: partnerStore);
+              actionButton = FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    '/sale_register',
+                    arguments: partnerStore,
+                  );
+                },
+                child: const Icon(Icons.add),
               );
               break;
             case 3:
@@ -68,7 +112,7 @@ class PartnerHomePage extends StatelessWidget {
           }
 
           return Scaffold(
-            // resizeToAvoidBottomInset: false,
+            floatingActionButton: actionButton,
             backgroundColor: Colors.white,
             appBar: AppBar(
               title: const Text('Partner Home'),
@@ -95,14 +139,14 @@ class PartnerHomePage extends StatelessWidget {
                     Icons.directions_car_filled_rounded,
                     color: Color.fromRGBO(13, 71, 161, 1),
                   ),
-                  label: 'Vehicle',
+                  label: 'Vehicles',
                 ),
                 NavigationDestination(
                   icon: Icon(
                     Icons.attach_money,
                     color: Color.fromRGBO(13, 71, 161, 1),
                   ),
-                  label: 'Sale',
+                  label: 'Sales',
                 ),
                 NavigationDestination(
                   icon: Icon(

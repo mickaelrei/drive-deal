@@ -7,7 +7,7 @@ abstract class VehicleImageTable {
   static const String createTable = '''
   CREATE TABLE $tableName(
     $id             INTEGER PRIMARY KEY AUTOINCREMENT,
-    $path           TEXT    NOT NULL,
+    $name           TEXT    NOT NULL,
     $vehicleId      INTEGER NOT NULL
   );
   ''';
@@ -18,8 +18,8 @@ abstract class VehicleImageTable {
   /// ID for identification
   static const String id = 'id';
 
-  /// Image path
-  static const String path = 'path';
+  /// Image name
+  static const String name = 'name';
 
   /// Reference to [Vehicle] object
   static const String vehicleId = 'vehicle_id';

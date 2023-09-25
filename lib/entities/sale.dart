@@ -44,22 +44,4 @@ class Sale {
 
     return map;
   }
-
-  /// Get [PartnerStore]'s profit on this sale
-  Future<double> getStoreProfit() async {
-    // TODO: Get store percent on [PartnerStore.autonomyLevel]
-    return 0;
-  }
-
-  /// Get network's profit on this sale
-  Future<double> getNetworkProfit() async {
-    // TODO: Get network percent on [PartnerStore.autonomyLevel]
-    return 0;
-  }
-
-  /// Get network's safety profit on this sale
-  Future<double> getSafetyProfit() async {
-    // TODO: Get safety percent on... idk
-    return 0;
-  }
 }

@@ -8,39 +8,47 @@ class Vehicle {
   Vehicle({
     this.id,
     required this.storeId,
-    required this.modelId,
-    required this.brandId,
-    required this.yearId,
+    required this.model,
+    required this.brand,
     required this.modelYear,
-    required this.vehicleImage,
+    required this.fipePrice,
+    required this.year,
     required this.plate,
-    required this.price,
     required this.purchaseDate,
   });
 
   /// ID for database identification
-  final int? id;
+  int? id;
 
   /// Reference to [PartnerStore] in database
   final int storeId;
 
   /// Used to get info on Fipe API
-  final int modelId;
+  final String model;
 
   /// Used to get info on Fipe API
-  final int brandId;
+  final String brand;
 
-  /// Manufacture year, used on Fipe API
-  final String yearId;
+  /// Model year, used on Fipe API
+  final String modelYear;
 
-  /// Model year
-  final int modelYear;
+  /// Price from Fipe API
+  final double fipePrice;
+
+  /// Manufacture year
+  final int year;
+
+  /// Plate, 7 chars in Brazilian format: AAA0A00
+  final String plate;
+
+  /// Date on which this vehicle was purchased by the [PartnerStore]
+  final DateTime purchaseDate;
 
   /// List of all [VehicleImage]s for this vehicle
   final _images = <VehicleImage>[];
 
   /// Getter for list of [VehicleImage]s
-  List<VehicleImage> get images => List.unmodifiable(_images);
+  List<VehicleImage> get images => _images;
 
   /// Method to set vehicles
   set images(List<VehicleImage> items) {
@@ -49,31 +57,18 @@ class Vehicle {
       ..addAll(items);
   }
 
-  /// Name of image file for this vehicle
-  final String vehicleImage;
-
-  /// Plate, 7 chars in Brazilian format: AAA0A00
-  final String plate;
-
-  /// Vehicle price
-  final double price;
-
-  /// Date on which this vehicle was purchased by the [PartnerStore]
-  final DateTime purchaseDate;
-
   /// Map representation of [Vehicle]
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};
 
     map[VehicleTable.id] = id;
     map[VehicleTable.storeId] = storeId;
-    map[VehicleTable.modelId] = modelId;
-    map[VehicleTable.brandId] = brandId;
-    map[VehicleTable.yearId] = yearId;
+    map[VehicleTable.model] = model;
+    map[VehicleTable.brand] = brand;
+    map[VehicleTable.year] = year;
     map[VehicleTable.modelYear] = modelYear;
-    map[VehicleTable.vehicleImage] = vehicleImage;
     map[VehicleTable.plate] = plate;
-    map[VehicleTable.price] = price;
+    map[VehicleTable.fipePrice] = fipePrice;
     map[VehicleTable.purchaseDate] = purchaseDate.millisecondsSinceEpoch;
 
     return map;

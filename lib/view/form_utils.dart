@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Widget for form title
 class FormTitle extends StatelessWidget {
@@ -38,6 +39,7 @@ class FormTextEntry extends StatelessWidget {
     this.onTap,
     this.hidden = false,
     this.enabled = true,
+    this.formatters,
     super.key,
   });
 
@@ -65,11 +67,15 @@ class FormTextEntry extends StatelessWidget {
   /// Whether the text field is enabled or not
   final bool? enabled;
 
+  /// Optional list of [TextInputFormatter]s
+  final List<TextInputFormatter>? formatters;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        inputFormatters: formatters,
         enabled: enabled,
         initialValue: text,
         onTap: onTap,
@@ -212,11 +218,12 @@ class FutureDropdown<T> extends StatelessWidget {
     required this.future,
     this.noData,
     this.onChanged,
+    this.initialSelected,
     super.key,
   });
 
   /// Future to be used on [FutureBuilder]
-  final Future<List<T>?> future;
+  final Future<List<T>?>? future;
 
   /// Widget to show when no data is received
   final Widget? noData;
@@ -226,6 +233,9 @@ class FutureDropdown<T> extends StatelessWidget {
 
   /// Callback for [DropdownButtonFormField] onChanged
   final void Function(T?)? onChanged;
+
+  /// Optional initial selected value
+  final T? initialSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -275,6 +285,7 @@ class FutureDropdown<T> extends StatelessWidget {
           }
 
           return DropdownButtonFormField<T>(
+            value: initialSelected,
             isExpanded: true,
             decoration: InputDecoration(
               border: OutlineInputBorder(
@@ -318,4 +329,88 @@ String getDateString(DateTime date) {
       '${month.padLeft(2, '0')}'
       '/'
       '${date.year}';
+}
+
+/// [TextInputFormatter] for either CNPJ or name
+class CnpjOrNameTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // Empty text
+    if (newValue.text == '') {
+      return newValue;
+    }
+
+    // If first character is not a letter nor a digit, keep old value
+    final letterDigitExp = RegExp(r'\w');
+    if (!letterDigitExp.hasMatch(newValue.text[0])) {
+      return oldValue;
+    }
+
+    // If first character is a letter, don't do any filtering
+    final digitExp = RegExp(r'\d');
+    if (!digitExp.hasMatch(newValue.text[0])) {
+      return newValue;
+    }
+
+    // If erasing
+    if (newValue.text.length < oldValue.text.length) {
+      // Keep removing any trailing [./-] chars
+      var newText = newValue.text;
+      final exp = RegExp(r'[.\/-]');
+      while (newText.isNotEmpty && exp.hasMatch(newText.characters.last)) {
+        newText = newText.substring(0, newText.length - 1);
+      }
+
+      return TextEditingValue(text: newText);
+    }
+
+    // Remove non-digit chars from new text
+    var newText = newValue.text;
+    newText = newText.replaceAllMapped(
+      RegExp(r'[.\/\-a-zA-Z]'),
+      (match) => '',
+    );
+
+    // Check if surpassed 14 digits limit
+    final newLength = newText.length;
+    if (newLength > 14) {
+      return oldValue;
+    }
+
+    // Format text based on new length
+    if (newLength <= 2) {
+      // Text remains the same
+    } else if (newLength <= 5) {
+      newText = '${newText.substring(0, 2)}'
+          '.'
+          '${newText.substring(2, newLength)}';
+    } else if (newLength <= 8) {
+      newText = '${newText.substring(0, 2)}'
+          '.'
+          '${newText.substring(2, 5)}'
+          '.'
+          '${newText.substring(5, newLength)}';
+    } else if (newLength <= 12) {
+      newText = '${newText.substring(0, 2)}'
+          '.'
+          '${newText.substring(2, 5)}'
+          '.'
+          '${newText.substring(5, 8)}'
+          '/'
+          '${newText.substring(8, newLength)}';
+    } else {
+      newText = '${newText.substring(0, 2)}'
+          '.'
+          '${newText.substring(2, 5)}'
+          '.'
+          '${newText.substring(5, 8)}'
+          '/'
+          '${newText.substring(8, 12)}'
+          '-'
+          '${newText.substring(12, newLength)}';
+    }
+
+    return TextEditingValue(text: newText);
+  }
 }

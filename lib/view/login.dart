@@ -40,8 +40,10 @@ class LoginState with ChangeNotifier {
     // in case of invalid login)
     late User? user;
 
-    // Check if login was a name or a CNPJ
+    // In case no login text is provided
     final loginText = nameOrCnpjController.text;
+
+    // Check if login was a name or a CNPJ
     if (_userUseCase.isCNPJ(loginText)) {
       // Its a CNPJ
       // Try to find store with same CNPJ
@@ -166,7 +168,7 @@ class LoginForm extends StatelessWidget {
                           if (context.mounted) {
                             Navigator.of(context).pushNamed(
                               '/home',
-                              arguments: {'isAdmin': true},
+                              arguments: {'is_admin': true},
                             );
                           }
 
@@ -175,8 +177,8 @@ class LoginForm extends StatelessWidget {
                             Navigator.of(context).pushNamed(
                               '/home',
                               arguments: {
-                                'isAdmin': false,
-                                'partnerStore': await state.getPartnerStore(),
+                                'is_admin': false,
+                                'partner_store': await state.getPartnerStore(),
                               },
                             );
                           }

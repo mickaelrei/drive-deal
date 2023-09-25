@@ -36,13 +36,12 @@ class VehicleRepository {
       final vehicle = Vehicle(
         id: item[VehicleTable.id],
         storeId: item[VehicleTable.storeId],
-        modelId: item[VehicleTable.modelId],
-        brandId: item[VehicleTable.brandId],
-        yearId: item[VehicleTable.yearId],
+        model: item[VehicleTable.model],
+        brand: item[VehicleTable.brand],
+        year: int.parse(item[VehicleTable.year]),
         modelYear: item[VehicleTable.modelYear],
-        vehicleImage: item[VehicleTable.vehicleImage],
         plate: item[VehicleTable.plate],
-        price: item[VehicleTable.price],
+        fipePrice: item[VehicleTable.fipePrice],
         purchaseDate: DateTime.fromMillisecondsSinceEpoch(
           item[VehicleTable.purchaseDate],
         ),

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../entities/autonomy_level.dart';
-import '../entities/partner_store.dart';
-import '../entities/user.dart';
-import '../exceptions.dart';
-import '../repositories/autonomy_level_repository.dart';
-import '../repositories/partner_store_repository.dart';
-import '../repositories/user_repository.dart';
-import '../usecases/autonomy_level_use_case.dart';
-import '../usecases/partner_store_use_case.dart';
-import '../usecases/user_use_case.dart';
-import 'form_utils.dart';
+import '../../entities/autonomy_level.dart';
+import '../../entities/partner_store.dart';
+import '../../entities/user.dart';
+import '../../exceptions.dart';
+import '../../repositories/autonomy_level_repository.dart';
+import '../../repositories/partner_store_repository.dart';
+import '../../repositories/user_repository.dart';
+import '../../usecases/autonomy_level_use_case.dart';
+import '../../usecases/partner_store_use_case.dart';
+import '../../usecases/user_use_case.dart';
+import '../form_utils.dart';
 
 /// Provider for register store form
 class RegisterStoreState with ChangeNotifier {

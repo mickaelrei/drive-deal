@@ -8,13 +8,12 @@ abstract class VehicleTable {
   CREATE TABLE $tableName(
     $id           INTEGER    PRIMARY KEY AUTOINCREMENT,
     $storeId      INTEGER    NOT NULL,
-    $modelId      INTEGER    NOT NULL,
-    $brandId      INTEGER    NOT NULL,
-    $yearId       INTEGER    NOT NULL,
+    $model        TEXT       NOT NULL,
+    $brand        TEXT       NOT NULL,
+    $year         TEXT       NOT NULL,
     $modelYear    TEXT       NOT NULL,
-    $vehicleImage TEXT       NOT NULL,
     $plate        VARCHAR(7) NOT NULL,
-    $price        REAL       NOT NULL,
+    $fipePrice    REAL       NOT NULL,
     $purchaseDate INTEGER    NOT NULL
   );
   ''';
@@ -29,25 +28,22 @@ abstract class VehicleTable {
   static const String storeId = 'store_id';
 
   /// Used to get info on Fipe API
-  static const String modelId = 'model_id';
+  static const String model = 'model';
 
   /// Used to get info on Fipe API
-  static const String brandId = 'brand_id';
+  static const String brand = 'brand';
 
-  /// Manufacture year, used on Fipe API
-  static const String yearId = 'year_id';
-
-  /// Model year
+  /// Model year, used on Fipe API
   static const String modelYear = 'model_year';
 
-  /// Name of image file for this vehicle
-  static const String vehicleImage = 'vehicle_image';
+  /// Manufacture year
+  static const String year = 'year';
 
   /// Plate, 7 chars in Brazilian format: AAA0A00
   static const String plate = 'plate';
 
-  /// Vehicle price
-  static const String price = 'price';
+  /// Vehicle price from Fipe API
+  static const String fipePrice = 'fipe_price';
 
   /// Date on which this vehicle was purchased by the [PartnerStore]
   static const String purchaseDate = 'purchase_date';

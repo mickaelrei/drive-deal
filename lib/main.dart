@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'entities/partner_store.dart';
 import 'exceptions.dart';
-import 'view/admin_home.dart';
+import 'view/home/admin_home.dart';
+import 'view/home/partner_home.dart';
 import 'view/login.dart';
-import 'view/partner_home.dart';
+import 'view/register/vehicle_register.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,29 +23,69 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
-        '/home': (context) {
-          // Get args to decide whether to open admin or partner home page
-          final args = ModalRoute.of(context)!.settings.arguments
-              as Map<String, dynamic>;
-
-          // Check if it's for admin
-          if (args['isAdmin']) {
-            return const AdminHomePage();
-          } else {
-            // If no partnerStore, something went wrong
-            if (args['partnerStore'] == null) {
-              throw InvalidPartnerStoreException(
-                'field "partnerStore" '
-                'not included in args',
-              );
-            }
-
-            return PartnerHomePage(
-              partnerStore: args['partnerStore']!,
-            );
-          }
-        },
+        '/vehicle_register': vehicleRegisterRoute,
+        '/store_edit': storeEditRoute,
+        '/home': homeRoute,
       },
     );
   }
+}
+
+/// Function to handle /home route
+Widget homeRoute(BuildContext context) {
+  // Get args to decide whether to open admin or partner home page
+  final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  // Check if it's for admin
+  if (args['is_admin']) {
+    return const AdminHomePage();
+  } else {
+    // If no partnerStore, something went wrong
+    final partnerStore = args['partner_store'];
+    if (partnerStore == null || partnerStore.id == null) {
+      throw InvalidPartnerStoreException(
+        'Invalid PartnerStore: $partnerStore',
+      );
+    }
+
+    return PartnerHomePage(
+      partnerStore: partnerStore as PartnerStore,
+    );
+  }
+}
+
+/// Function to handle /store_edit route
+Widget storeEditRoute(BuildContext context) {
+  final args = ModalRoute.of(context)!.settings.arguments as PartnerStore;
+
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Store edit'),
+    ),
+    body: Center(
+      child: Text('Editing of store: ${args.name}'),
+    ),
+  );
+}
+
+/// Function to handle /vehicle_register route
+Widget vehicleRegisterRoute(BuildContext context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  // Check for valid args
+  if (args['partner_store'] == null) {
+    throw InvalidPartnerStoreException('message');
+  }
+
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Vehicle register'),
+    ),
+    body: RegisterVehicleForm(
+      partnerStore: args['partner_store'],
+      onRegister: args['on_register'],
+    ),
+  );
 }

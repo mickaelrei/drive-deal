@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../entities/vehicle_image.dart';
 import '../repositories/vehicle_image_repository.dart';
 
@@ -14,7 +16,16 @@ class VehicleImageUseCase {
   }
 
   /// Method to insert a [VehicleImage] in the database
-  Future<int> insert(VehicleImage vehicleImage) async {
-    return await _vehicleImageRepository.insert(vehicleImage);
+  Future<int> insert(
+    VehicleImage vehicleImage, {
+    required String originalPath,
+  }) async {
+    // Insert into database
+    final id = await _vehicleImageRepository.insert(vehicleImage);
+
+    // Save image
+    await _vehicleImageRepository.saveImage(File(originalPath));
+
+    return id;
   }
 }
