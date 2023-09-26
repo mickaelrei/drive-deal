@@ -5,6 +5,7 @@ import 'exceptions.dart';
 import 'view/home/admin_home.dart';
 import 'view/home/partner_home.dart';
 import 'view/login.dart';
+import 'view/register/sale_register.dart';
 import 'view/register/vehicle_register.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginPage(),
         '/vehicle_register': vehicleRegisterRoute,
+        '/sale_register': saleRegisterRoute,
         '/store_edit': storeEditRoute,
         '/home': homeRoute,
       },
@@ -76,7 +78,9 @@ Widget vehicleRegisterRoute(BuildContext context) {
 
   // Check for valid args
   if (args['partner_store'] == null) {
-    throw InvalidPartnerStoreException('message');
+    throw InvalidPartnerStoreException(
+      'Invalid PartnerStore: ${args['partner_store']}',
+    );
   }
 
   return Scaffold(
@@ -84,6 +88,29 @@ Widget vehicleRegisterRoute(BuildContext context) {
       title: const Text('Vehicle register'),
     ),
     body: RegisterVehicleForm(
+      partnerStore: args['partner_store'],
+      onRegister: args['on_register'],
+    ),
+  );
+}
+
+/// Function to handle /sale_register route
+Widget saleRegisterRoute(BuildContext context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  // Check for valid args
+  if (args['partner_store'] == null) {
+    throw InvalidPartnerStoreException(
+      'Invalid PartnerStore: ${args['partner_store']}',
+    );
+  }
+
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Sale register'),
+    ),
+    body: RegisterSaleForm(
       partnerStore: args['partner_store'],
       onRegister: args['on_register'],
     ),

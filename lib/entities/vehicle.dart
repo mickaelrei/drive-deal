@@ -73,4 +73,9 @@ class Vehicle {
 
     return map;
   }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }

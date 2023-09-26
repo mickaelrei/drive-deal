@@ -42,7 +42,6 @@ class User {
 
   @override
   String toString() {
-    return 'ID: $id, name: $name, IsAdmin: $isAdmin, '
-        'StoreID: $storeId, Password: $password';
+    return toMap().toString();
   }
 }

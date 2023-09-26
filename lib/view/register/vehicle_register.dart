@@ -91,11 +91,14 @@ class RegisterVehicleState with ChangeNotifier {
     plateController.clear();
     purchaseDate = null;
 
+    // Reset list of images
+    imagePaths.clear();
+
     notifyListeners();
   }
 
-  /// Method to add images using [ImagePicker]
-  Future<void> addImages() async {
+  /// Method to add images from gallery using [ImagePicker]
+  Future<void> addImagesFromGallery() async {
     try {
       // Wait for picked images
       final images = await ImagePicker().pickMultiImage();
@@ -110,6 +113,34 @@ class RegisterVehicleState with ChangeNotifier {
     } on PlatformException {
       /// Happens when trying to use ImagePicker while already being used
       /// (usually on a double click from the user)
+    }
+  }
+
+  /// Method to add an image from camera using [ImagePicker]
+  Future<void> addImageFromCamera() async {
+    try {
+      // Wait for picked image
+      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      if (image == null) return;
+
+      // Check if image is already in list
+      if (imagePaths.contains(image.path)) return;
+
+      // Add to list of image paths
+      imagePaths.add(image.path);
+      notifyListeners();
+    } on PlatformException {
+      /// Happens when trying to use ImagePicker while already being used
+      /// (usually on a double click from the user)
+    }
+  }
+
+  /// Method to remove an image
+  void removeImage(String path) {
+    // Check if exists
+    if (imagePaths.contains(path)) {
+      imagePaths.remove(path);
+      notifyListeners();
     }
   }
 
@@ -187,11 +218,6 @@ class RegisterVehicleState with ChangeNotifier {
 
     // Update screen
     notifyListeners();
-  }
-
-  /// Method to set new chosen plate
-  void setPlate(String plate) {
-    // TODO: idk
   }
 
   /// Method to try registering a vehicle
@@ -293,12 +319,12 @@ class RegisterVehicleForm extends StatelessWidget {
           final previewImages = <Widget>[];
           for (final path in state.imagePaths) {
             previewImages.add(Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: CircleAvatar(
-                radius: 25,
-                backgroundImage: FileImage(
-                  File(path),
-                ),
+              padding: const EdgeInsets.only(left: 4.0),
+              child: VehicleImagePreview(
+                imagePath: path,
+                onDelete: () {
+                  state.removeImage(path);
+                },
               ),
             ));
           }
@@ -328,7 +354,7 @@ class RegisterVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const FormTextHeader(label: 'Model Year'),
+                const FormTextHeader(label: 'Model year'),
                 FutureDropdown<FipeModelYear>(
                   future: state.modelYears,
                   onChanged: state.setModelYear,
@@ -336,7 +362,7 @@ class RegisterVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const FormTextHeader(label: 'FIPE Price'),
+                const FormTextHeader(label: 'FIPE price'),
                 FutureBuilder(
                   future: state.currentVehicleInfo,
                   builder: (context, snapshot) {
@@ -363,7 +389,7 @@ class RegisterVehicleForm extends StatelessWidget {
                     );
                   },
                 ),
-                const FormTextHeader(label: 'Manufacture Year'),
+                const FormTextHeader(label: 'Manufacture year'),
                 FormTextEntry(
                   label: 'Manufacture year',
                   controller: state.manufactureYearController,
@@ -381,29 +407,10 @@ class RegisterVehicleForm extends StatelessWidget {
                 const FormTextHeader(label: 'Images'),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: state.addImages,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: CircleAvatar(
-                              radius: 25,
-                              child: IconButton(
-                                splashRadius: 25,
-                                onPressed: state.addImages,
-                                icon: const Icon(
-                                  Icons.add,
-                                ),
-                              ),
-                            ),
-                          ),
-                          ...previewImages,
-                        ],
-                      ),
-                    ),
+                  child: VehicleImagesScrollView(
+                    addFromCamera: state.addImageFromCamera,
+                    addFromGallery: state.addImagesFromGallery,
+                    previewImages: previewImages,
                   ),
                 ),
                 Padding(
@@ -430,6 +437,117 @@ class RegisterVehicleForm extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Widget for a scrollable with preview of vehicle images
+class VehicleImagesScrollView extends StatelessWidget {
+  /// Constructor
+  const VehicleImagesScrollView({
+    required this.addFromGallery,
+    required this.addFromCamera,
+    required this.previewImages,
+    super.key,
+  });
+
+  /// Callback to add images from gallery
+  final void Function() addFromGallery;
+
+  /// Callback to add image from camera
+  final void Function() addFromCamera;
+
+  /// List of preview images
+  final List<Widget> previewImages;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: CircleAvatar(
+              backgroundColor: Colors.blue,
+              radius: 33,
+              child: IconButton(
+                color: Colors.white,
+                iconSize: 37,
+                splashRadius: 30,
+                onPressed: addFromGallery,
+                icon: const Icon(
+                  Icons.image,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: CircleAvatar(
+              backgroundColor: Colors.blue,
+              radius: 33,
+              child: IconButton(
+                color: Colors.white,
+                iconSize: 37,
+                splashRadius: 30,
+                onPressed: addFromCamera,
+                icon: const Icon(
+                  Icons.camera_alt,
+                ),
+              ),
+            ),
+          ),
+          ...previewImages,
+        ],
+      ),
+    );
+  }
+}
+
+/// Widget for displaying a preview of a vehicle image
+class VehicleImagePreview extends StatelessWidget {
+  /// Constructor
+  const VehicleImagePreview({
+    required this.imagePath,
+    this.onDelete,
+    super.key,
+  });
+
+  /// Path to image
+  final String imagePath;
+
+  /// Optional callback for delete button click
+  final void Function()? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(35),
+      ),
+      color: Colors.lightBlue[200],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 25,
+              backgroundImage: FileImage(
+                File(imagePath),
+              ),
+            ),
+            IconButton(
+              splashRadius: 25,
+              splashColor: Colors.grey,
+              color: Colors.grey[700],
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete, size: 35),
+            )
+          ],
+        ),
       ),
     );
   }

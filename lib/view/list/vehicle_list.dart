@@ -65,14 +65,14 @@ class VehicleTile extends StatelessWidget {
               icon: const Icon(Icons.edit, color: Colors.cyan),
               splashRadius: 25,
               onPressed: () {
-                print('Edit');
+                print('Vehicle edit');
               },
             ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               splashRadius: 25,
               onPressed: () {
-                print('Remove');
+                print('Vehicle remove');
               },
             )
           ],

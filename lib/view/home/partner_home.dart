@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
+import '../../entities/sale.dart';
 import '../../entities/vehicle.dart';
 import '../list/sale_list.dart';
 import '../list/vehicle_list.dart';
@@ -28,6 +29,13 @@ class PartnerHomeState with ChangeNotifier {
   void onVehicleRegister(Vehicle vehicle) {
     // Add to list of vehicles
     partnerStore.vehicles.add(vehicle);
+    notifyListeners();
+  }
+
+  /// Callback for when a sale gets registered
+  void onSaleRegister(Sale sale) {
+    // Add to list of sales
+    partnerStore.sales.add(sale);
     notifyListeners();
   }
 }
@@ -88,7 +96,10 @@ class PartnerHomePage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pushNamed(
                     '/sale_register',
-                    arguments: partnerStore,
+                    arguments: {
+                      'partner_store': partnerStore,
+                      'on_register': state.onSaleRegister,
+                    },
                   );
                 },
                 child: const Icon(Icons.add),

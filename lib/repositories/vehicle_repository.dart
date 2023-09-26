@@ -20,6 +20,31 @@ class VehicleRepository {
     return await database.insert(VehicleTable.tableName, map);
   }
 
+  /// Method to create a [Vehicle] object from a database query
+  Future<Vehicle> fromQuery(Map<String, dynamic> query) async {
+    // Create vehicle object
+    final vehicle = Vehicle(
+      id: query[VehicleTable.id],
+      storeId: query[VehicleTable.storeId],
+      model: query[VehicleTable.model],
+      brand: query[VehicleTable.brand],
+      year: int.parse(query[VehicleTable.year]),
+      modelYear: query[VehicleTable.modelYear],
+      plate: query[VehicleTable.plate],
+      fipePrice: query[VehicleTable.fipePrice],
+      purchaseDate: DateTime.fromMillisecondsSinceEpoch(
+        query[VehicleTable.purchaseDate],
+      ),
+    );
+
+    // Get all images from this vehicle
+    final images = await _vehicleImageRepository.select();
+    images.removeWhere((image) => image.vehicleId != vehicle.id);
+    vehicle.images = images;
+
+    return vehicle;
+  }
+
   /// Method to get all [Vehicle] objects in [VehicleTable]
   Future<List<Vehicle>> select() async {
     final database = await getDatabase();
@@ -32,37 +57,39 @@ class VehicleRepository {
     // Convert query items to [Vehicle] objects
     final list = <Vehicle>[];
     for (final item in result) {
-      // Create vehicle object
-      final vehicle = Vehicle(
-        id: item[VehicleTable.id],
-        storeId: item[VehicleTable.storeId],
-        model: item[VehicleTable.model],
-        brand: item[VehicleTable.brand],
-        year: int.parse(item[VehicleTable.year]),
-        modelYear: item[VehicleTable.modelYear],
-        plate: item[VehicleTable.plate],
-        fipePrice: item[VehicleTable.fipePrice],
-        purchaseDate: DateTime.fromMillisecondsSinceEpoch(
-          item[VehicleTable.purchaseDate],
-        ),
-      );
-
-      // Get all images from this vehicle
-      final images = await _vehicleImageRepository.select();
-      images.removeWhere((image) => image.vehicleId != vehicle.id);
-      vehicle.images = images;
-
       // Add to list
-      list.add(vehicle);
+      list.add(await fromQuery(item));
     }
 
     return list;
+  }
+
+  /// Method to get [Vehicle] by given id
+  Future<Vehicle?> selectById(int id) async {
+    final database = await getDatabase();
+
+    // Query all items
+    final List<Map<String, dynamic>> result = await database.query(
+      VehicleTable.tableName,
+      where: '${VehicleTable.id} = ?',
+      whereArgs: [id],
+    );
+
+    // Check if exists
+    if (result.isNotEmpty) {
+      return await fromQuery(result.first);
+    }
+
+    // If no result, return null
+    return null;
   }
 
   /// Method to delete a specific [Vehicle] from database
   Future<void> delete(Vehicle vehicle) async {
     final database = await getDatabase();
 
+    // TODO: Also delete all VehicleImages from this vehicle
+    // TODO: Open a transaction for all operations
     await database.delete(
       VehicleTable.tableName,
       where: '${VehicleTable.id} = ?',

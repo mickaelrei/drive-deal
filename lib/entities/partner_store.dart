@@ -1,6 +1,7 @@
 import '../database/partner_store_table.dart';
 
 import 'autonomy_level.dart';
+import 'sale.dart';
 import 'vehicle.dart';
 
 /// PartnerStore entity
@@ -34,6 +35,19 @@ class PartnerStore {
   /// Method to set vehicles
   set vehicles(List<Vehicle> items) {
     _vehicles
+      ..clear()
+      ..addAll(items);
+  }
+
+  /// List of all [Sale]s for this store
+  final _sales = <Sale>[];
+
+  /// Getter for sales
+  List<Sale> get sales => _sales;
+
+  /// Method to set sales
+  set sales(List<Sale> items) {
+    _sales
       ..clear()
       ..addAll(items);
   }

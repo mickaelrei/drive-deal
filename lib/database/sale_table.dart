@@ -6,12 +6,15 @@ abstract class SaleTable {
   /// Used on table creation
   static const String createTable = '''
   CREATE TABLE $tableName(
-    $id           INTEGER     PRIMARY KEY AUTOINCREMENT,
-    $storeId      INTEGER     NOT NULL,
-    $customerCpf  VARCHAR(11) NOT NULL,
-    $customerName TEXT        NOT NULL,
-    $saleDate     INTEGER     NOT NULL,
-    $price        REAL        NOT NULL
+    $id            INTEGER     PRIMARY KEY AUTOINCREMENT,
+    $storeId       INTEGER     NOT NULL,
+    $customerCpf   VARCHAR(11) NOT NULL,
+    $customerName  TEXT        NOT NULL,
+    $vehicleId     INTEGER     NOT NULL,
+    $saleDate      INTEGER     NOT NULL,
+    $storeProfit   REAL        NOT NULL,
+    $networkProfit REAL        NOT NULL,
+    $safetyProfit  REAL        NOT NULL
   );
   ''';
 
@@ -30,9 +33,18 @@ abstract class SaleTable {
   /// Name of customer
   static const String customerName = 'customer_name';
 
+  /// for [Vehicle] reference in database
+  static const String vehicleId = 'vehicle_id';
+
   /// On what date the sale happened
   static const String saleDate = 'sale_date';
 
-  /// Price of sale
-  static const String price = 'price';
+  /// How much of this sale went for the store
+  static const String storeProfit = 'store_profit';
+
+  /// How much of this sale went for the network
+  static const String networkProfit = 'network_profit';
+
+  /// How much of this sale went for network safety
+  static const String safetyProfit = 'safety_profit';
 }

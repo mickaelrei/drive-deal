@@ -74,6 +74,7 @@ class VehicleImageRepository {
   Future<void> delete(VehicleImage vehicleImage) async {
     final database = await getDatabase();
 
+    // TODO: Also delete image from images folder
     await database.delete(
       VehicleImageTable.tableName,
       where: '${VehicleImageTable.id} = ?',
