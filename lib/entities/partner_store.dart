@@ -15,7 +15,7 @@ class PartnerStore {
   });
 
   /// ID for database identification
-  final int? id;
+  int? id;
 
   /// CNPJ, 14 chars
   final String cnpj;

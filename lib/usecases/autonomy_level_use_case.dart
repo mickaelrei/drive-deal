@@ -15,7 +15,7 @@ class AutonomyLevelUseCase {
   }
 
   /// Method to insert a [AutonomyLevel] into database
-  Future<int> insert(AutonomyLevel autonomyLevel) async {
+  Future<void> insert(AutonomyLevel autonomyLevel) async {
     // Check if store and network percents don't surpass 100%
     final totalPercent =
         autonomyLevel.storePercent + autonomyLevel.networkPercent;
@@ -25,7 +25,9 @@ class AutonomyLevelUseCase {
       );
     }
 
-    return await _autonomyLevelRepository.insert(autonomyLevel);
+    // Insert and set id
+    final id = await _autonomyLevelRepository.insert(autonomyLevel);
+    autonomyLevel.id = id;
   }
 
   /// Method to select by given id

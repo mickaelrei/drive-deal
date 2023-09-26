@@ -21,7 +21,7 @@ class RegisterStoreState with ChangeNotifier {
   }
 
   /// Callback function to when a [PartnerStore] gets registered
-  final Future<void> Function()? onRegister;
+  final Future<void> Function(PartnerStore)? onRegister;
 
   /// To insert a new [PartnerStore] in database
   final PartnerStoreUseCase _partnerStoreUseCase = PartnerStoreUseCase(
@@ -107,7 +107,7 @@ class RegisterStoreState with ChangeNotifier {
 
     // If no errors, call onRegister callback and return null meaning success
     if (onRegister != null) {
-      onRegister!();
+      onRegister!(partnerStore);
     }
     return null;
   }
@@ -127,7 +127,7 @@ class RegisterStoreForm extends StatelessWidget {
   const RegisterStoreForm({required this.onRegister, super.key});
 
   /// Callback to be called when a [PartnerStore] gets registered
-  final Future<void> Function()? onRegister;
+  final Future<void> Function(PartnerStore)? onRegister;
 
   @override
   Widget build(BuildContext context) {

@@ -24,23 +24,24 @@ class VehicleUseCase {
   }
 
   /// Method to insert a [Vehicle] in the database
-  Future<int> insert(Vehicle vehicle, List<String> imagePaths) async {
+  Future<void> insert(Vehicle vehicle, [List<String>? imagePaths]) async {
     // Insert vehicle
     final vehicleId = await _vehicleRepository.insert(vehicle);
+    vehicle.id = vehicleId;
 
-    // Insert all images
-    for (final path in imagePaths) {
-      // Create object
-      final vehicleImage = VehicleImage(
-        name: basename(path),
-        vehicleId: vehicleId,
-      );
-      vehicle.images.add(vehicleImage);
+    if (imagePaths != null) {
+      // Insert all images
+      for (final path in imagePaths) {
+        // Create object
+        final vehicleImage = VehicleImage(
+          name: basename(path),
+          vehicleId: vehicleId,
+        );
+        vehicle.images.add(vehicleImage);
 
-      // Insert on database
-      await _vehicleImageUseCase.insert(vehicleImage, originalPath: path);
+        // Insert on database
+        await _vehicleImageUseCase.insert(vehicleImage, originalPath: path);
+      }
     }
-
-    return vehicleId;
   }
 }

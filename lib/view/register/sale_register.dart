@@ -92,7 +92,6 @@ class RegisterSaleState with ChangeNotifier {
     );
 
     // Create sale object and insert into database
-    print(_saleVehicle);
     final sale = Sale(
       storeId: partnerStore.id!,
       customerCpf: customerCpfController.text,
@@ -103,10 +102,9 @@ class RegisterSaleState with ChangeNotifier {
       networkProfit: networkProfit,
       safetyProfit: safetyProfit,
     );
-    final saleId = await _saleUseCase.insert(sale);
+    await _saleUseCase.insert(sale);
 
-    // Set id
-    sale.id = saleId;
+    // Call onRegister callback
     if (onRegister != null) {
       onRegister!(sale);
     }

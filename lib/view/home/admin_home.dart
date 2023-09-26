@@ -33,8 +33,8 @@ class AdminHomeState with ChangeNotifier {
   }
 
   /// Called when a PartnerStore gets registered
-  Future<void> onRegister() async {
-    // Update lists
+  Future<void> onRegister(PartnerStore partnerStore) async {
+    // Add to list
     await getLists();
 
     // Update widget

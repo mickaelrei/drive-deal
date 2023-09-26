@@ -11,7 +11,7 @@ class VehicleImage {
   });
 
   /// ID for database identification
-  final int? id;
+  int? id;
 
   /// Image name
   final String name;

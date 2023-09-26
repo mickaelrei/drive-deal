@@ -24,12 +24,13 @@ class PartnerStoreUseCase {
   }
 
   /// Method to insert a [PartnerStore] in the database
-  Future<int> insert({
+  Future<void> insert({
     required PartnerStore partnerStore,
     required String password,
   }) async {
     // Get id of inserted store
     final storeId = await _partnerStoreRepository.insert(partnerStore);
+    partnerStore.id = storeId;
 
     // Create user for this partner store
     final user = User(
@@ -37,7 +38,5 @@ class PartnerStoreUseCase {
       password: password,
     );
     await _userUseCase.insert(user);
-
-    return storeId;
   }
 }

@@ -13,7 +13,7 @@ class AutonomyLevel {
   });
 
   /// ID for database identification
-  final int? id;
+  int? id;
 
   /// Autonomy level label (beginner, intermediate, ...)
   final String label;

@@ -18,8 +18,9 @@ class UserUseCase {
   }
 
   /// Method to insert a [User] in the database
-  Future<int> insert(User user) async {
-    return await _userRepository.insert(user);
+  Future<void> insert(User user) async {
+    final id = await _userRepository.insert(user);
+    user.id = id;
   }
 
   /// Method to get admin [User] from given name and password

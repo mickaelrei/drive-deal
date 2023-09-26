@@ -16,16 +16,15 @@ class VehicleImageUseCase {
   }
 
   /// Method to insert a [VehicleImage] in the database
-  Future<int> insert(
+  Future<void> insert(
     VehicleImage vehicleImage, {
     required String originalPath,
   }) async {
     // Insert into database
     final id = await _vehicleImageRepository.insert(vehicleImage);
+    vehicleImage.id = id;
 
     // Save image
     await _vehicleImageRepository.saveImage(File(originalPath));
-
-    return id;
   }
 }

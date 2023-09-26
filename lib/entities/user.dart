@@ -13,7 +13,7 @@ class User {
   });
 
   /// ID for database identification
-  final int? id;
+  int? id;
 
   /// Name for admin login
   final String? name;

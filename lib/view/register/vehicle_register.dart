@@ -272,10 +272,9 @@ class RegisterVehicleState with ChangeNotifier {
       plate: plate,
       purchaseDate: purchaseDate!,
     );
-    final vehicleId = await _vehicleUseCase.insert(vehicle, imagePaths);
+    await _vehicleUseCase.insert(vehicle, imagePaths);
 
-    // Set id
-    vehicle.id = vehicleId;
+    // Call onRegister callback
     if (onRegister != null) {
       onRegister!(vehicle);
     }
