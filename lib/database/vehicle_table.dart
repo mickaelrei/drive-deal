@@ -14,7 +14,8 @@ abstract class VehicleTable {
     $modelYear    TEXT       NOT NULL,
     $plate        VARCHAR(7) NOT NULL,
     $fipePrice    REAL       NOT NULL,
-    $purchaseDate INTEGER    NOT NULL
+    $purchaseDate INTEGER    NOT NULL,
+    $sold         INTEGER    NOT NULL
   );
   ''';
 
@@ -47,4 +48,7 @@ abstract class VehicleTable {
 
   /// Date on which this vehicle was purchased by the [PartnerStore]
   static const String purchaseDate = 'purchase_date';
+
+  /// Whether this vehicle is sold or not
+  static const String sold = 'sold';
 }

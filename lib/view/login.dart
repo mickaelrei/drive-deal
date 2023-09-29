@@ -9,6 +9,7 @@ import '../repositories/user_repository.dart';
 import '../usecases/partner_store_use_case.dart';
 import '../usecases/user_use_case.dart';
 
+import '../utils/dialogs.dart';
 import 'form_utils.dart';
 
 /// Provider for login page
@@ -161,12 +162,12 @@ class LoginForm extends StatelessWidget {
                       switch (loginType) {
                         case LoginType.invalid:
                           if (context.mounted) {
-                            invalidLoginDialog(context);
+                            await invalidLoginDialog(context);
                           }
                           break;
                         case LoginType.admin:
                           if (context.mounted) {
-                            Navigator.of(context).pushNamed(
+                            await Navigator.of(context).pushNamed(
                               '/home',
                               arguments: {'is_admin': true},
                             );
@@ -174,7 +175,7 @@ class LoginForm extends StatelessWidget {
 
                         case LoginType.nonAdmin:
                           if (context.mounted) {
-                            Navigator.of(context).pushNamed(
+                            await Navigator.of(context).pushNamed(
                               '/home',
                               arguments: {
                                 'is_admin': false,
@@ -193,25 +194,6 @@ class LoginForm extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Show invalid login dialog
-void invalidLoginDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Invalid Login'),
-        content: const Text('Review your credentials.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
-          )
-        ],
-      );
-    },
-  );
 }
 
 /// Enum for type of login

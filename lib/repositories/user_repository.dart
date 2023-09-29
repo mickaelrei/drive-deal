@@ -12,7 +12,7 @@ class UserRepository {
     final database = await getDatabase();
     final map = user.toMap();
 
-    return await database.insert(UserTable.tableName, map);
+    return database.insert(UserTable.tableName, map);
   }
 
   /// Method to get all [User] objects in [UserTable]

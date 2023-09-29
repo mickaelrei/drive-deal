@@ -15,6 +15,7 @@ class Vehicle {
     required this.year,
     required this.plate,
     required this.purchaseDate,
+    this.sold = false,
   });
 
   /// ID for database identification
@@ -44,6 +45,9 @@ class Vehicle {
   /// Date on which this vehicle was purchased by the [PartnerStore]
   final DateTime purchaseDate;
 
+  /// Whether there is a [Sale] registered on this vehicel
+  final bool sold;
+
   /// List of all [VehicleImage]s for this vehicle
   final _images = <VehicleImage>[];
 
@@ -70,6 +74,7 @@ class Vehicle {
     map[VehicleTable.plate] = plate;
     map[VehicleTable.fipePrice] = fipePrice;
     map[VehicleTable.purchaseDate] = purchaseDate.millisecondsSinceEpoch;
+    map[VehicleTable.sold] = sold ? 1 : 0;
 
     return map;
   }

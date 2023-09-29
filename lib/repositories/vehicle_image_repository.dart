@@ -20,7 +20,7 @@ class VehicleImageRepository {
     final database = await getDatabase();
     final map = vehicleImage.toMap();
 
-    return await database.insert(VehicleImageTable.tableName, map);
+    return database.insert(VehicleImageTable.tableName, map);
   }
 
   /// Method to get all [VehicleImage] objects in [VehicleImageTable]
@@ -74,12 +74,15 @@ class VehicleImageRepository {
   Future<void> delete(VehicleImage vehicleImage) async {
     final database = await getDatabase();
 
-    // TODO: Also delete image from images folder
+    // Delete from database
     await database.delete(
       VehicleImageTable.tableName,
       where: '${VehicleImageTable.id} = ?',
       whereArgs: [vehicleImage.id],
     );
+
+    // Delete image file
+    await deleteImage(vehicleImage.name);
   }
 
   /// Method to get path of images directory
@@ -126,5 +129,11 @@ class VehicleImageRepository {
     }
 
     return file;
+  }
+
+  /// Method to delete an image from the images folder
+  Future<void> deleteImage(String imageName) async {
+    final imageFile = await loadImage(imageName);
+    await imageFile.delete();
   }
 }

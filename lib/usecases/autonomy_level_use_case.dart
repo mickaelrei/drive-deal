@@ -1,6 +1,6 @@
 import '../entities/autonomy_level.dart';
-import '../exceptions.dart';
 import '../repositories/autonomy_level_repository.dart';
+import '../utils/exceptions.dart';
 
 /// Class to be used for [AutonomyLevel] operations
 class AutonomyLevelUseCase {

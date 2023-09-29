@@ -13,7 +13,7 @@ class AutonomyLevelRepository {
     final database = await getDatabase();
     final map = autonomyLevel.toMap();
 
-    return await database.insert(AutonomyLevelTable.tableName, map);
+    return database.insert(AutonomyLevelTable.tableName, map);
   }
 
   /// Method to get all [AutonomyLevel] objects in [AutonomyLevelTable]

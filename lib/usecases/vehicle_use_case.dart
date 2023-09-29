@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:path/path.dart';
 
 import '../entities/vehicle.dart';
@@ -43,5 +45,22 @@ class VehicleUseCase {
         await _vehicleImageUseCase.insert(vehicleImage, originalPath: path);
       }
     }
+  }
+
+  /// Method to delete a [Vehicle] from the database
+  Future<void> delete(Vehicle vehicle) async {
+    await _vehicleRepository.delete(vehicle);
+  }
+
+  /// Method to get all images from a vehicle
+  Future<List<File>> getImages(Vehicle vehicle) async {
+    final images = <File>[];
+
+    // Get all images
+    for (final image in vehicle.images) {
+      images.add(await _vehicleImageUseCase.loadImage(image.name));
+    }
+
+    return images;
   }
 }

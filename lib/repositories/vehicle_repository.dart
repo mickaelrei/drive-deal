@@ -1,7 +1,9 @@
 import '../database/database.dart';
+import '../database/vehicle_image_table.dart';
 import '../database/vehicle_table.dart';
 
 import '../entities/vehicle.dart';
+import '../usecases/vehicle_image_use_case.dart';
 import 'vehicle_image_repository.dart';
 
 /// Class for [Vehicle] table operations
@@ -9,15 +11,15 @@ class VehicleRepository {
   /// Default constructor
   const VehicleRepository();
 
-  final VehicleImageRepository _vehicleImageRepository =
-      const VehicleImageRepository();
+  final VehicleImageUseCase _vehicleImageUseCase =
+      const VehicleImageUseCase(VehicleImageRepository());
 
   /// Insert a [Vehicle] on the database [VehicleTable] table
   Future<int> insert(Vehicle vehicle) async {
     final database = await getDatabase();
     final map = vehicle.toMap();
 
-    return await database.insert(VehicleTable.tableName, map);
+    return database.insert(VehicleTable.tableName, map);
   }
 
   /// Method to create a [Vehicle] object from a database query
@@ -35,10 +37,11 @@ class VehicleRepository {
       purchaseDate: DateTime.fromMillisecondsSinceEpoch(
         query[VehicleTable.purchaseDate],
       ),
+      sold: query[VehicleTable.sold] == 1,
     );
 
     // Get all images from this vehicle
-    final images = await _vehicleImageRepository.select();
+    final images = await _vehicleImageUseCase.select();
     images.removeWhere((image) => image.vehicleId != vehicle.id);
     vehicle.images = images;
 
@@ -77,7 +80,7 @@ class VehicleRepository {
 
     // Check if exists
     if (result.isNotEmpty) {
-      return await fromQuery(result.first);
+      return fromQuery(result.first);
     }
 
     // If no result, return null
@@ -88,12 +91,26 @@ class VehicleRepository {
   Future<void> delete(Vehicle vehicle) async {
     final database = await getDatabase();
 
-    // TODO: Also delete all VehicleImages from this vehicle
-    // TODO: Open a transaction for all operations
-    await database.delete(
-      VehicleTable.tableName,
-      where: '${VehicleTable.id} = ?',
-      whereArgs: [vehicle.id],
-    );
+    // Open transaction for multiple operations
+    await database.transaction((txn) async {
+      final batch = txn.batch();
+
+      // Delete vehicle
+      batch.delete(
+        VehicleTable.tableName,
+        where: '${VehicleTable.id} = ?',
+        whereArgs: [vehicle.id],
+      );
+
+      // Delete vehicle images
+      batch.delete(
+        VehicleImageTable.tableName,
+        where: '${VehicleImageTable.vehicleId} = ?',
+        whereArgs: [vehicle.id],
+      );
+
+      // Commit
+      await batch.commit();
+    });
   }
 }

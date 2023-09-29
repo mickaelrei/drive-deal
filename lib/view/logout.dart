@@ -8,11 +8,13 @@ class LogoutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: IconButton.filled(
-        color: Colors.red,
-        icon: const Text('Logout?'),
-        onPressed: () {
-          Navigator.of(context).pushReplacementNamed('/login');
+      child: TextButton(
+        child: const Text(
+          'Logout?',
+          style: TextStyle(fontSize: 20),
+        ),
+        onPressed: () async {
+          await Navigator.of(context).pushReplacementNamed('/login');
         },
       ),
     );

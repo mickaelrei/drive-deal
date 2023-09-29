@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'entities/partner_store.dart';
-import 'exceptions.dart';
+import 'utils/exceptions.dart';
 import 'view/home/admin_home.dart';
 import 'view/home/partner_home.dart';
 import 'view/login.dart';

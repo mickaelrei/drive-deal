@@ -22,7 +22,7 @@ class PartnerStoreRepository {
     final database = await getDatabase();
     final map = partnerStore.toMap();
 
-    return await database.insert(PartnerStoreTable.tableName, map);
+    return database.insert(PartnerStoreTable.tableName, map);
   }
 
   /// Method to create a [PartnerStore] object from a database query
@@ -89,7 +89,7 @@ class PartnerStoreRepository {
 
     // Check if exists
     if (result.isNotEmpty) {
-      return await fromQuery(result.first);
+      return fromQuery(result.first);
     }
 
     // If no result, return null
@@ -109,7 +109,7 @@ class PartnerStoreRepository {
 
     // Check if exists
     if (result.isNotEmpty) {
-      return await fromQuery(result.first);
+      return fromQuery(result.first);
     }
 
     // If no result, return null
@@ -120,12 +120,37 @@ class PartnerStoreRepository {
   Future<void> delete(PartnerStore partnerStore) async {
     final database = await getDatabase();
 
-    // TODO: Also delete all Vehicles and Sales from this store
-    // TODO: Open a transaction to make all operations
-    await database.delete(
-      PartnerStoreTable.tableName,
-      where: '${PartnerStoreTable.id} = ?',
-      whereArgs: [partnerStore.id],
-    );
+    // Open transaction for multiple operations
+    await database.transaction((txn) async {
+      final batch = txn.batch();
+
+      // Delete store
+      batch.delete(
+        PartnerStoreTable.tableName,
+        where: '${PartnerStoreTable.id} = ?',
+        whereArgs: [partnerStore.id],
+      );
+
+      // TODO: Don't delete vehicles, just set storeId to null
+      // Delete vehicles
+      // batch.delete(
+      //   VehicleTable.tableName,
+      //   where: '${VehicleTable.storeId} = ?',
+      //   whereArgs: [partnerStore.id],
+      // );
+
+      // TODO: Don't delete vehicle images
+      // Delete vehicle images
+      // for (final vehicle in partnerStore.vehicles) {
+      //   batch.delete(
+      //     VehicleImageTable.tableName,
+      //     where: '${VehicleImageTable.vehicleId} = ?',
+      //     whereArgs: [vehicle.id],
+      //   );
+      // }
+
+      // Commit
+      await batch.commit();
+    });
   }
 }

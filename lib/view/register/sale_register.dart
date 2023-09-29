@@ -6,6 +6,7 @@ import '../../entities/sale.dart';
 import '../../entities/vehicle.dart';
 import '../../repositories/sale_repository.dart';
 import '../../usecases/sale_use_case.dart';
+import '../../utils/dialogs.dart';
 import '../form_utils.dart';
 
 /// Provider for register sale page
@@ -227,23 +228,4 @@ class RegisterSaleForm extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Show register dialog
-Future<void> registerDialog(BuildContext context, String? result) async {
-  await showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(result == null ? 'Success' : 'Error'),
-        content: Text(result ?? 'Successfully registered!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
-          )
-        ],
-      );
-    },
-  );
 }

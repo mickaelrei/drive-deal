@@ -86,6 +86,9 @@ linter:
     - hash_and_equals
     - avoid_equals_and_hash_code_on_mutable_classes # avoid
     - avoid_null_checks_in_equality_operators
+    - discarded_futures
+    - unawaited_futures
+    - unnecessary_await_in_return
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

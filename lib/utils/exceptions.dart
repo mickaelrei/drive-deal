@@ -1,5 +1,5 @@
-import 'entities/autonomy_level.dart';
-import 'entities/partner_store.dart';
+import '../entities/autonomy_level.dart';
+import '../entities/partner_store.dart';
 
 /// To be thrown when an insert fails
 class DatabaseInsertFailException implements Exception {

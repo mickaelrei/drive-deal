@@ -4,13 +4,17 @@ import 'package:provider/provider.dart';
 import '../../entities/autonomy_level.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
-import '../../exceptions.dart';
+
 import '../../repositories/autonomy_level_repository.dart';
 import '../../repositories/partner_store_repository.dart';
 import '../../repositories/user_repository.dart';
+
 import '../../usecases/autonomy_level_use_case.dart';
 import '../../usecases/partner_store_use_case.dart';
 import '../../usecases/user_use_case.dart';
+
+import '../../utils/dialogs.dart';
+import '../../utils/exceptions.dart';
 import '../form_utils.dart';
 
 /// Provider for register store form
@@ -107,7 +111,7 @@ class RegisterStoreState with ChangeNotifier {
 
     // If no errors, call onRegister callback and return null meaning success
     if (onRegister != null) {
-      onRegister!(partnerStore);
+      await onRegister!(partnerStore);
     }
     return null;
   }
@@ -198,7 +202,7 @@ class RegisterStoreForm extends StatelessWidget {
 
                     // Show dialog with register result
                     if (context.mounted) {
-                      registerDialog(context, result);
+                      await registerDialog(context, result);
                     }
                   },
                 ),
@@ -260,23 +264,4 @@ class AutonomyLevelDropdown extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Show register dialog
-void registerDialog(BuildContext context, String? result) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(result == null ? 'Success' : 'Error'),
-        content: Text(result ?? 'Successfully registered!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
-          )
-        ],
-      );
-    },
-  );
 }

@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import '../entities/user.dart';
@@ -72,7 +73,7 @@ class UserUseCase {
       password += String.fromCharCode(code);
     }
 
-    print('Generated password: $password');
+    dev.log('Generated password: $password');
     return password;
   }
 

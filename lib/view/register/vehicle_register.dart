@@ -17,6 +17,7 @@ import '../form_utils.dart';
 class RegisterVehicleState with ChangeNotifier {
   /// Constructor
   RegisterVehicleState({required this.partnerStore, this.onRegister}) {
+    // ignore: discarded_futures
     init();
   }
 
@@ -65,7 +66,7 @@ class RegisterVehicleState with ChangeNotifier {
   DateTime? purchaseDate;
 
   /// Initialize some lists
-  void init() {
+  Future<void> init() async {
     brands = fipeUseCase.getBrands();
     clear();
   }
@@ -153,7 +154,7 @@ class RegisterVehicleState with ChangeNotifier {
   }
 
   /// Method to set new chosen brand
-  void setBrand(FipeBrand? brand) {
+  Future<void> setBrand(FipeBrand? brand) async {
     if (brand == null || _currentBrand == brand) {
       return;
     }
@@ -175,7 +176,7 @@ class RegisterVehicleState with ChangeNotifier {
   }
 
   /// Method to set new chosen model
-  void setModel(FipeModel? model) {
+  Future<void> setModel(FipeModel? model) async {
     if (model == null || _currentModel == model) {
       return;
     }
@@ -197,7 +198,7 @@ class RegisterVehicleState with ChangeNotifier {
   }
 
   /// Method to set new chosen model year
-  void setModelYear(FipeModelYear? modelYear) {
+  Future<void> setModelYear(FipeModelYear? modelYear) async {
     if (modelYear == null || _currentModelYear == modelYear) {
       return;
     }
@@ -271,6 +272,7 @@ class RegisterVehicleState with ChangeNotifier {
       year: manufactureYear,
       plate: plate,
       purchaseDate: purchaseDate!,
+      sold: false,
     );
     await _vehicleUseCase.insert(vehicle, imagePaths);
 

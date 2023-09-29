@@ -25,6 +25,11 @@ class PartnerHomeState with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Callback for when an info about the store was edited
+  void onStoreEdit() {
+    notifyListeners();
+  }
+
   /// Callback for when a vehicle gets registered
   void onVehicleRegister(Vehicle vehicle) {
     // Add to list of vehicles
@@ -64,11 +69,16 @@ class PartnerHomePage extends StatelessWidget {
               // Home
               page = PartnerInfo(partnerStore: partnerStore);
               actionButton = FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
+                onPressed: () async {
+                  // Go in route and check if anything was changed
+                  final changed = await Navigator.of(context).pushNamed(
                     '/store_edit',
                     arguments: partnerStore,
-                  );
+                  ) as bool?;
+
+                  if (changed == true) {
+                    state.onStoreEdit();
+                  }
                 },
                 child: const Icon(Icons.edit),
               );
@@ -77,8 +87,8 @@ class PartnerHomePage extends StatelessWidget {
               // Register vehicle
               page = VehicleListPage(partnerStore: partnerStore);
               actionButton = FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
+                onPressed: () async {
+                  await Navigator.of(context).pushNamed(
                     '/vehicle_register',
                     arguments: {
                       'partner_store': partnerStore,
@@ -93,8 +103,8 @@ class PartnerHomePage extends StatelessWidget {
               // Register sale
               page = SaleListPage(partnerStore: partnerStore);
               actionButton = FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
+                onPressed: () async {
+                  await Navigator.of(context).pushNamed(
                     '/sale_register',
                     arguments: {
                       'partner_store': partnerStore,

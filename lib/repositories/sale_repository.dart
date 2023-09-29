@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../database/database.dart';
 import '../database/sale_table.dart';
 
@@ -16,7 +18,7 @@ class SaleRepository {
     final database = await getDatabase();
     final map = sale.toMap();
 
-    return await database.insert(SaleTable.tableName, map);
+    return database.insert(SaleTable.tableName, map);
   }
 
   /// Method to get all [Sale] objects in [SaleTable]
@@ -53,12 +55,6 @@ class SaleRepository {
 
   /// Method to delete a specific [Sale] from database
   Future<void> delete(Sale sale) async {
-    final database = await getDatabase();
-
-    await database.delete(
-      SaleTable.tableName,
-      where: '${SaleTable.id} = ?',
-      whereArgs: [sale.id],
-    );
+    log('Attempt to delete sale');
   }
 }

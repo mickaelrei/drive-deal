@@ -27,4 +27,14 @@ class VehicleImageUseCase {
     // Save image
     await _vehicleImageRepository.saveImage(File(originalPath));
   }
+
+  /// Method to delete a [VehicleImage] from the database
+  Future<void> delete(VehicleImage image) async {
+    await _vehicleImageRepository.delete(image);
+  }
+
+  /// Method to load an image from a given name
+  Future<File> loadImage(String imageName) async {
+    return _vehicleImageRepository.loadImage(imageName);
+  }
 }
