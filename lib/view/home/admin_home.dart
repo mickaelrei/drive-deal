@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +14,7 @@ import '../register/store_register.dart';
 class AdminHomeState with ChangeNotifier {
   /// Constructor
   AdminHomeState() {
-    getLists();
+    unawaited(getLists());
   }
 
   /// For [PartnerStore] operations

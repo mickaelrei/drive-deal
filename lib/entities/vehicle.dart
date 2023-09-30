@@ -15,7 +15,7 @@ class Vehicle {
     required this.year,
     required this.plate,
     required this.purchaseDate,
-    this.sold = false,
+    required this.sold, // = false,
   });
 
   /// ID for database identification
@@ -46,7 +46,7 @@ class Vehicle {
   final DateTime purchaseDate;
 
   /// Whether there is a [Sale] registered on this vehicel
-  final bool sold;
+  bool sold;
 
   /// List of all [VehicleImage]s for this vehicle
   final _images = <VehicleImage>[];

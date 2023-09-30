@@ -63,6 +63,7 @@ class VehicleListState with ChangeNotifier {
   void onDelete(Vehicle vehicle) async {
     // TODO: Instead of deleting, just mark as "sold" when a Sale
     //  gets registered on the vehicle
+    log('Vehicle delete is disabled');
 
     // // Wait for database deletion
     // await _vehicleUseCase.delete(vehicle);
@@ -165,7 +166,8 @@ class VehicleTile extends StatelessWidget {
       shadowColor: Colors.grey,
       child: ListTile(
         title: Text(
-          vehicle.model,
+          '${vehicle.sold ? '(SOLD) ' : ''}${vehicle.model}',
+          // style: TextStyle(overflow: TextOverflow.ellipsis),
         ),
         subtitle: Text('${vehicle.brand}, ${vehicle.modelYear}'),
         trailing: Row(
@@ -178,18 +180,6 @@ class VehicleTile extends StatelessWidget {
                 log('Vehicle edit');
               },
             ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              splashRadius: 25,
-              onPressed: () async {
-                // Show confirm dialog
-                final confirmed = await confirmDialog(context);
-
-                if (confirmed) {
-                  onDelete(vehicle);
-                }
-              },
-            )
           ],
         ),
         leading: FutureBuilder(

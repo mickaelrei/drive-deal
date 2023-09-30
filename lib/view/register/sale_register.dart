@@ -19,6 +19,9 @@ class RegisterSaleState with ChangeNotifier {
   /// What [PartnerStore] is this provider linked to
   final PartnerStore partnerStore;
 
+  /// List of vehicles available for sale
+  final availableVehicles = <Vehicle>[];
+
   /// Callback function for when a sale gets registered
   final void Function(Sale)? onRegister;
 
@@ -56,7 +59,15 @@ class RegisterSaleState with ChangeNotifier {
   }
 
   /// Initialize some lists
-  void init() {}
+  void init() {
+    availableVehicles.clear();
+
+    // Filter for not sold vehicles
+    final notSold = partnerStore.vehicles.where((vehicle) => !vehicle.sold);
+
+    // Add to list
+    availableVehicles.addAll(notSold);
+  }
 
   /// Method to clear everything for a new register
   void clear() {
@@ -163,7 +174,7 @@ class RegisterSaleForm extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    items: partnerStore.vehicles
+                    items: state.availableVehicles
                         .map(
                           (e) => DropdownMenuItem<Vehicle>(
                             value: e,

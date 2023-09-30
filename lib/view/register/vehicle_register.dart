@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -17,8 +18,7 @@ import '../form_utils.dart';
 class RegisterVehicleState with ChangeNotifier {
   /// Constructor
   RegisterVehicleState({required this.partnerStore, this.onRegister}) {
-    // ignore: discarded_futures
-    init();
+    unawaited(init());
   }
 
   /// What [PartnerStore] is this provider linked to
@@ -381,7 +381,9 @@ class RegisterVehicleForm extends StatelessWidget {
 
                     if (snapshot.data == null) {
                       // Empty text entry
-                      return const FormTextEntry();
+                      return const FormTextEntry(
+                        enabled: false,
+                      );
                     }
 
                     return FormTextEntry(

@@ -3,6 +3,7 @@ import 'dart:developer';
 import '../database/database.dart';
 import '../database/sale_table.dart';
 
+import '../database/vehicle_table.dart';
 import '../entities/sale.dart';
 import 'vehicle_repository.dart';
 
@@ -18,7 +19,21 @@ class SaleRepository {
     final database = await getDatabase();
     final map = sale.toMap();
 
-    return database.insert(SaleTable.tableName, map);
+    // Insert sale
+    final saleId = database.insert(SaleTable.tableName, map);
+
+    // Set vehicle.sold to true
+    sale.vehicle.sold = true;
+
+    // Update in database
+    await database.update(
+      VehicleTable.tableName,
+      sale.vehicle.toMap(),
+      where: '${VehicleTable.id} = ?',
+      whereArgs: [sale.vehicle.id],
+    );
+
+    return saleId;
   }
 
   /// Method to get all [Sale] objects in [SaleTable]
