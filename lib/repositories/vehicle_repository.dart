@@ -87,6 +87,18 @@ class VehicleRepository {
     return null;
   }
 
+  /// Method to update a [Vehicle] in the database
+  Future<void> update(Vehicle vehicle) async {
+    final database = await getDatabase();
+
+    await database.update(
+      VehicleTable.tableName,
+      vehicle.toMap(),
+      where: '${VehicleTable.id} = ?',
+      whereArgs: [vehicle.id],
+    );
+  }
+
   /// Method to delete a specific [Vehicle] from database
   Future<void> delete(Vehicle vehicle) async {
     final database = await getDatabase();

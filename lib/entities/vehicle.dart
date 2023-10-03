@@ -1,5 +1,6 @@
 import '../database/vehicle_table.dart';
 import 'partner_store.dart';
+import 'sale.dart';
 import 'vehicle_image.dart';
 
 /// Vehicle entity
@@ -25,25 +26,25 @@ class Vehicle {
   final int storeId;
 
   /// Used to get info on Fipe API
-  final String model;
+  String model;
 
   /// Used to get info on Fipe API
-  final String brand;
+  String brand;
 
   /// Model year, used on Fipe API
-  final String modelYear;
+  String modelYear;
 
   /// Price from Fipe API
-  final double fipePrice;
+  double fipePrice;
 
   /// Manufacture year
-  final int year;
+  int year;
 
   /// Plate, 7 chars in Brazilian format: AAA0A00
-  final String plate;
+  String plate;
 
   /// Date on which this vehicle was purchased by the [PartnerStore]
-  final DateTime purchaseDate;
+  DateTime purchaseDate;
 
   /// Whether there is a [Sale] registered on this vehicel
   bool sold;

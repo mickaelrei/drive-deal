@@ -3,7 +3,6 @@ import 'dart:developer';
 import '../database/database.dart';
 import '../database/sale_table.dart';
 
-import '../database/vehicle_table.dart';
 import '../entities/sale.dart';
 import 'vehicle_repository.dart';
 
@@ -26,12 +25,7 @@ class SaleRepository {
     sale.vehicle.sold = true;
 
     // Update in database
-    await database.update(
-      VehicleTable.tableName,
-      sale.vehicle.toMap(),
-      where: '${VehicleTable.id} = ?',
-      whereArgs: [sale.vehicle.id],
-    );
+    await _vehicleRepository.update(sale.vehicle);
 
     return saleId;
   }

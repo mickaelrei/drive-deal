@@ -39,6 +39,22 @@ class FipeUseCase {
     return items;
   }
 
+  /// Method to get a brand by given name
+  Future<FipeBrand?> getBrandByName(String name) async {
+    // Get all brands
+    final brands = await getBrands();
+    if (brands == null) return null;
+
+    // Find brand with matching name
+    for (final brand in brands) {
+      if (brand.name == name) {
+        return brand;
+      }
+    }
+
+    return null;
+  }
+
   /// Method to get all models by given brand
   Future<List<FipeModel>?> getModelsByBrand(FipeBrand brand) async {
     final url = Uri.parse(
@@ -59,6 +75,22 @@ class FipeUseCase {
     }
 
     return items;
+  }
+
+  /// Method to get a model by given name and brand
+  Future<FipeModel?> getModelByName(String name, FipeBrand brand) async {
+    // Get all models
+    final models = await getModelsByBrand(brand);
+    if (models == null) return null;
+
+    // Find model with matching name
+    for (final model in models) {
+      if (model.name == name) {
+        return model;
+      }
+    }
+
+    return null;
   }
 
   /// Method to get all model years by given brand and model
@@ -85,6 +117,26 @@ class FipeUseCase {
     }
 
     return items;
+  }
+
+  /// Method to get a model year by given name, brand and model
+  Future<FipeModelYear?> getModelYearByName(
+    String name,
+    FipeBrand brand,
+    FipeModel model,
+  ) async {
+    // Get all modelYears
+    final modelYears = await getModelYears(brand, model);
+    if (modelYears == null) return null;
+
+    // Find model year with matching name
+    for (final modelYear in modelYears) {
+      if (modelYear.name == name) {
+        return modelYear;
+      }
+    }
+
+    return null;
   }
 
   /// Method to get all extra info of a vehicle by given brand, model and year

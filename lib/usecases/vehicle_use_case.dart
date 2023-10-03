@@ -31,17 +31,64 @@ class VehicleUseCase {
     final vehicleId = await _vehicleRepository.insert(vehicle);
     vehicle.id = vehicleId;
 
-    if (imagePaths != null) {
-      // Insert all images
-      for (final path in imagePaths) {
+    if (imagePaths == null) return;
+
+    // Insert all images
+    for (final path in imagePaths) {
+      // Create object
+      final vehicleImage = VehicleImage(
+        name: basename(path),
+        vehicleId: vehicleId,
+      );
+      vehicle.images.add(vehicleImage);
+
+      // Insert on database
+      await _vehicleImageUseCase.insert(vehicleImage, originalPath: path);
+    }
+  }
+
+  /// Method to update a [Vehicle] in the database
+  Future<void> update(Vehicle vehicle, [List<String>? imagePaths]) async {
+    await _vehicleRepository.update(vehicle);
+
+    if (imagePaths == null) return;
+
+    // Check for deleted images
+    for (final originalImage in vehicle.images) {
+      // Try to find a path with matching file name
+      final result = imagePaths.where(
+        (path) => basename(path) == originalImage.name,
+      );
+
+      // If didn't find, delete image
+      if (result.isEmpty) {
+        // Remove from list
+        vehicle.images.removeWhere((image) => image == originalImage);
+
+        // Delete from database
+        await _vehicleImageUseCase.delete(originalImage);
+      }
+    }
+
+    // Check for new images
+    for (final path in imagePaths) {
+      // Try to find an image with matching name
+      final result = vehicle.images.where(
+        (image) => image.name == basename(path),
+      );
+
+      // If didn't find, it's a new image
+      if (result.isEmpty) {
         // Create object
         final vehicleImage = VehicleImage(
           name: basename(path),
-          vehicleId: vehicleId,
+          vehicleId: vehicle.id!,
         );
+
+        // Add to vehicle list
         vehicle.images.add(vehicleImage);
 
-        // Insert on database
+        // Insert in database
         await _vehicleImageUseCase.insert(vehicleImage, originalPath: path);
       }
     }

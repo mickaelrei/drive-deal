@@ -266,11 +266,12 @@ class FutureDropdown<T> extends StatelessWidget {
             return DropdownButtonFormField<T>(
               isExpanded: true,
               decoration: InputDecoration(
+                labelText: 'Unable to retrieve data',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              items: const [],
+              items: null,
               onChanged: onChanged,
             );
           }
@@ -278,7 +279,7 @@ class FutureDropdown<T> extends StatelessWidget {
           // Build dropdown items
           final dropdownItems = <DropdownMenuItem<T>>[];
           for (final item in snapshot.data!) {
-            dropdownItems.add(DropdownMenuItem(
+            dropdownItems.add(DropdownMenuItem<T>(
               value: item,
               child: dropdownBuilder(item),
             ));

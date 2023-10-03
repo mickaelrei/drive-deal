@@ -73,7 +73,9 @@ class PartnerHomePage extends StatelessWidget {
                   // Go in route and check if anything was changed
                   final changed = await Navigator.of(context).pushNamed(
                     '/store_edit',
-                    arguments: partnerStore,
+                    arguments: {
+                      'partner_store': partnerStore,
+                    },
                   ) as bool?;
 
                   if (changed == true) {

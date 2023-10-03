@@ -8,7 +8,6 @@ import '../../entities/partner_store.dart';
 import '../../entities/vehicle.dart';
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/vehicle_use_case.dart';
-import '../../utils/dialogs.dart';
 
 /// Provider for vehicle listing page
 class VehicleListState with ChangeNotifier {
@@ -59,24 +58,10 @@ class VehicleListState with ChangeNotifier {
     return _vehicleImages[vehicle];
   }
 
-  /// Method to delete a vehicle from the listing page
-  void onDelete(Vehicle vehicle) async {
-    // TODO: Instead of deleting, just mark as "sold" when a Sale
-    //  gets registered on the vehicle
-    log('Vehicle delete is disabled');
-
-    // // Wait for database deletion
-    // await _vehicleUseCase.delete(vehicle);
-
-    // // Delete from list
-    // partnerStore.vehicles.removeWhere((element) => element.id == vehicle.id);
-
-    // // Delete from images map
-    // _vehicleImages.removeWhere((key, value) => key.id == vehicle.id);
-
-    // // Check for changes in vehicle list
-    // await updateImages();
-    // notifyListeners();
+  /// Callback for vehicle edit
+  void onEdit(Vehicle vehicle) {
+    log('Vehicle with id ${vehicle.id} was edited');
+    notifyListeners();
   }
 }
 
@@ -130,7 +115,15 @@ class VehicleListPage extends StatelessWidget {
                 child: VehicleTile(
                   vehicle: vehicle,
                   images: images,
-                  onDelete: state.onDelete,
+                  onEdit: () async {
+                    await Navigator.of(context).pushNamed(
+                      '/vehicle_edit',
+                      arguments: {
+                        'vehicle': vehicle,
+                        'on_edit': state.onEdit,
+                      },
+                    );
+                  },
                 ),
               );
             },
@@ -147,7 +140,7 @@ class VehicleTile extends StatelessWidget {
   const VehicleTile(
       {required this.vehicle,
       required this.images,
-      required this.onDelete,
+      required this.onEdit,
       super.key});
 
   /// [Vehicle] object to show
@@ -156,8 +149,8 @@ class VehicleTile extends StatelessWidget {
   /// List of images of the [Vehicle]
   final Future<List<File>>? images;
 
-  /// Callback for deletion
-  final void Function(Vehicle) onDelete;
+  /// Callback for edit
+  final void Function() onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -166,20 +159,26 @@ class VehicleTile extends StatelessWidget {
       shadowColor: Colors.grey,
       child: ListTile(
         title: Text(
-          '${vehicle.sold ? '(SOLD) ' : ''}${vehicle.model}',
+          vehicle.model,
           // style: TextStyle(overflow: TextOverflow.ellipsis),
         ),
         subtitle: Text('${vehicle.brand}, ${vehicle.modelYear}'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              icon: const Icon(Icons.edit, color: Colors.blue),
-              splashRadius: 25,
-              onPressed: () {
-                log('Vehicle edit');
-              },
-            ),
+            vehicle.sold
+                ? IconButton(
+                    icon: const Icon(Icons.circle),
+                    color: Colors.red,
+                    onPressed: () {
+                      log('ele');
+                    },
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    splashRadius: 25,
+                    onPressed: onEdit,
+                  ),
           ],
         ),
         leading: FutureBuilder(
