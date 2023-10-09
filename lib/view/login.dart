@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../entities/partner_store.dart';
 import '../entities/user.dart';
 
 import '../repositories/partner_store_repository.dart';
@@ -10,7 +9,7 @@ import '../usecases/partner_store_use_case.dart';
 import '../usecases/user_use_case.dart';
 
 import '../utils/dialogs.dart';
-import 'form_utils.dart';
+import '../utils/forms.dart';
 
 /// Provider for login page
 class LoginState with ChangeNotifier {
@@ -36,10 +35,10 @@ class LoginState with ChangeNotifier {
   GlobalKey<FormState> get formKey => _formKey;
 
   /// Method for login attempt
-  Future<LoginType> login() async {
+  Future<User?> login() async {
     // User object that will be either an admin or normal user (or null
     // in case of invalid login)
-    late User? user;
+    late final User? user;
 
     // In case no login text is provided
     final loginText = nameOrCnpjController.text;
@@ -48,10 +47,10 @@ class LoginState with ChangeNotifier {
     if (_userUseCase.isCNPJ(loginText)) {
       // Its a CNPJ
       // Try to find store with same CNPJ
-      final store = await getPartnerStore(loginText);
+      final store = await _partnerStoreUseCase.selectByCNPJ(loginText);
       if (store == null) {
         // No store with this CNPJ
-        return LoginType.invalid;
+        return null;
       }
 
       // Get normal user
@@ -67,22 +66,19 @@ class LoginState with ChangeNotifier {
       );
     }
 
-    // Invalid user
-    if (user == null) {
-      return LoginType.invalid;
-    }
+    // Return user object
+    return user;
+    // // Invalid user
+    // if (user == null) {
+    //   return LoginType.invalid;
+    // }
 
-    // Valid user
-    if (user.isAdmin) {
-      return LoginType.admin;
-    } else {
-      return LoginType.nonAdmin;
-    }
-  }
-
-  /// Method to get partner store
-  Future<PartnerStore?> getPartnerStore([String? cnpj]) async {
-    return _partnerStoreUseCase.selectByCNPJ(cnpj ?? nameOrCnpjController.text);
+    // // Valid user
+    // if (user.isAdmin) {
+    //   return LoginType.admin;
+    // } else {
+    //   return LoginType.nonAdmin;
+    // }
   }
 
   @override
@@ -134,13 +130,13 @@ class LoginForm extends StatelessWidget {
                 const FormTitle(
                   title: 'Login',
                 ),
-                const FormTextHeader(label: 'Name or CNPJ'),
+                const TextHeader(label: 'Name or CNPJ'),
                 FormTextEntry(
                   controller: state.nameOrCnpjController,
                   label: 'Name or CNPJ',
                   prefixIcon: Icons.person,
                 ),
-                const FormTextHeader(label: 'Password'),
+                const TextHeader(label: 'Password'),
                 FormTextEntry(
                   controller: state.passwordController,
                   hidden: true,
@@ -158,31 +154,24 @@ class LoginForm extends StatelessWidget {
                       if (!state.formKey.currentState!.validate()) return;
 
                       // In case of valid entries, try to submit
-                      final loginType = await state.login();
-                      switch (loginType) {
-                        case LoginType.invalid:
-                          if (context.mounted) {
-                            await invalidLoginDialog(context);
-                          }
-                          break;
-                        case LoginType.admin:
-                          if (context.mounted) {
-                            await Navigator.of(context).pushNamed(
-                              '/home',
-                              arguments: {'is_admin': true},
-                            );
-                          }
+                      final user = await state.login();
 
-                        case LoginType.nonAdmin:
-                          if (context.mounted) {
-                            await Navigator.of(context).pushNamed(
-                              '/home',
-                              arguments: {
-                                'is_admin': false,
-                                'partner_store': await state.getPartnerStore(),
-                              },
-                            );
-                          }
+                      // If user is null, login was invalid
+                      if (user == null) {
+                        if (context.mounted) {
+                          await invalidLoginDialog(context);
+                        }
+                        return;
+                      }
+
+                      // Go to home page
+                      if (context.mounted) {
+                        await Navigator.of(context).pushNamed(
+                          '/home',
+                          arguments: {
+                            'user': user,
+                          },
+                        );
                       }
                     },
                   ),
@@ -194,16 +183,4 @@ class LoginForm extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Enum for type of login
-enum LoginType {
-  /// Admin login
-  admin,
-
-  /// Non-admin (partner) login
-  nonAdmin,
-
-  /// Invalid login (incorrect name or password)
-  invalid,
 }

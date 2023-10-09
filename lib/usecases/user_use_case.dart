@@ -18,6 +18,11 @@ class UserUseCase {
     return _userRepository.select();
   }
 
+  /// Method to select from db by given id
+  Future<User?> selectById(int id) async {
+    return _userRepository.selectById(id);
+  }
+
   /// Method to insert a [User] in the database
   Future<void> insert(User user) async {
     final id = await _userRepository.insert(user);
@@ -52,7 +57,8 @@ class UserUseCase {
     // Get all users
     final users = await select();
     for (final user in users) {
-      if (user.storeId != storeId) continue;
+      // If no partner store (admin) or different id, ignore
+      if (user.store == null || user.store!.id != storeId) continue;
 
       // Check if password is the same
       if (user.password == password) {

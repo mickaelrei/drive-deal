@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
+import '../../entities/user.dart';
 import '../../entities/vehicle.dart';
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/vehicle_use_case.dart';
@@ -68,68 +69,109 @@ class VehicleListState with ChangeNotifier {
 /// Widget for listing [Vehicle]s
 class VehicleListPage extends StatelessWidget {
   /// Constructor
-  const VehicleListPage({required this.partnerStore, super.key});
+  const VehicleListPage({
+    required this.partnerStore,
+    this.navBar,
+    this.onVehicleRegister,
+    this.theme = UserSettings.defaultAppTheme,
+    super.key,
+  });
 
   /// [Vehicle] objects will be listed from this [PartnerStore] object
   final PartnerStore partnerStore;
 
+  /// Page navigation bar
+  final Widget? navBar;
+
+  /// Optional callback for when a vehicle gets registered
+  final void Function(Vehicle)? onVehicleRegister;
+
+  /// App theme
+  final AppTheme theme;
+
   @override
   Widget build(BuildContext context) {
+    // Scaffold body
+    late final Widget body;
+
+    // Check if list of vehicles is empty
     if (partnerStore.vehicles.isEmpty) {
-      return const Center(
+      body = const Center(
         child: Text(
           'No vehicles!',
           style: TextStyle(fontSize: 25),
         ),
       );
+    } else {
+      body = ChangeNotifierProvider(
+        create: (context) {
+          return VehicleListState(partnerStore: partnerStore);
+        },
+        child: Consumer<VehicleListState>(
+          builder: (_, state, __) {
+            // TODO: Add a "sort-by" to sort by:
+            //  - All
+            //  - Sold
+            //  - Not sold
+            //  - Price
+            //  - Purchase date
+            //  -
+
+            // TODO: Sort order:
+            //  - Ascending
+            //  - Descending
+            return ListView.builder(
+              itemCount: partnerStore.vehicles.length,
+              itemBuilder: (context, index) {
+                // Get vehicle object
+                final vehicle = partnerStore.vehicles[index];
+
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: VehicleTile(
+                    vehicle: vehicle,
+                    images: state.getImages(vehicle),
+                    onEdit: () async {
+                      await Navigator.of(context).pushNamed(
+                        '/vehicle_edit',
+                        arguments: {
+                          'vehicle': vehicle,
+                          'on_edit': state.onEdit,
+                          'theme': theme,
+                        },
+                      );
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      );
     }
 
-    return ChangeNotifierProvider(
-      create: (context) {
-        return VehicleListState(partnerStore: partnerStore);
-      },
-      child: Consumer<VehicleListState>(
-        builder: (_, state, __) {
-          // TODO: Add a "sort-by" to sort by:
-          //  - All
-          //  - Sold
-          //  - Not sold
-          //  - Price
-          //  - Purchase date
-          //  -
-
-          // TODO: Sort order:
-          //  - Ascending
-          //  - Descending
-          return ListView.builder(
-            itemCount: partnerStore.vehicles.length,
-            itemBuilder: (context, index) {
-              // Get vehicle object
-              final vehicle = partnerStore.vehicles[index];
-
-              // Get images for this vehicle
-              final images = state.getImages(vehicle);
-
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: VehicleTile(
-                  vehicle: vehicle,
-                  images: images,
-                  onEdit: () async {
-                    await Navigator.of(context).pushNamed(
-                      '/vehicle_edit',
-                      arguments: {
-                        'vehicle': vehicle,
-                        'on_edit': state.onEdit,
-                      },
-                    );
-                  },
-                ),
-              );
+    return Scaffold(
+      appBar: AppBar(title: const Text('Vehicles')),
+      bottomNavigationBar: navBar,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Wait until finished registering vehicles
+          await Navigator.of(context).pushNamed(
+            '/vehicle_register',
+            arguments: {
+              'partner_store': partnerStore,
+              'on_register': onVehicleRegister,
+              'theme': theme,
             },
           );
+
+          // Update page
+          // TODO: Need to get state from here. Put Provider on top of Scaffold
+          // state.;
         },
+        child: const Icon(Icons.add),
       ),
+      body: body,
     );
   }
 }
@@ -160,7 +202,6 @@ class VehicleTile extends StatelessWidget {
       child: ListTile(
         title: Text(
           vehicle.model,
-          // style: TextStyle(overflow: TextOverflow.ellipsis),
         ),
         subtitle: Text('${vehicle.brand}, ${vehicle.modelYear}'),
         trailing: Row(
@@ -168,11 +209,10 @@ class VehicleTile extends StatelessWidget {
           children: [
             vehicle.sold
                 ? IconButton(
-                    icon: const Icon(Icons.circle),
+                    icon: const Icon(Icons.sell),
                     color: Colors.red,
-                    onPressed: () {
-                      log('ele');
-                    },
+                    splashRadius: 1,
+                    onPressed: () {},
                   )
                 : IconButton(
                     icon: const Icon(Icons.edit, color: Colors.blue),
@@ -189,7 +229,11 @@ class VehicleTile extends StatelessWidget {
             }
 
             if (snapshot.data == null) {
-              return const NoVehicleTile();
+              return const NoVehicleImage();
+            }
+
+            if (snapshot.data!.isEmpty) {
+              return const NoVehicleImage();
             }
 
             return CircleAvatar(
@@ -207,9 +251,9 @@ class VehicleTile extends StatelessWidget {
 }
 
 /// Widget for an image in a [VehicleTile] with no images
-class NoVehicleTile extends StatelessWidget {
+class NoVehicleImage extends StatelessWidget {
   /// Constructor
-  const NoVehicleTile({super.key});
+  const NoVehicleImage({super.key});
 
   @override
   Widget build(BuildContext context) {

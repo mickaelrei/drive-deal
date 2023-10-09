@@ -95,9 +95,9 @@ class FormTextEntry extends StatelessWidget {
 }
 
 /// Text that appears before a form text entry
-class FormTextHeader extends StatelessWidget {
+class TextHeader extends StatelessWidget {
   /// Constructor
-  const FormTextHeader({required this.label, super.key});
+  const TextHeader({required this.label, super.key});
 
   /// What text to show on the header
   final String label;
@@ -266,7 +266,6 @@ class FutureDropdown<T> extends StatelessWidget {
             return DropdownButtonFormField<T>(
               isExpanded: true,
               decoration: InputDecoration(
-                labelText: 'Unable to retrieve data',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),

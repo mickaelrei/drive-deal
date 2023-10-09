@@ -34,7 +34,7 @@ class PartnerStoreUseCase {
 
     // Create user for this partner store
     final user = User(
-      storeId: storeId,
+      store: partnerStore,
       password: password,
     );
     await _userUseCase.insert(user);

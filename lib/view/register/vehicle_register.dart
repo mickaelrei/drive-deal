@@ -4,20 +4,23 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/vehicle.dart';
+
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/fipe_use_case.dart';
 import '../../usecases/vehicle_use_case.dart';
-import '../form_utils.dart';
 
-/// Provider for register vehicle page
-class RegisterVehicleState with ChangeNotifier {
+import '../../utils/currency_format.dart';
+import '../../utils/dialogs.dart';
+import '../../utils/forms.dart';
+
+/// Provider for vehicle register page
+class VehicleRegisterState with ChangeNotifier {
   /// Constructor
-  RegisterVehicleState({required this.partnerStore, this.onRegister}) {
+  VehicleRegisterState({required this.partnerStore, this.onRegister}) {
     unawaited(init());
   }
 
@@ -64,6 +67,9 @@ class RegisterVehicleState with ChangeNotifier {
 
   /// Input vehicle purchase date
   DateTime? purchaseDate;
+
+  /// Vehicle that (eventually) got registered
+  Vehicle? _registeredVehicle;
 
   /// Initialize some lists
   Future<void> init() async {
@@ -281,8 +287,16 @@ class RegisterVehicleState with ChangeNotifier {
       onRegister!(vehicle);
     }
 
+    // Set registered vehicle
+    _registeredVehicle = vehicle;
+
     // Success
     return null;
+  }
+
+  /// Returns the registered vehicle, if it got registered already
+  Vehicle? getRegisteredVehicle() {
+    return _registeredVehicle;
   }
 
   @override
@@ -294,10 +308,13 @@ class RegisterVehicleState with ChangeNotifier {
 }
 
 /// Form for [Vehicle] registering
-class RegisterVehicleForm extends StatelessWidget {
+class VehicleRegisterForm extends StatelessWidget {
   /// Constructor
-  const RegisterVehicleForm(
-      {required this.partnerStore, this.onRegister, super.key});
+  const VehicleRegisterForm({
+    required this.partnerStore,
+    this.onRegister,
+    super.key,
+  });
 
   /// Which [PartnerStore] will the registered vehicle be linked to
   final PartnerStore partnerStore;
@@ -307,14 +324,14 @@ class RegisterVehicleForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<RegisterVehicleState>(
+    return ChangeNotifierProvider<VehicleRegisterState>(
       create: (context) {
-        return RegisterVehicleState(
+        return VehicleRegisterState(
           partnerStore: partnerStore,
           onRegister: onRegister,
         );
       },
-      child: Consumer<RegisterVehicleState>(
+      child: Consumer<VehicleRegisterState>(
         builder: (_, state, __) {
           // Create preview images
           final previewImages = <Widget>[];
@@ -338,7 +355,7 @@ class RegisterVehicleForm extends StatelessWidget {
                 const FormTitle(
                   title: 'Register Vehicle',
                 ),
-                const FormTextHeader(label: 'Brand'),
+                const TextHeader(label: 'Brand'),
                 FutureDropdown<FipeBrand>(
                   initialSelected: state._currentBrand,
                   future: state.brands,
@@ -347,7 +364,7 @@ class RegisterVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const FormTextHeader(label: 'Model'),
+                const TextHeader(label: 'Model'),
                 FutureDropdown<FipeModel>(
                   future: state.models,
                   onChanged: state.setModel,
@@ -355,7 +372,7 @@ class RegisterVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const FormTextHeader(label: 'Model year'),
+                const TextHeader(label: 'Model year'),
                 FutureDropdown<FipeModelYear>(
                   future: state.modelYears,
                   onChanged: state.setModelYear,
@@ -363,7 +380,7 @@ class RegisterVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const FormTextHeader(label: 'FIPE price'),
+                const TextHeader(label: 'FIPE price'),
                 FutureBuilder(
                   future: state.currentVehicleInfo,
                   builder: (context, snapshot) {
@@ -392,22 +409,22 @@ class RegisterVehicleForm extends StatelessWidget {
                     );
                   },
                 ),
-                const FormTextHeader(label: 'Manufacture year'),
+                const TextHeader(label: 'Manufacture year'),
                 FormTextEntry(
                   label: 'Manufacture year',
                   controller: state.manufactureYearController,
                 ),
-                const FormTextHeader(label: 'Plate'),
+                const TextHeader(label: 'Plate'),
                 FormTextEntry(
                   label: 'Plate',
                   controller: state.plateController,
                 ),
-                const FormTextHeader(label: 'Purchase date'),
+                const TextHeader(label: 'Purchase date'),
                 DatePicker(
                   initialDate: state.purchaseDate,
                   onDatePicked: state.setDate,
                 ),
-                const FormTextHeader(label: 'Images'),
+                const TextHeader(label: 'Images'),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: VehicleImagesScrollView(
@@ -429,9 +446,12 @@ class RegisterVehicleForm extends StatelessWidget {
                         await registerDialog(context, result);
                       }
 
-                      // Clear inputs
+                      // Return to list page
                       if (result == null) {
-                        state.clear();
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop(
+                          state.getRegisteredVehicle(),
+                        );
                       }
                     },
                   ),
@@ -554,34 +574,4 @@ class VehicleImagePreview extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Format price in brazil's currency
-String formatPrice(double price) {
-  final priceFormat = NumberFormat.currency(
-    locale: 'pt_BR',
-    symbol: 'R\$',
-    decimalDigits: 2,
-  );
-
-  return priceFormat.format(price);
-}
-
-/// Show register dialog
-Future<void> registerDialog(BuildContext context, String? result) async {
-  await showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(result == null ? 'Success' : 'Error'),
-        content: Text(result ?? 'Successfully registered!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
-          )
-        ],
-      );
-    },
-  );
 }

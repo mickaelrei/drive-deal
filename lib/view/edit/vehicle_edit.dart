@@ -1,25 +1,27 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/vehicle.dart';
+
 import '../../repositories/vehicle_image_repository.dart';
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/fipe_use_case.dart';
 import '../../usecases/vehicle_image_use_case.dart';
 import '../../usecases/vehicle_use_case.dart';
-import '../form_utils.dart';
 
-/// Provider for edit vehicle page
-class EditVehicleState with ChangeNotifier {
+import '../../utils/currency_format.dart';
+import '../../utils/dialogs.dart';
+import '../../utils/forms.dart';
+
+/// Provider for vehicle edit page
+class VehicleEditState with ChangeNotifier {
   /// Constructor
-  EditVehicleState({required this.vehicle, this.onEdit}) {
+  VehicleEditState({required this.vehicle, this.onEdit}) {
     // Set initial values on inputs
     unawaited(init());
   }
@@ -79,6 +81,8 @@ class EditVehicleState with ChangeNotifier {
   /// Input vehicle purchase date
   DateTime? purchaseDate;
 
+  bool _disposed = false;
+
   /// Initialize inputs with current vehicle data
   Future<void> init() async {
     // Clear lists
@@ -95,13 +99,11 @@ class EditVehicleState with ChangeNotifier {
     _currentBrand = await fipeUseCase.getBrandByName(vehicle.brand);
     if (_currentBrand == null) {
       // Error getting brand
-      log('Error loading brand ${vehicle.brand}');
       error = true;
       loading = false;
-      notifyListeners();
+      _updateScreen();
       return;
     }
-    log('Loaded brand');
 
     // Get model
     _currentModel = await fipeUseCase.getModelByName(
@@ -110,13 +112,11 @@ class EditVehicleState with ChangeNotifier {
     );
     if (_currentModel == null) {
       // Error getting model
-      log('Error loading model ${vehicle.model}');
       error = true;
       loading = false;
-      notifyListeners();
+      _updateScreen();
       return;
     }
-    log('Loaded model');
 
     // Get model year
     _currentModelYear = await fipeUseCase.getModelYearByName(
@@ -126,13 +126,11 @@ class EditVehicleState with ChangeNotifier {
     );
     if (_currentModelYear == null) {
       // Error getting model year
-      log('Error loading model year ${vehicle.modelYear}');
       error = true;
       loading = false;
-      notifyListeners();
+      _updateScreen();
       return;
     }
-    log('Loaded model year');
 
     // Get fipe price
     currentVehicleInfo = fipeUseCase.getInfoByModel(
@@ -150,11 +148,10 @@ class EditVehicleState with ChangeNotifier {
       final file = await _vehicleImageUseCase.loadImage(image.name);
       imagePaths.add(file.path);
     }
-    log('Loaded images');
 
     // Finished loading
     loading = false;
-    notifyListeners();
+    _updateScreen();
   }
 
   /// Method to clear everything for a new edit
@@ -181,7 +178,7 @@ class EditVehicleState with ChangeNotifier {
     // Reset list of images
     imagePaths.clear();
 
-    notifyListeners();
+    _updateScreen();
   }
 
   /// Method to add images from gallery using [ImagePicker]
@@ -196,7 +193,7 @@ class EditVehicleState with ChangeNotifier {
 
         imagePaths.add(file.path);
       }
-      notifyListeners();
+      _updateScreen();
     } on PlatformException {
       /// Happens when trying to use ImagePicker while already being used
       /// (usually on a double click from the user)
@@ -215,7 +212,7 @@ class EditVehicleState with ChangeNotifier {
 
       // Add to list of image paths
       imagePaths.add(image.path);
-      notifyListeners();
+      _updateScreen();
     } on PlatformException {
       /// Happens when trying to use ImagePicker while already being used
       /// (usually on a double click from the user)
@@ -227,7 +224,7 @@ class EditVehicleState with ChangeNotifier {
     // Check if exists
     if (imagePaths.contains(path)) {
       imagePaths.remove(path);
-      notifyListeners();
+      _updateScreen();
     }
   }
 
@@ -236,7 +233,7 @@ class EditVehicleState with ChangeNotifier {
     purchaseDate = date;
 
     // Update to show new picked date
-    notifyListeners();
+    _updateScreen();
   }
 
   /// Method to set new chosen brand
@@ -258,7 +255,7 @@ class EditVehicleState with ChangeNotifier {
     currentVehicleInfo = Future.value(null);
 
     // Update screen
-    notifyListeners();
+    _updateScreen();
   }
 
   /// Method to set new chosen model
@@ -373,8 +370,15 @@ class EditVehicleState with ChangeNotifier {
     return null;
   }
 
+  void _updateScreen() {
+    if (!_disposed) {
+      notifyListeners();
+    }
+  }
+
   @override
   void dispose() {
+    _disposed = true;
     super.dispose();
     manufactureYearController.dispose();
     plateController.dispose();
@@ -382,9 +386,9 @@ class EditVehicleState with ChangeNotifier {
 }
 
 /// Form for [Vehicle] editing
-class EditVehicleForm extends StatelessWidget {
+class VehicleEditForm extends StatelessWidget {
   /// Constructor
-  const EditVehicleForm({required this.vehicle, this.onEdit, super.key});
+  const VehicleEditForm({required this.vehicle, this.onEdit, super.key});
 
   /// Which [Vehicle] will be edited
   final Vehicle vehicle;
@@ -394,14 +398,14 @@ class EditVehicleForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<EditVehicleState>(
+    return ChangeNotifierProvider<VehicleEditState>(
       create: (context) {
-        return EditVehicleState(
+        return VehicleEditState(
           vehicle: vehicle,
           onEdit: onEdit,
         );
       },
-      child: Consumer<EditVehicleState>(
+      child: Consumer<VehicleEditState>(
         builder: (_, state, __) {
           // If still loading info
           if (state.loading) {
@@ -454,7 +458,7 @@ class EditVehicleForm extends StatelessWidget {
                 const FormTitle(
                   title: 'Edit Vehicle',
                 ),
-                const FormTextHeader(label: 'Brand'),
+                const TextHeader(label: 'Brand'),
                 FutureDropdown<FipeBrand>(
                   initialSelected: state._currentBrand,
                   future: state.brands,
@@ -463,7 +467,7 @@ class EditVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const FormTextHeader(label: 'Model'),
+                const TextHeader(label: 'Model'),
                 FutureDropdown<FipeModel>(
                   initialSelected: state._currentModel,
                   future: state.models,
@@ -472,7 +476,7 @@ class EditVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const FormTextHeader(label: 'Model year'),
+                const TextHeader(label: 'Model year'),
                 FutureDropdown<FipeModelYear>(
                   initialSelected: state._currentModelYear,
                   future: state.modelYears,
@@ -481,7 +485,7 @@ class EditVehicleForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const FormTextHeader(label: 'FIPE price'),
+                const TextHeader(label: 'FIPE price'),
                 FutureBuilder(
                   future: state.currentVehicleInfo,
                   builder: (context, snapshot) {
@@ -510,22 +514,22 @@ class EditVehicleForm extends StatelessWidget {
                     );
                   },
                 ),
-                const FormTextHeader(label: 'Manufacture year'),
+                const TextHeader(label: 'Manufacture year'),
                 FormTextEntry(
                   label: 'Manufacture year',
                   controller: state.manufactureYearController,
                 ),
-                const FormTextHeader(label: 'Plate'),
+                const TextHeader(label: 'Plate'),
                 FormTextEntry(
                   label: 'Plate',
                   controller: state.plateController,
                 ),
-                const FormTextHeader(label: 'Purchase date'),
+                const TextHeader(label: 'Purchase date'),
                 DatePicker(
                   initialDate: state.purchaseDate,
                   onDatePicked: state.setDate,
                 ),
-                const FormTextHeader(label: 'Images'),
+                const TextHeader(label: 'Images'),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: VehicleImagesScrollView(
@@ -673,34 +677,4 @@ class VehicleImagePreview extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Format price in brazil's currency
-String formatPrice(double price) {
-  final priceFormat = NumberFormat.currency(
-    locale: 'pt_BR',
-    symbol: 'R\$',
-    decimalDigits: 2,
-  );
-
-  return priceFormat.format(price);
-}
-
-/// Show edit dialog
-Future<void> editDialog(BuildContext context, String? result) async {
-  await showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(result == null ? 'Success' : 'Error'),
-        content: Text(result ?? 'Successfully edited!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
-          )
-        ],
-      );
-    },
-  );
 }

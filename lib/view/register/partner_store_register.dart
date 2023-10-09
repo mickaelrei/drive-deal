@@ -15,12 +15,12 @@ import '../../usecases/user_use_case.dart';
 
 import '../../utils/dialogs.dart';
 import '../../utils/exceptions.dart';
-import '../form_utils.dart';
+import '../../utils/forms.dart';
 
-/// Provider for register store form
-class RegisterStoreState with ChangeNotifier {
+/// Provider for register partner store form
+class PartnerStoreRegisterState with ChangeNotifier {
   /// Constructor
-  RegisterStoreState({required this.onRegister}) {
+  PartnerStoreRegisterState({required this.onRegister}) {
     init();
   }
 
@@ -126,90 +126,108 @@ class RegisterStoreState with ChangeNotifier {
 }
 
 /// Form for registering a partner store
-class RegisterStoreForm extends StatelessWidget {
+class PartnerStoreRegisterForm extends StatelessWidget {
   /// Constructor
-  const RegisterStoreForm({required this.onRegister, super.key});
+  const PartnerStoreRegisterForm({
+    this.navBar,
+    required this.onRegister,
+    this.theme = UserSettings.defaultAppTheme,
+    super.key,
+  });
+
+  /// Page navigation bar
+  final Widget? navBar;
 
   /// Callback to be called when a [PartnerStore] gets registered
   final Future<void> Function(PartnerStore)? onRegister;
 
+  /// App theme
+  final AppTheme theme;
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<RegisterStoreState>(
-      create: (context) {
-        return RegisterStoreState(onRegister: onRegister);
-      },
-      child: Consumer<RegisterStoreState>(
-        builder: (_, state, __) {
-          return Column(
-            children: [
-              const FormTitle(
-                title: 'Register',
-              ),
-              const FormTextHeader(label: 'Name'),
-              FormTextEntry(
-                label: 'Name',
-                controller: state.nameController,
-                validator: (text) {
-                  if (text == null || text.isEmpty) {
-                    return 'Name can\'t be empty';
-                  }
-                  if (text.length < 3) {
-                    return 'Name needs to be at least 3 characters long';
-                  }
-                  if (text.length > 120) {
-                    return 'Name can be at max 120 characters long';
-                  }
-                  // Valid
-                  return null;
-                },
-              ),
-              const FormTextHeader(label: 'CNPJ'),
-              FormTextEntry(
-                label: 'CNPJ',
-                controller: state.cnpjController,
-                validator: (text) {
-                  if (text == null || text.isEmpty) {
-                    return 'CNPJ can\'t be empty';
-                  }
-                  if (text.length != 14) {
-                    return 'CNPJ needs to be exactly 14 characters long'
-                        ' (only digits)';
-                  }
-                  // Valid
-                  return null;
-                },
-              ),
-              const FormTextHeader(label: 'Autonomy Level'),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: AutonomyLevelDropdown(
-                  items: state.autonomyLevels,
-                  controller: state.autonomyLevelController,
-                  selected: state.chosenAutonomyLevel,
-                  onSelected: (autonomyLevel) {
-                    state.chosenAutonomyLevel = autonomyLevel;
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: SubmitButton(
-                  label: 'Register',
-                  onPressed: () async {
-                    // Try registering
-                    final result = await state.register();
+    return Theme(
+      data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Register Partner Store')),
+        resizeToAvoidBottomInset: false,
+        body: ChangeNotifierProvider<PartnerStoreRegisterState>(
+          create: (context) {
+            return PartnerStoreRegisterState(onRegister: onRegister);
+          },
+          child: Consumer<PartnerStoreRegisterState>(
+            builder: (_, state, __) {
+              return Column(
+                children: [
+                  const FormTitle(
+                    title: 'Register',
+                  ),
+                  const TextHeader(label: 'Name'),
+                  FormTextEntry(
+                    label: 'Name',
+                    controller: state.nameController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return 'Name can\'t be empty';
+                      }
+                      if (text.length < 3) {
+                        return 'Name needs to be at least 3 characters long';
+                      }
+                      if (text.length > 120) {
+                        return 'Name can be at max 120 characters long';
+                      }
+                      // Valid
+                      return null;
+                    },
+                  ),
+                  const TextHeader(label: 'CNPJ'),
+                  FormTextEntry(
+                    label: 'CNPJ',
+                    controller: state.cnpjController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return 'CNPJ can\'t be empty';
+                      }
+                      if (text.length != 14) {
+                        return 'CNPJ needs to be exactly 14 characters long'
+                            ' (only digits)';
+                      }
+                      // Valid
+                      return null;
+                    },
+                  ),
+                  const TextHeader(label: 'Autonomy Level'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: AutonomyLevelDropdown(
+                      items: state.autonomyLevels,
+                      controller: state.autonomyLevelController,
+                      selected: state.chosenAutonomyLevel,
+                      onSelected: (autonomyLevel) {
+                        state.chosenAutonomyLevel = autonomyLevel;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: SubmitButton(
+                      label: 'Register',
+                      onPressed: () async {
+                        // Try registering
+                        final result = await state.register();
 
-                    // Show dialog with register result
-                    if (context.mounted) {
-                      await registerDialog(context, result);
-                    }
-                  },
-                ),
-              )
-            ],
-          );
-        },
+                        // Show dialog with register result
+                        if (context.mounted) {
+                          await registerDialog(context, result);
+                        }
+                      },
+                    ),
+                  )
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }

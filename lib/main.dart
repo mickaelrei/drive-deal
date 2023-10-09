@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'utils/routes.dart';
-import 'view/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,10 +14,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        sliderTheme: const SliderThemeData(
+          showValueIndicator: ShowValueIndicator.always,
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginPage(),
+      routes: const {
+        '/login': loginRoute,
         '/vehicle_register': vehicleRegisterRoute,
         '/vehicle_edit': vehicleEditRoute,
         '/sale_register': saleRegisterRoute,

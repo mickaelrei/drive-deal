@@ -1,6 +1,5 @@
 import '../entities/autonomy_level.dart';
 import '../repositories/autonomy_level_repository.dart';
-import '../utils/exceptions.dart';
 
 /// Class to be used for [AutonomyLevel] operations
 class AutonomyLevelUseCase {
@@ -20,7 +19,9 @@ class AutonomyLevelUseCase {
     final totalPercent =
         autonomyLevel.storePercent + autonomyLevel.networkPercent;
     if (totalPercent > 100) {
-      throw InvalidAutonomyLevelException(
+      throw ArgumentError.value(
+        autonomyLevel,
+        'autonomyLevel',
         'sum of storePercent and networkPercent surpass 100%.',
       );
     }

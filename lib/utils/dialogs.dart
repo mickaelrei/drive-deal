@@ -19,6 +19,25 @@ Future<void> registerDialog(BuildContext context, String? result) async {
   );
 }
 
+/// Show edit dialog
+Future<void> editDialog(BuildContext context, String? result) async {
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(result == null ? 'Success' : 'Error'),
+        content: Text(result ?? 'Successfully edited!'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Ok'),
+          )
+        ],
+      );
+    },
+  );
+}
+
 /// Show invalid login dialog
 Future<void> invalidLoginDialog(BuildContext context) async {
   await showDialog(

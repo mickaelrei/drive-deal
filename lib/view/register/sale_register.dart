@@ -4,15 +4,17 @@ import 'package:provider/provider.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/sale.dart';
 import '../../entities/vehicle.dart';
+
 import '../../repositories/sale_repository.dart';
 import '../../usecases/sale_use_case.dart';
-import '../../utils/dialogs.dart';
-import '../form_utils.dart';
 
-/// Provider for register sale page
-class RegisterSaleState with ChangeNotifier {
+import '../../utils/dialogs.dart';
+import '../../utils/forms.dart';
+
+/// Provider for sale register page
+class SaleRegisterState with ChangeNotifier {
   /// Constructor
-  RegisterSaleState({required this.partnerStore, this.onRegister}) {
+  SaleRegisterState({required this.partnerStore, this.onRegister}) {
     init();
   }
 
@@ -44,6 +46,9 @@ class RegisterSaleState with ChangeNotifier {
 
   /// Input sale date
   DateTime? saleDate;
+
+  /// Sale that (eventually) got registered
+  Sale? _registeredSale;
 
   /// Method to set sale date
   void setDate(DateTime date) {
@@ -121,8 +126,16 @@ class RegisterSaleState with ChangeNotifier {
       onRegister!(sale);
     }
 
+    // Set registered sale
+    _registeredSale = sale;
+
     // Success
     return null;
+  }
+
+  /// Returns the registered sale, if it got registered already
+  Sale? getRegisteredSale() {
+    return _registeredSale;
   }
 
   @override
@@ -135,10 +148,13 @@ class RegisterSaleState with ChangeNotifier {
 }
 
 /// Form for [Sale] registering
-class RegisterSaleForm extends StatelessWidget {
+class SaleRegisterForm extends StatelessWidget {
   /// Constructor
-  const RegisterSaleForm(
-      {required this.partnerStore, this.onRegister, super.key});
+  const SaleRegisterForm({
+    required this.partnerStore,
+    this.onRegister,
+    super.key,
+  });
 
   /// Which [PartnerStore] will the registered sale be linked to
   final PartnerStore partnerStore;
@@ -148,14 +164,14 @@ class RegisterSaleForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<RegisterSaleState>(
+    return ChangeNotifierProvider<SaleRegisterState>(
       create: (context) {
-        return RegisterSaleState(
+        return SaleRegisterState(
           partnerStore: partnerStore,
           onRegister: onRegister,
         );
       },
-      child: Consumer<RegisterSaleState>(
+      child: Consumer<SaleRegisterState>(
         builder: (_, state, __) {
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -165,7 +181,7 @@ class RegisterSaleForm extends StatelessWidget {
                 const FormTitle(
                   title: 'Register Sale',
                 ),
-                const FormTextHeader(label: 'Vehicle'),
+                const TextHeader(label: 'Vehicle'),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: DropdownButtonFormField<Vehicle>(
@@ -185,17 +201,17 @@ class RegisterSaleForm extends StatelessWidget {
                     onChanged: state.setVehicle,
                   ),
                 ),
-                const FormTextHeader(label: 'Customer name'),
+                const TextHeader(label: 'Customer name'),
                 FormTextEntry(
                   label: 'Customer Name',
                   controller: state.customerNameController,
                 ),
-                const FormTextHeader(label: 'Customer CPF'),
+                const TextHeader(label: 'Customer CPF'),
                 FormTextEntry(
                   label: 'Customer CPF',
                   controller: state.customerCpfController,
                 ),
-                const FormTextHeader(label: 'Sale price'),
+                const TextHeader(label: 'Sale price'),
                 FormTextEntry(
                   validator: (text) {
                     final price = double.tryParse(text!);
@@ -207,7 +223,7 @@ class RegisterSaleForm extends StatelessWidget {
                   label: 'Price',
                   controller: state.priceController,
                 ),
-                const FormTextHeader(label: 'Sale date'),
+                const TextHeader(label: 'Sale date'),
                 DatePicker(
                   initialDate: state.saleDate,
                   onDatePicked: state.setDate,
@@ -225,9 +241,12 @@ class RegisterSaleForm extends StatelessWidget {
                         await registerDialog(context, result);
                       }
 
-                      // Clear inputs
+                      // Go back to sale listing
                       if (result == null) {
-                        state.clear();
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop(
+                          state.getRegisteredSale(),
+                        );
                       }
                     },
                   ),
