@@ -30,7 +30,7 @@ Future<void> editDialog(BuildContext context, String? result) async {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
+            child: const Text('OK'),
           )
         ],
       );

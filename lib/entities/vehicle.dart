@@ -16,6 +16,7 @@ class Vehicle {
     required this.year,
     required this.plate,
     required this.purchaseDate,
+    required this.purchasePrice,
     required this.sold, // = false,
   });
 
@@ -46,6 +47,9 @@ class Vehicle {
   /// Date on which this vehicle was purchased by the [PartnerStore]
   DateTime purchaseDate;
 
+  /// For how much the store purchased this vehicle
+  double purchasePrice;
+
   /// Whether there is a [Sale] registered on this vehicel
   bool sold;
 
@@ -75,6 +79,7 @@ class Vehicle {
     map[VehicleTable.plate] = plate;
     map[VehicleTable.fipePrice] = fipePrice;
     map[VehicleTable.purchaseDate] = purchaseDate.millisecondsSinceEpoch;
+    map[VehicleTable.purchasePrice] = purchasePrice;
     map[VehicleTable.sold] = sold ? 1 : 0;
 
     return map;

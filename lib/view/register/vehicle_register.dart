@@ -31,10 +31,10 @@ class VehicleRegisterState with ChangeNotifier {
   final void Function(Vehicle)? onRegister;
 
   /// Operations on FIPE api
-  final FipeUseCase fipeUseCase = FipeUseCase();
+  final fipeUseCase = FipeUseCase();
 
   /// Operations on [Vehicle] database table
-  final VehicleUseCase _vehicleUseCase = const VehicleUseCase(
+  final _vehicleUseCase = const VehicleUseCase(
     VehicleRepository(),
   );
 
@@ -59,11 +59,13 @@ class VehicleRegisterState with ChangeNotifier {
   Future<FipeVehicleInfo?>? currentVehicleInfo;
 
   /// Controller for vehicle manufacture year
-  final TextEditingController manufactureYearController =
-      TextEditingController();
+  final manufactureYearController = TextEditingController();
 
   /// Controller for vehicle plate
-  final TextEditingController plateController = TextEditingController();
+  final plateController = TextEditingController();
+
+  /// Controller for vehicle purchase date
+  final purchasePriceController = TextEditingController();
 
   /// Input vehicle purchase date
   DateTime? purchaseDate;
@@ -261,6 +263,15 @@ class VehicleRegisterState with ChangeNotifier {
       return 'Choose a purchase date';
     }
 
+    // Check for purchase price
+    final purchasePrice = double.tryParse(purchasePriceController.text);
+    if (purchasePrice == null) {
+      return 'Purchase price needs to be a valid number.';
+    }
+    if (purchasePrice < 0) {
+      return 'Purchase price can\'t be negative.';
+    }
+
     // Get price
     final vehicleInfo = await currentVehicleInfo;
     if (vehicleInfo == null) {
@@ -278,6 +289,7 @@ class VehicleRegisterState with ChangeNotifier {
       year: manufactureYear,
       plate: plate,
       purchaseDate: purchaseDate!,
+      purchasePrice: purchasePrice,
       sold: false,
     );
     await _vehicleUseCase.insert(vehicle, imagePaths);
@@ -304,6 +316,7 @@ class VehicleRegisterState with ChangeNotifier {
     super.dispose();
     manufactureYearController.dispose();
     plateController.dispose();
+    purchasePriceController.dispose();
   }
 }
 
@@ -408,6 +421,11 @@ class VehicleRegisterForm extends StatelessWidget {
                       enabled: false,
                     );
                   },
+                ),
+                const TextHeader(label: 'Purchase price'),
+                FormTextEntry(
+                  label: 'Purchase price',
+                  controller: state.purchasePriceController,
                 ),
                 const TextHeader(label: 'Manufacture year'),
                 FormTextEntry(

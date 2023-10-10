@@ -24,6 +24,10 @@ class VehicleRepository {
 
   /// Method to create a [Vehicle] object from a database query
   Future<Vehicle> fromQuery(Map<String, dynamic> query) async {
+    final purchaseDate = DateTime.fromMillisecondsSinceEpoch(
+      query[VehicleTable.purchaseDate],
+    );
+
     // Create vehicle object
     final vehicle = Vehicle(
       id: query[VehicleTable.id],
@@ -34,9 +38,8 @@ class VehicleRepository {
       modelYear: query[VehicleTable.modelYear],
       plate: query[VehicleTable.plate],
       fipePrice: query[VehicleTable.fipePrice],
-      purchaseDate: DateTime.fromMillisecondsSinceEpoch(
-        query[VehicleTable.purchaseDate],
-      ),
+      purchaseDate: purchaseDate,
+      purchasePrice: query[VehicleTable.purchasePrice],
       sold: query[VehicleTable.sold] == 1,
     );
 

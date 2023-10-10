@@ -81,6 +81,12 @@ class LoginState with ChangeNotifier {
     // }
   }
 
+  /// Method to clear form inputs
+  void clear() {
+    nameOrCnpjController.clear();
+    passwordController.clear();
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -98,6 +104,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Drive Deal'),
         centerTitle: true,
@@ -155,6 +162,9 @@ class LoginForm extends StatelessWidget {
 
                       // In case of valid entries, try to submit
                       final user = await state.login();
+
+                      // Clear inputs
+                      state.clear();
 
                       // If user is null, login was invalid
                       if (user == null) {

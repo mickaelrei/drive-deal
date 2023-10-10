@@ -16,7 +16,7 @@ class User {
   int? id;
 
   /// Name for admin login
-  final String? name;
+  String? name;
 
   /// If this user is an admin, by default false
   final bool isAdmin;
@@ -25,7 +25,7 @@ class User {
   final PartnerStore? store;
 
   /// Encrypted password
-  final String password;
+  String password;
 
   /// User settings
   final UserSettings settings = UserSettings();

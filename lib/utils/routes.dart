@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import '../entities/partner_store.dart';
 import '../entities/user.dart';
 import '../entities/vehicle.dart';
+import '../view/edit/partner_store_edit.dart';
+import '../view/edit/user_edit.dart';
 import '../view/edit/vehicle_edit.dart';
 import '../view/home/admin_home.dart';
 import '../view/home/partner_home.dart';
+import '../view/info/partner_store_info.dart';
+import '../view/info/vehicle_info.dart';
 import '../view/login.dart';
+import '../view/register/partner_store_register.dart';
 import '../view/register/sale_register.dart';
 import '../view/register/vehicle_register.dart';
 
@@ -39,8 +44,43 @@ Widget homeRoute(BuildContext context) {
   }
 }
 
-/// Function to handle /store_edit route
-Widget storeEditRoute(BuildContext context) {
+/// Function to handle /user_edit route
+Widget userEditRoute(BuildContext context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  // Check for valid args
+  final user = args['user'] as User?;
+  if (user == null || user.id == null) {
+    throw ArgumentError.value(
+      user,
+      'args[\'user\']',
+      'field \'user\' in args should be not null with a non-null id',
+    );
+  }
+
+  // Get theme
+  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
+
+  return Theme(
+    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
+    child: Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Edit user'),
+      ),
+      body: Center(
+        child: UserEditPage(
+          user: user,
+          onEdit: args['on_edit'],
+        ),
+      ),
+    ),
+  );
+}
+
+/// Function to handle /store_register route
+Widget storeRegisterRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
@@ -54,12 +94,86 @@ Widget storeEditRoute(BuildContext context) {
     );
   }
 
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Store edit'),
+  // Get theme
+  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
+
+  return Theme(
+    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
+    child: Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Register store'),
+      ),
+      body: PartnerStoreRegisterForm(
+        onRegister: args['on_register'],
+      ),
     ),
-    body: Center(
-      child: Text('Editing of store: ${partnerStore.name}'),
+  );
+}
+
+/// Function to handle /store_edit route
+Widget storeEditRoute(BuildContext context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  // Check for valid args
+  final user = args['user'] as User?;
+  if (user == null || user.id == null) {
+    throw ArgumentError.value(
+      user,
+      'args[\'user\']',
+      'field \'user\' in args should be not null with a non-null id',
+    );
+  }
+
+  // Get theme
+  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
+
+  return Theme(
+    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
+    child: Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Edit store'),
+      ),
+      body: Center(
+        child: PartnerStoreEditPage(
+          user: user,
+          onEdit: args['on_edit'],
+        ),
+      ),
+    ),
+  );
+}
+
+/// Function to handle /store_info route
+Widget storeInfoRoute(BuildContext context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  // Check for valid args
+  final partnerStore = args['partner_store'] as PartnerStore?;
+  if (partnerStore == null || partnerStore.id == null) {
+    throw ArgumentError.value(
+      partnerStore,
+      'args[\'partner_store\']',
+      'field \'partner_store\' in args should be not null with a non-null id',
+    );
+  }
+
+  // Get theme
+  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
+
+  return Theme(
+    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
+    child: Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Store info'),
+      ),
+      body: PartnerStoreInfoPage(
+        partnerStore: partnerStore,
+      ),
     ),
   );
 }
@@ -85,8 +199,9 @@ Widget vehicleRegisterRoute(BuildContext context) {
   return Theme(
     data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
     child: Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Vehicle register'),
+        title: const Text('Register vehicle'),
       ),
       body: VehicleRegisterForm(
         partnerStore: partnerStore,
@@ -117,12 +232,45 @@ Widget vehicleEditRoute(BuildContext context) {
   return Theme(
     data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
     child: Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Vehicle edit'),
+        title: const Text('Edit vehicle'),
       ),
       body: VehicleEditForm(
         vehicle: args['vehicle'],
         onEdit: args['on_edit'],
+      ),
+    ),
+  );
+}
+
+/// Function to handle /vehicle_info route
+Widget vehicleInfoRoute(BuildContext context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  // Check for valid args
+  final vehicle = args['vehicle'] as Vehicle?;
+  if (vehicle == null || vehicle.id == null) {
+    throw ArgumentError.value(
+      vehicle,
+      'args[\'vehicle\']',
+      'field \'vehicle\' in args should be not null with a non-null id',
+    );
+  }
+
+  // Get theme
+  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
+
+  return Theme(
+    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
+    child: Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Vehicle info'),
+      ),
+      body: VehicleInfoPage(
+        vehicle: args['vehicle'],
       ),
     ),
   );
@@ -149,8 +297,9 @@ Widget saleRegisterRoute(BuildContext context) {
   return Theme(
     data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
     child: Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Sale register'),
+        title: const Text('Register sale'),
       ),
       body: SaleRegisterForm(
         partnerStore: partnerStore,

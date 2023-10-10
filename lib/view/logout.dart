@@ -11,7 +11,10 @@ class LogoutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Logout')),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Logout'),
+      ),
       bottomNavigationBar: navBar,
       body: Center(
         child: TextButton(

@@ -39,4 +39,9 @@ class PartnerStoreUseCase {
     );
     await _userUseCase.insert(user);
   }
+
+  /// Method to update a [PartnerStore] in the database
+  Future<void> update(PartnerStore partnerStore) async {
+    await _partnerStoreRepository.update(partnerStore);
+  }
 }

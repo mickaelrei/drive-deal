@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,11 +23,11 @@ import '../../utils/forms.dart';
 class PartnerStoreRegisterState with ChangeNotifier {
   /// Constructor
   PartnerStoreRegisterState({required this.onRegister}) {
-    init();
+    unawaited(init());
   }
 
   /// Callback function to when a [PartnerStore] gets registered
-  final Future<void> Function(PartnerStore)? onRegister;
+  final void Function(PartnerStore)? onRegister;
 
   /// To insert a new [PartnerStore] in database
   final PartnerStoreUseCase _partnerStoreUseCase = PartnerStoreUseCase(
@@ -58,12 +60,13 @@ class PartnerStoreRegisterState with ChangeNotifier {
   final autonomyLevels = <AutonomyLevel>[];
 
   /// Method to init variables
-  void init() async {
+  Future<void> init() async {
     // Get all autonomy levels
     final items = await _autonomyLevelUseCase.select();
     autonomyLevels
       ..clear()
       ..addAll(items);
+    notifyListeners();
   }
 
   /// Method for register attempt
@@ -111,7 +114,7 @@ class PartnerStoreRegisterState with ChangeNotifier {
 
     // If no errors, call onRegister callback and return null meaning success
     if (onRegister != null) {
-      await onRegister!(partnerStore);
+      onRegister!(partnerStore);
     }
     return null;
   }
@@ -139,7 +142,7 @@ class PartnerStoreRegisterForm extends StatelessWidget {
   final Widget? navBar;
 
   /// Callback to be called when a [PartnerStore] gets registered
-  final Future<void> Function(PartnerStore)? onRegister;
+  final void Function(PartnerStore)? onRegister;
 
   /// App theme
   final AppTheme theme;
@@ -149,8 +152,10 @@ class PartnerStoreRegisterForm extends StatelessWidget {
     return Theme(
       data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Register Partner Store')),
         resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: const Text('Register Partner Store'),
+        ),
         body: ChangeNotifierProvider<PartnerStoreRegisterState>(
           create: (context) {
             return PartnerStoreRegisterState(onRegister: onRegister);
@@ -227,57 +232,6 @@ class PartnerStoreRegisterForm extends StatelessWidget {
               );
             },
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Dropdown for [AutonomyLevel]s
-class AutonomyLevelDropdown extends StatelessWidget {
-  /// Constructor
-  const AutonomyLevelDropdown({
-    required this.items,
-    required this.controller,
-    this.onSelected,
-    this.selected,
-    super.key,
-  });
-
-  /// List of [AutonomyLevel]s
-  final List<AutonomyLevel> items;
-
-  /// Controller for text field
-  final TextEditingController controller;
-
-  /// Current selected item
-  final AutonomyLevel? selected;
-
-  /// Callback for when an item is selected
-  final void Function(AutonomyLevel?)? onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    // Initialize entries
-    final entries = <DropdownMenuEntry<AutonomyLevel>>[];
-    for (final item in items) {
-      entries.add(DropdownMenuEntry<AutonomyLevel>(
-        value: item,
-        label: item.label,
-      ));
-    }
-
-    return DropdownMenu<AutonomyLevel>(
-      enableFilter: true,
-      enableSearch: true,
-      width: MediaQuery.of(context).size.width - 16,
-      onSelected: onSelected,
-      initialSelection: selected,
-      controller: controller,
-      dropdownMenuEntries: entries,
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
         ),
       ),
     );

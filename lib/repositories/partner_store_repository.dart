@@ -116,6 +116,18 @@ class PartnerStoreRepository {
     return null;
   }
 
+  /// Method to update a [PartnerStore] in the database
+  Future<void> update(PartnerStore partnerStore) async {
+    final database = await getDatabase();
+
+    await database.update(
+      PartnerStoreTable.tableName,
+      partnerStore.toMap(),
+      where: '${PartnerStoreTable.id} = ?',
+      whereArgs: [partnerStore.id],
+    );
+  }
+
   /// Method to delete a specific [PartnerStore] from database
   Future<void> delete(PartnerStore partnerStore) async {
     final database = await getDatabase();
@@ -131,15 +143,14 @@ class PartnerStoreRepository {
         whereArgs: [partnerStore.id],
       );
 
-      // TODO: Don't delete vehicles, just set storeId to null
-      // Delete vehicles
+      // Don't delete vehicles
       // batch.delete(
       //   VehicleTable.tableName,
       //   where: '${VehicleTable.storeId} = ?',
       //   whereArgs: [partnerStore.id],
       // );
 
-      // TODO: Don't delete vehicle images
+      // Don't delete vehicle images
       // Delete vehicle images
       // for (final vehicle in partnerStore.vehicles) {
       //   batch.delete(

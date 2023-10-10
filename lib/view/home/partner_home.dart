@@ -82,10 +82,11 @@ class PartnerHomePage extends StatelessWidget {
           switch (state.navigationBarSelectedIndex) {
             case 0:
               // Home
-              page = PartnerInfo(
-                partnerStore: user.store!,
+              page = PartnerInfoPage(
+                user: user,
                 navBar: navBar,
                 onStoreEdit: state.onStoreEdit,
+                theme: user.settings.appTheme,
               );
               break;
             case 1:
@@ -156,13 +157,7 @@ class PartnerBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // late Color destinationColor;
-    // if (theme == AppTheme.dark) {
-    //   destinationColor = const Color.fromARGB(255, 112, 193, 231);
-    // } else {
-    //   destinationColor = const Color.fromRGBO(13, 71, 161, 1);
-    // }
-
+    // Get icon color based on theme
     final destinationColor =
         theme == AppTheme.dark ? Colors.white : Colors.black;
 
@@ -213,17 +208,18 @@ class PartnerBottomNavigationBar extends StatelessWidget {
 }
 
 /// Widget for info about [PartnerStore]
-class PartnerInfo extends StatelessWidget {
+class PartnerInfoPage extends StatelessWidget {
   /// Constructor
-  const PartnerInfo({
-    required this.partnerStore,
+  const PartnerInfoPage({
+    required this.user,
     this.navBar,
     this.onStoreEdit,
+    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
-  /// Reference to [PartnerStore] object
-  final PartnerStore partnerStore;
+  /// Reference to [User] object
+  final User user;
 
   /// Page navigation bar
   final Widget? navBar;
@@ -231,22 +227,30 @@ class PartnerInfo extends StatelessWidget {
   /// Optional callback for when the [PartnerStore] gets edited
   final void Function()? onStoreEdit;
 
+  /// Theme
+  final AppTheme theme;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Partner Home')),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Partner Home'),
+      ),
       bottomNavigationBar: navBar,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Go in route and check if anything was changed
-          final changed = await Navigator.of(context).pushNamed(
+          // Go in edit route
+          await Navigator.of(context).pushNamed(
             '/store_edit',
             arguments: {
-              'partner_store': partnerStore,
+              'user': user,
+              'theme': theme,
             },
-          ) as bool?;
+          );
 
-          if (changed == true && onStoreEdit != null) {
+          // Call edit callback
+          if (onStoreEdit != null) {
             onStoreEdit!();
           }
         },
@@ -258,11 +262,11 @@ class PartnerInfo extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const TextHeader(label: 'Store name:'),
-            InfoText(partnerStore.name),
+            InfoText(user.store!.name),
             const TextHeader(label: 'CNPJ:'),
-            InfoText(partnerStore.cnpj),
+            InfoText(user.store!.cnpj),
             const TextHeader(label: 'Autonomy Level:'),
-            InfoText(partnerStore.autonomyLevel.label),
+            InfoText(user.store!.autonomyLevel.label),
           ],
         ),
       ),

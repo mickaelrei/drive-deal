@@ -79,7 +79,7 @@ Future<Database> getDatabase() async {
         '(${PartnerStoreTable.cnpj},'
         ' ${PartnerStoreTable.name},'
         ' ${PartnerStoreTable.autonomyLevelId}) '
-        'VALUES(\'12345678901234\', \'daniel automoveis\', 1)',
+        'VALUES(\'12345678901234\', \'Daniel Automóveis\', 1)',
       );
 
       // Create user for partner store

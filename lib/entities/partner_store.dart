@@ -18,13 +18,13 @@ class PartnerStore {
   int? id;
 
   /// CNPJ, 14 chars
-  final String cnpj;
+  String cnpj;
 
   /// Store name, 120 chars max
-  final String name;
+  String name;
 
   /// Reference to [AutonomyLevel] table
-  final AutonomyLevel autonomyLevel;
+  AutonomyLevel autonomyLevel;
 
   /// List of all [Vehicle]s for this store
   final _vehicles = <Vehicle>[];

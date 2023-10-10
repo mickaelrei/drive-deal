@@ -7,9 +7,9 @@ import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
 import '../../repositories/partner_store_repository.dart';
 import '../../usecases/partner_store_use_case.dart';
+import '../../utils/forms.dart';
 import '../list/partner_store_list.dart';
 import '../logout.dart';
-import '../register/partner_store_register.dart';
 import '../unknown_page.dart';
 import '../user_settings.dart';
 
@@ -38,11 +38,16 @@ class AdminHomeState with ChangeNotifier {
   }
 
   /// Called when a PartnerStore gets registered
-  Future<void> onRegister(PartnerStore partnerStore) async {
+  Future<void> onPartnerStoreRegister(PartnerStore partnerStore) async {
     // Add to list
     await getLists();
 
     // Update widget
+    notifyListeners();
+  }
+
+  /// Callback for when the admin user gets edited
+  void onUserEdit() {
     notifyListeners();
   }
 
@@ -72,23 +77,26 @@ class AdminHomePage extends StatelessWidget {
           final navBar = AdminBottomNavigationBar(
             onSelected: state.changePage,
             selectedIndex: state.navigationBarSelectedIndex,
+            theme: user.settings.appTheme,
           );
 
           // Get page based on current selected index
           late final Widget page;
           switch (state.navigationBarSelectedIndex) {
             case 0:
+              page = AdminInfoPage(
+                user: user,
+                navBar: navBar,
+                onUserEdit: state.onUserEdit,
+              );
+            case 1:
               // Listing of partner stores
               page = PartnerStoreListPage(
+                user: user,
+                theme: user.settings.appTheme,
+                onPartnerStoreRegister: state.onPartnerStoreRegister,
                 navBar: navBar,
                 items: state.partnerStores,
-              );
-              break;
-            case 1:
-              // Register a new partner store
-              page = PartnerStoreRegisterForm(
-                navBar: navBar,
-                onRegister: state.onRegister,
               );
               break;
             case 2:
@@ -103,8 +111,94 @@ class AdminHomePage extends StatelessWidget {
               break;
           }
 
-          return page;
+          return Theme(
+            data: user.settings.appTheme == AppTheme.dark
+                ? ThemeData.dark()
+                : ThemeData.light(),
+            child: page,
+          );
         },
+      ),
+    );
+  }
+}
+
+/// Widget for info about [PartnerStore]
+class AdminInfoPage extends StatelessWidget {
+  /// Constructor
+  const AdminInfoPage({
+    required this.user,
+    this.navBar,
+    this.onUserEdit,
+    this.theme = UserSettings.defaultAppTheme,
+    super.key,
+  });
+
+  /// Reference to [User] object
+  final User user;
+
+  /// Page navigation bar
+  final Widget? navBar;
+
+  /// Optional callback for when the [PartnerStore] gets edited
+  final void Function()? onUserEdit;
+
+  /// Theme
+  final AppTheme theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Partner Home'),
+      ),
+      bottomNavigationBar: navBar,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Go in edit route
+          await Navigator.of(context).pushNamed(
+            '/user_edit',
+            arguments: {
+              'user': user,
+              'theme': theme,
+              'on_edit': onUserEdit,
+            },
+          );
+        },
+        child: const Icon(Icons.edit),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const TextHeader(label: 'User name:'),
+            InfoText(user.name!),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Wrapper for text for partner info
+class InfoText extends StatelessWidget {
+  /// Constructor
+  const InfoText(this.data, {super.key});
+
+  /// Text to show
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Text(
+        data,
+        style: const TextStyle(
+          fontSize: 25,
+        ),
       ),
     );
   }
@@ -116,6 +210,7 @@ class AdminBottomNavigationBar extends StatelessWidget {
   const AdminBottomNavigationBar({
     this.onSelected,
     this.selectedIndex = 0,
+    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -125,19 +220,21 @@ class AdminBottomNavigationBar extends StatelessWidget {
   /// Index of selected destination
   final int selectedIndex;
 
-  /// Icon color
-  static const Color destinationColor = Color.fromRGBO(13, 71, 161, 1);
+  /// Theme
+  final AppTheme theme;
 
   @override
   Widget build(BuildContext context) {
+    // Get icon color based on theme
+    final destinationColor =
+        theme == AppTheme.dark ? Colors.white : Colors.black;
+
     return NavigationBar(
       onDestinationSelected: onSelected,
       animationDuration: const Duration(milliseconds: 1000),
-      backgroundColor: Colors.grey.shade200,
-      indicatorColor: Colors.blue.shade300,
       selectedIndex: selectedIndex,
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-      destinations: const [
+      destinations: [
         NavigationDestination(
           icon: Icon(
             Icons.home_outlined,

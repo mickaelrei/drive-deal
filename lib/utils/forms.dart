@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../entities/autonomy_level.dart';
+
 /// Widget for form title
 class FormTitle extends StatelessWidget {
   /// Constructor
@@ -186,9 +188,6 @@ class DatePicker extends StatelessWidget {
           ),
           child: Text(
             initialDate != null ? getDateString(initialDate!) : 'Purchase date',
-            style: TextStyle(
-              color: initialDate != null ? Colors.black : Colors.grey[700],
-            ),
           ),
         ),
         onTap: () async {
@@ -296,6 +295,62 @@ class FutureDropdown<T> extends StatelessWidget {
             onChanged: onChanged,
           );
         },
+      ),
+    );
+  }
+}
+
+/// Dropdown for [AutonomyLevel]s
+class AutonomyLevelDropdown extends StatelessWidget {
+  /// Constructor
+  const AutonomyLevelDropdown({
+    required this.items,
+    this.controller,
+    this.onSelected,
+    this.selected,
+    this.enabled = true,
+    super.key,
+  });
+
+  /// List of [AutonomyLevel]s
+  final List<AutonomyLevel> items;
+
+  /// Controller for text field
+  final TextEditingController? controller;
+
+  /// Current selected item
+  final AutonomyLevel? selected;
+
+  /// Whether the dropdown is enabled or not
+  final bool enabled;
+
+  /// Callback for when an item is selected
+  final void Function(AutonomyLevel?)? onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    // Initialize entries
+    final entries = <DropdownMenuEntry<AutonomyLevel>>[];
+    for (final item in items) {
+      entries.add(DropdownMenuEntry<AutonomyLevel>(
+        value: item,
+        label: item.label,
+      ));
+    }
+
+    return DropdownMenu<AutonomyLevel>(
+      enabled: enabled,
+      enableFilter: true,
+      enableSearch: true,
+      width: MediaQuery.of(context).size.width - 16,
+      onSelected: onSelected,
+      initialSelection: selected,
+      controller: controller,
+      dropdownMenuEntries: entries,
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
       ),
     );
   }

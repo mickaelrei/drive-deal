@@ -99,6 +99,18 @@ class UserRepository {
     return null;
   }
 
+  /// Method to update a [User] in the database
+  Future<void> update(User user) async {
+    final database = await getDatabase();
+
+    await database.update(
+      UserTable.tableName,
+      user.toMap(),
+      where: '${UserTable.id} = ?',
+      whereArgs: [user.id],
+    );
+  }
+
   /// Method to delete a specific [User] from database
   Future<void> delete(User user) async {
     final database = await getDatabase();

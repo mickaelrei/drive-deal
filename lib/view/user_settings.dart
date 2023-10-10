@@ -94,7 +94,10 @@ class UserSettingsPage extends StatelessWidget {
                 ? ThemeData.dark()
                 : ThemeData.light(),
             child: Scaffold(
-              appBar: AppBar(title: const Text('Settings')),
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                title: const Text('Settings'),
+              ),
               bottomNavigationBar: navBar,
               body: Column(
                 children: [

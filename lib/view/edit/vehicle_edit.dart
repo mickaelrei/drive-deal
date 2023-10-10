@@ -39,15 +39,15 @@ class VehicleEditState with ChangeNotifier {
   bool error = false;
 
   /// Operations on FIPE api
-  final FipeUseCase fipeUseCase = FipeUseCase();
+  final fipeUseCase = FipeUseCase();
 
   /// Operations on [Vehicle] database table
-  final VehicleUseCase _vehicleUseCase = const VehicleUseCase(
+  final _vehicleUseCase = const VehicleUseCase(
     VehicleRepository(),
   );
 
   /// To load/save images
-  final VehicleImageUseCase _vehicleImageUseCase = const VehicleImageUseCase(
+  final _vehicleImageUseCase = const VehicleImageUseCase(
     VehicleImageRepository(),
   );
 
@@ -72,11 +72,13 @@ class VehicleEditState with ChangeNotifier {
   Future<FipeVehicleInfo?>? currentVehicleInfo;
 
   /// Controller for vehicle manufacture year
-  final TextEditingController manufactureYearController =
-      TextEditingController();
+  final manufactureYearController = TextEditingController();
 
   /// Controller for vehicle plate
-  final TextEditingController plateController = TextEditingController();
+  final plateController = TextEditingController();
+
+  /// Controller for vehicle purchase price
+  final purchasePriceController = TextEditingController();
 
   /// Input vehicle purchase date
   DateTime? purchaseDate;
@@ -91,6 +93,7 @@ class VehicleEditState with ChangeNotifier {
     // Set controllers
     plateController.text = vehicle.plate;
     manufactureYearController.text = vehicle.year.toString();
+    purchasePriceController.text = vehicle.purchasePrice.toString();
     purchaseDate = vehicle.purchaseDate;
 
     brands = fipeUseCase.getBrands();
@@ -173,6 +176,7 @@ class VehicleEditState with ChangeNotifier {
     // Reset controllers
     manufactureYearController.clear();
     plateController.clear();
+    purchasePriceController.clear();
     purchaseDate = null;
 
     // Reset list of images
@@ -342,6 +346,15 @@ class VehicleEditState with ChangeNotifier {
       return 'Choose a purchase date';
     }
 
+    // Check for purchase price
+    final purchasePrice = double.tryParse(purchasePriceController.text);
+    if (purchasePrice == null) {
+      return 'Purchase price needs to be a valid number.';
+    }
+    if (purchasePrice < 0) {
+      return 'Purchase price can\'t be negative.';
+    }
+
     // Get price
     final vehicleInfo = await currentVehicleInfo;
     if (vehicleInfo == null) {
@@ -357,6 +370,7 @@ class VehicleEditState with ChangeNotifier {
     vehicle.year = manufactureYear;
     vehicle.plate = plate;
     vehicle.purchaseDate = purchaseDate!;
+    vehicle.purchasePrice = purchasePrice;
 
     // Update in database
     await _vehicleUseCase.update(vehicle, imagePaths);
@@ -382,6 +396,7 @@ class VehicleEditState with ChangeNotifier {
     super.dispose();
     manufactureYearController.dispose();
     plateController.dispose();
+    purchasePriceController.dispose();
   }
 }
 

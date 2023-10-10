@@ -29,6 +29,25 @@ class UserUseCase {
     user.id = id;
   }
 
+  /// Method to update a [User] in the database
+  Future<bool> update(User user) async {
+    // Check if any other user has the same name
+    final users = await _userRepository.select();
+    for (final otherUser in users) {
+      // Ignore same user
+      if (user.id == otherUser.id) continue;
+
+      // Check if name is the same
+      if (user.name == otherUser.name) {
+        return false;
+      }
+    }
+
+    // Await update and return success
+    await _userRepository.update(user);
+    return true;
+  }
+
   /// Method to get admin [User] from given name and password
   Future<User?> getAdmin({
     required String name,

@@ -151,7 +151,10 @@ class VehicleListPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Vehicles')),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Vehicles'),
+      ),
       bottomNavigationBar: navBar,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -164,10 +167,6 @@ class VehicleListPage extends StatelessWidget {
               'theme': theme,
             },
           );
-
-          // Update page
-          // TODO: Need to get state from here. Put Provider on top of Scaffold
-          // state.;
         },
         child: const Icon(Icons.add),
       ),
@@ -200,6 +199,14 @@ class VehicleTile extends StatelessWidget {
       elevation: 5,
       shadowColor: Colors.grey,
       child: ListTile(
+        onTap: () async {
+          await Navigator.of(context).pushNamed(
+            '/vehicle_info',
+            arguments: {
+              'vehicle': vehicle,
+            },
+          );
+        },
         title: Text(
           vehicle.model,
         ),
@@ -208,11 +215,10 @@ class VehicleTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             vehicle.sold
-                ? IconButton(
-                    icon: const Icon(Icons.sell),
-                    color: Colors.red,
+                ? const IconButton(
+                    icon: Icon(Icons.sell, color: Colors.red),
                     splashRadius: 1,
-                    onPressed: () {},
+                    onPressed: null,
                   )
                 : IconButton(
                     icon: const Icon(Icons.edit, color: Colors.blue),

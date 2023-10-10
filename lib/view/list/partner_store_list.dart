@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../entities/partner_store.dart';
+import '../../entities/user.dart';
 
 /// Widget for listing [PartnerStore]s
 class PartnerStoreListPage extends StatelessWidget {
   /// Constructor
   const PartnerStoreListPage({
     required this.items,
+    required this.user,
     this.navBar,
+    this.onPartnerStoreRegister,
+    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -17,12 +21,34 @@ class PartnerStoreListPage extends StatelessWidget {
   /// List of [PartnerStore]
   final Future<List<PartnerStore>> items;
 
+  /// Admin user
+  final User user;
+
+  /// Callback for partner store registering
+  final void Function(PartnerStore)? onPartnerStoreRegister;
+
+  /// Theme
+  final AppTheme theme;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: navBar,
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Wait until finished registering stores
+          await Navigator.of(context).pushNamed(
+            '/store_register',
+            arguments: {
+              'user': user,
+              'on_register': onPartnerStoreRegister,
+              'theme': theme,
+            },
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+      bottomNavigationBar: navBar,
       appBar: AppBar(
         title: const Text('Partner Stores'),
       ),
@@ -81,6 +107,14 @@ class PartnerStoreTile extends StatelessWidget {
       elevation: 5,
       shadowColor: Colors.grey,
       child: ListTile(
+        onTap: () async {
+          await Navigator.of(context).pushNamed(
+            '/store_info',
+            arguments: {
+              'partner_store': partnerStore,
+            },
+          );
+        },
         title: Text('Name: ${partnerStore.name}'),
         subtitle: Text(
           'CNPJ: ${partnerStore.cnpj}\n'

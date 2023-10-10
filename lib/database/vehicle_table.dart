@@ -6,16 +6,17 @@ abstract class VehicleTable {
   /// Used on table creation
   static const String createTable = '''
   CREATE TABLE $tableName(
-    $id           INTEGER    PRIMARY KEY AUTOINCREMENT,
-    $storeId      INTEGER    NOT NULL,
-    $model        TEXT       NOT NULL,
-    $brand        TEXT       NOT NULL,
-    $year         TEXT       NOT NULL,
-    $modelYear    TEXT       NOT NULL,
-    $plate        VARCHAR(7) NOT NULL,
-    $fipePrice    REAL       NOT NULL,
-    $purchaseDate INTEGER    NOT NULL,
-    $sold         INTEGER    NOT NULL
+    $id            INTEGER    PRIMARY KEY AUTOINCREMENT,
+    $storeId       INTEGER    NOT NULL,
+    $model         TEXT       NOT NULL,
+    $brand         TEXT       NOT NULL,
+    $year          TEXT       NOT NULL,
+    $modelYear     TEXT       NOT NULL,
+    $plate         VARCHAR(7) NOT NULL,
+    $fipePrice     REAL       NOT NULL,
+    $purchaseDate  INTEGER    NOT NULL,
+    $purchasePrice REAL       NOT NULL,
+    $sold          INTEGER    NOT NULL
   );
   ''';
 
@@ -48,6 +49,9 @@ abstract class VehicleTable {
 
   /// Date on which this vehicle was purchased by the [PartnerStore]
   static const String purchaseDate = 'purchase_date';
+
+  /// For how much the store purchased this vehicle
+  static const String purchasePrice = 'purchase_price';
 
   /// Whether this vehicle is sold or not
   static const String sold = 'sold';

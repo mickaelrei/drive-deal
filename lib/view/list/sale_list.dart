@@ -195,7 +195,10 @@ class SaleListPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sales')),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Sales'),
+      ),
       bottomNavigationBar: navBar,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
