@@ -133,72 +133,68 @@ class AutonomyLevelRegisterForm extends StatelessWidget {
       },
       child: Consumer<AutonomyLevelRegisterState>(
         builder: (_, state, __) {
-          return SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Form(
-              key: state.formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const FormTitle(
-                    title: 'Register',
-                  ),
-                  const TextHeader(label: 'Label'),
-                  FormTextEntry(
-                    label: 'Label',
-                    controller: state.labelController,
-                    validator: (text) {
-                      if (text == null || text.isEmpty) {
-                        return 'Label can\'t be blank.';
+          return Form(
+            key: state.formKey,
+            child: ListView(
+              children: [
+                const FormTitle(
+                  title: 'Register',
+                ),
+                const TextHeader(label: 'Label'),
+                FormTextEntry(
+                  label: 'Label',
+                  controller: state.labelController,
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return 'Label can\'t be blank.';
+                    }
+                    if (text.length < 3) {
+                      return 'Label needs at least 3 characters.';
+                    }
+                    return null;
+                  },
+                ),
+                const TextHeader(label: 'Sale store profit (in %)'),
+                Slider(
+                  max: 100.0,
+                  value: state.storeProfitPercent,
+                  onChanged: state.onStoreProfitPercentChanged,
+                  label: '${state.storeProfitPercent.toStringAsFixed(0)}%',
+                  divisions: 100,
+                ),
+                const TextHeader(label: 'Sale network profit (in %)'),
+                Slider(
+                  max: 100.0,
+                  value: state.networkProfitPercent,
+                  onChanged: state.onNetworkProfitPercentChanged,
+                  label: '${state.networkProfitPercent.toStringAsFixed(0)}%',
+                  divisions: 100,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SubmitButton(
+                    label: 'Register',
+                    onPressed: () async {
+                      // Validate inputs
+                      if (!state.formKey.currentState!.validate()) return;
+
+                      // Try registering
+                      final result = await state.register();
+
+                      // Show dialog with register result
+                      if (context.mounted) {
+                        await registerDialog(context, result);
                       }
-                      if (text.length < 3) {
-                        return 'Label needs at least 3 characters.';
+
+                      // Go back to autonomy level listing
+                      if (result == null) {
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
                       }
-                      return null;
                     },
                   ),
-                  const TextHeader(label: 'Sale store profit (in %)'),
-                  Slider(
-                    max: 100.0,
-                    value: state.storeProfitPercent,
-                    onChanged: state.onStoreProfitPercentChanged,
-                    label: '${state.storeProfitPercent.toStringAsFixed(0)}%',
-                    divisions: 100,
-                  ),
-                  const TextHeader(label: 'Sale network profit (in %)'),
-                  Slider(
-                    max: 100.0,
-                    value: state.networkProfitPercent,
-                    onChanged: state.onNetworkProfitPercentChanged,
-                    label: '${state.networkProfitPercent.toStringAsFixed(0)}%',
-                    divisions: 100,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SubmitButton(
-                      label: 'Register',
-                      onPressed: () async {
-                        // Validate inputs
-                        if (!state.formKey.currentState!.validate()) return;
-
-                        // Try registering
-                        final result = await state.register();
-
-                        // Show dialog with register result
-                        if (context.mounted) {
-                          await registerDialog(context, result);
-                        }
-
-                        // Go back to autonomy level listing
-                        if (result == null) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
           );
         },

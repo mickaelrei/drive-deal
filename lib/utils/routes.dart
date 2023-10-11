@@ -97,7 +97,7 @@ Widget storeRegisterRoute(BuildContext context) {
   return Theme(
     data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
     child: Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Register store'),
       ),

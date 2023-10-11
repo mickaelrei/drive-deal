@@ -14,7 +14,7 @@ import '../../usecases/fipe_use_case.dart';
 import '../../usecases/vehicle_image_use_case.dart';
 import '../../usecases/vehicle_use_case.dart';
 
-import '../../utils/currency_format.dart';
+import '../../utils/formats.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/forms.dart';
 

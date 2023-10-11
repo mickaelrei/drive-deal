@@ -64,6 +64,6 @@ class SaleRepository {
 
   /// Method to delete a specific [Sale] from database
   Future<void> delete(Sale sale) async {
-    log('Attempt to delete sale');
+    log('Attempt to delete sale, ignoring');
   }
 }

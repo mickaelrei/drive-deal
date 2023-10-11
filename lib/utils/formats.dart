@@ -10,3 +10,12 @@ String formatPrice(double price) {
 
   return priceFormat.format(price);
 }
+
+/// Returns a string in the DD/MM/YYYY format
+String formatDate(DateTime date) {
+  return '${date.day.toString().padLeft(2, '0')}'
+      '/'
+      '${date.month.toString().padLeft(2, '0')}'
+      '/'
+      '${date.year}';
+}

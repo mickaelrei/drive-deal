@@ -90,6 +90,16 @@ class SaleRegisterState with ChangeNotifier {
       return 'Choose a vehicle';
     }
 
+    // Check if sale date is set
+    if (saleDate == null) {
+      return 'Sale date is required';
+    }
+
+    // Make sure that sale date is newer than vehicle purchase date
+    if (saleDate!.compareTo(_saleVehicle!.purchaseDate) < 0) {
+      return 'Sale date needs to be after vehicle purchase date';
+    }
+
     // Get total price
     final price = double.tryParse(priceController.text);
     if (price == null) {

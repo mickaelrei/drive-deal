@@ -8,13 +8,11 @@ import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/vehicle.dart';
-
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/fipe_use_case.dart';
 import '../../usecases/vehicle_use_case.dart';
-
-import '../../utils/currency_format.dart';
 import '../../utils/dialogs.dart';
+import '../../utils/formats.dart';
 import '../../utils/forms.dart';
 
 /// Provider for vehicle register page

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/sale.dart';
 import '../../entities/user.dart';
+import '../../utils/formats.dart';
 
 /// Provider for sale listing page
 class SaleListState with ChangeNotifier {
@@ -182,7 +183,10 @@ class SaleListPage extends StatelessWidget {
 
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: SaleTile(sale: sale),
+                        child: SaleTile(
+                          sale: sale,
+                          theme: theme,
+                        ),
                       );
                     },
                   ),
@@ -221,10 +225,17 @@ class SaleListPage extends StatelessWidget {
 /// Widget for displaying a [Sale] in a [ListView]
 class SaleTile extends StatelessWidget {
   /// Constructor
-  const SaleTile({required this.sale, super.key});
+  const SaleTile({
+    required this.sale,
+    this.theme = UserSettings.defaultAppTheme,
+    super.key,
+  });
 
   /// [Sale] object to show
   final Sale sale;
+
+  /// Theme
+  final AppTheme theme;
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +247,7 @@ class SaleTile extends StatelessWidget {
           await Navigator.of(context).pushNamed(
             '/sale_info',
             arguments: {
+              'theme': theme,
               'sale': sale,
             },
           );
@@ -245,13 +257,4 @@ class SaleTile extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Returns a string in the DD/MM/YYYY format
-String formatDate(DateTime date) {
-  return '${date.day.toString().padLeft(2, '0')}'
-      '/'
-      '${date.month.toString().padLeft(2, '0')}'
-      '/'
-      '${date.year}';
 }

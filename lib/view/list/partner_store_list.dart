@@ -80,7 +80,10 @@ class PartnerStoreListPage extends StatelessWidget {
 
               return Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: PartnerStoreTile(partnerStore: partnerStore),
+                child: PartnerStoreTile(
+                  partnerStore: partnerStore,
+                  theme: theme,
+                ),
               );
             },
           );
@@ -93,10 +96,17 @@ class PartnerStoreListPage extends StatelessWidget {
 /// Widget for displaying a [PartnerStore] in a [ListView]
 class PartnerStoreTile extends StatelessWidget {
   /// Constructor
-  const PartnerStoreTile({required this.partnerStore, super.key});
+  const PartnerStoreTile({
+    required this.partnerStore,
+    this.theme = UserSettings.defaultAppTheme,
+    super.key,
+  });
 
   /// [PartnerStore] object to show
   final PartnerStore partnerStore;
+
+  /// Theme
+  final AppTheme theme;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +118,7 @@ class PartnerStoreTile extends StatelessWidget {
           await Navigator.of(context).pushNamed(
             '/store_info',
             arguments: {
+              'theme': theme,
               'partner_store': partnerStore,
             },
           );

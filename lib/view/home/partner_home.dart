@@ -170,7 +170,7 @@ class PartnerBottomNavigationBar extends StatelessWidget {
       onDestinationSelected: onSelected,
       animationDuration: const Duration(milliseconds: 1000),
       selectedIndex: selectedIndex,
-      labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       destinations: [
         NavigationDestination(
           icon: Icon(
@@ -266,28 +266,6 @@ class PartnerInfoPage extends StatelessWidget {
             const TextHeader(label: 'Autonomy Level:'),
             InfoText(user.store!.autonomyLevel.label),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Wrapper for text for partner info
-class InfoText extends StatelessWidget {
-  /// Constructor
-  const InfoText(this.data, {super.key});
-
-  /// Text to show
-  final String data;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: Text(
-        data,
-        style: const TextStyle(
-          fontSize: 25,
         ),
       ),
     );

@@ -123,6 +123,28 @@ class TextHeader extends StatelessWidget {
   }
 }
 
+/// Wrapper for text for displaying entity info
+class InfoText extends StatelessWidget {
+  /// Constructor
+  const InfoText(this.data, {super.key});
+
+  /// Text to show
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Text(
+        data,
+        style: const TextStyle(
+          fontSize: 25,
+        ),
+      ),
+    );
+  }
+}
+
 /// Button for submitting login attempt
 class SubmitButton extends StatelessWidget {
   /// Constructor

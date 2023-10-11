@@ -23,7 +23,7 @@ class AutonomyLevelUseCase {
 
     // Check if total percent is roughly equal to 100
     final diff = 100 - totalPercent;
-    if (diff.abs() < .001) {
+    if (diff.abs() > .001) {
       throw ArgumentError.value(
         autonomyLevel,
         'autonomyLevel',

@@ -162,7 +162,7 @@ class PartnerStoreRegisterForm extends StatelessWidget {
         builder: (_, state, __) {
           return Form(
             key: state.formKey,
-            child: Column(
+            child: ListView(
               children: [
                 const FormTitle(
                   title: 'Register',
@@ -203,7 +203,7 @@ class PartnerStoreRegisterForm extends StatelessWidget {
                 ),
                 const TextHeader(label: 'Autonomy Level'),
                 Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
+                  padding: const EdgeInsets.only(top: 8.0, left: 8.0),
                   child: AutonomyLevelDropdown(
                     items: state.autonomyLevels,
                     controller: state.autonomyLevelController,
@@ -214,7 +214,7 @@ class PartnerStoreRegisterForm extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: SubmitButton(
                     label: 'Register',
                     onPressed: () async {

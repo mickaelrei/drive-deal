@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -55,14 +54,8 @@ class VehicleListState with ChangeNotifier {
     }
   }
 
-  /// Retrieve list of images with given vehicle
-  Future<List<File>>? getImages(Vehicle vehicle) {
-    return _vehicleImages[vehicle];
-  }
-
   /// Callback for vehicle edit
   void onEdit(Vehicle vehicle) {
-    log('Vehicle with id ${vehicle.id} was edited');
     notifyListeners();
   }
 }
@@ -131,8 +124,8 @@ class VehicleListPage extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: VehicleTile(
                     vehicle: vehicle,
-                    // ignore: discarded_futures
-                    images: state.getImages(vehicle),
+                    theme: theme,
+                    images: state._vehicleImages[vehicle],
                     onEdit: () async {
                       await Navigator.of(context).pushNamed(
                         '/vehicle_edit',
@@ -180,11 +173,13 @@ class VehicleListPage extends StatelessWidget {
 /// Widget for displaying a [Vehicle] in a [ListView]
 class VehicleTile extends StatelessWidget {
   /// Constructor
-  const VehicleTile(
-      {required this.vehicle,
-      required this.images,
-      required this.onEdit,
-      super.key});
+  const VehicleTile({
+    required this.vehicle,
+    required this.images,
+    required this.onEdit,
+    this.theme = UserSettings.defaultAppTheme,
+    super.key,
+  });
 
   /// [Vehicle] object to show
   final Vehicle vehicle;
@@ -194,6 +189,9 @@ class VehicleTile extends StatelessWidget {
 
   /// Callback for edit
   final void Function() onEdit;
+
+  /// Theme
+  final AppTheme theme;
 
   @override
   Widget build(BuildContext context) {
@@ -205,6 +203,7 @@ class VehicleTile extends StatelessWidget {
           await Navigator.of(context).pushNamed(
             '/vehicle_info',
             arguments: {
+              'theme': theme,
               'vehicle': vehicle,
             },
           );
