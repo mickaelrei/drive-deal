@@ -69,6 +69,7 @@ class UserSettingsPage extends StatelessWidget {
     required this.user,
     this.navBar,
     this.onThemeChanged,
+    this.onLanguageChanged,
     super.key,
   });
 
@@ -80,6 +81,9 @@ class UserSettingsPage extends StatelessWidget {
 
   /// Callback for theme changing
   final void Function(AppTheme)? onThemeChanged;
+
+  /// Callback for language changing
+  final void Function(AppLanguage)? onLanguageChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +143,13 @@ class UserSettingsPage extends StatelessWidget {
                             child: DropdownMenu<AppLanguage>(
                               initialSelection: state.appLanguage,
                               onSelected: (language) async {
+                                // Set new language
                                 await state.setAppLanguage(language!);
+
+                                // Call callback
+                                if (onLanguageChanged != null) {
+                                  onLanguageChanged!(language);
+                                }
                               },
                               dropdownMenuEntries: const [
                                 DropdownMenuEntry<AppLanguage>(

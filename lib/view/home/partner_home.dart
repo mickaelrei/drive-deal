@@ -5,10 +5,12 @@ import '../../entities/partner_store.dart';
 import '../../entities/sale.dart';
 import '../../entities/user.dart';
 import '../../entities/vehicle.dart';
+
 import '../../utils/forms.dart';
+
 import '../list/sale_list.dart';
 import '../list/vehicle_list.dart';
-import '../logout.dart';
+
 import '../unknown_page.dart';
 import '../user_settings.dart';
 
@@ -50,6 +52,11 @@ class PartnerHomeState with ChangeNotifier {
 
   /// Callback for when the theme setting is changed
   void onThemeChanged(AppTheme newTheme) {
+    notifyListeners();
+  }
+
+  /// Callback for when the language setting is changed
+  void onLanguageChanged(AppLanguage newLanguage) {
     notifyListeners();
   }
 }
@@ -113,11 +120,9 @@ class PartnerHomePage extends StatelessWidget {
                 user: user,
                 navBar: navBar,
                 onThemeChanged: state.onThemeChanged,
+                onLanguageChanged: state.onLanguageChanged,
               );
               break;
-            case 4:
-              // Logout
-              page = LogoutPage(navBar: navBar);
             default:
               // Error
               page = UnknownPage(navBar: navBar);
@@ -194,13 +199,6 @@ class PartnerBottomNavigationBar extends StatelessWidget {
             color: destinationColor,
           ),
           label: 'Settings',
-        ),
-        NavigationDestination(
-          icon: Icon(
-            Icons.logout,
-            color: destinationColor,
-          ),
-          label: 'Logout',
         ),
       ],
     );

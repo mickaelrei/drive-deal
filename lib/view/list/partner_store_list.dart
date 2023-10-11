@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../entities/partner_store.dart';
@@ -8,7 +10,6 @@ class PartnerStoreListPage extends StatelessWidget {
   /// Constructor
   const PartnerStoreListPage({
     required this.items,
-    required this.user,
     this.navBar,
     this.onPartnerStoreRegister,
     this.theme = UserSettings.defaultAppTheme,
@@ -18,14 +19,11 @@ class PartnerStoreListPage extends StatelessWidget {
   /// Page navigation bar
   final Widget? navBar;
 
-  /// List of [PartnerStore]
-  final Future<List<PartnerStore>> items;
-
-  /// Admin user
-  final User user;
-
   /// Callback for partner store registering
   final void Function(PartnerStore)? onPartnerStoreRegister;
+
+  /// List of [PartnerStore]s
+  final Future<List<PartnerStore>> items;
 
   /// Theme
   final AppTheme theme;
@@ -40,7 +38,6 @@ class PartnerStoreListPage extends StatelessWidget {
           await Navigator.of(context).pushNamed(
             '/store_register',
             arguments: {
-              'user': user,
               'on_register': onPartnerStoreRegister,
               'theme': theme,
             },

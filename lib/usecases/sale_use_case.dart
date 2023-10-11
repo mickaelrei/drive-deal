@@ -1,6 +1,7 @@
 import '../entities/autonomy_level.dart';
 import '../entities/sale.dart';
 import '../repositories/sale_repository.dart';
+import '../utils/safety_percent.dart';
 
 /// Class to be used for [Sale] operations
 class SaleUseCase {
@@ -39,17 +40,12 @@ class SaleUseCase {
     return totalPrice * autonomyLevel.networkPercent / 100.0;
   }
 
-  /// Method to calculate the network safety's profit on a sale,
+  /// Method to get the network safety's profit on a sale,
   /// given sale's total price
   double calculateSafetyProfit({
     required double totalPrice,
     required AutonomyLevel autonomyLevel,
   }) {
-    // TODO: Get safetyPercent from a better place (SharedPrefs probably)
-
-    final safetyPercent =
-        100 - autonomyLevel.storePercent - autonomyLevel.storePercent;
-
     return totalPrice * safetyPercent / 100.0;
   }
 }

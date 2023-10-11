@@ -26,6 +26,11 @@ class PartnerStoreRegisterState with ChangeNotifier {
     unawaited(init());
   }
 
+  final _formKey = GlobalKey<FormState>();
+
+  /// Form key getter
+  GlobalKey<FormState> get formKey => _formKey;
+
   /// Callback function to when a [PartnerStore] gets registered
   final void Function(PartnerStore)? onRegister;
 
@@ -149,90 +154,87 @@ class PartnerStoreRegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          title: const Text('Register Partner Store'),
-        ),
-        body: ChangeNotifierProvider<PartnerStoreRegisterState>(
-          create: (context) {
-            return PartnerStoreRegisterState(onRegister: onRegister);
-          },
-          child: Consumer<PartnerStoreRegisterState>(
-            builder: (_, state, __) {
-              return Column(
-                children: [
-                  const FormTitle(
-                    title: 'Register',
-                  ),
-                  const TextHeader(label: 'Name'),
-                  FormTextEntry(
-                    label: 'Name',
-                    controller: state.nameController,
-                    validator: (text) {
-                      if (text == null || text.isEmpty) {
-                        return 'Name can\'t be empty';
-                      }
-                      if (text.length < 3) {
-                        return 'Name needs to be at least 3 characters long';
-                      }
-                      if (text.length > 120) {
-                        return 'Name can be at max 120 characters long';
-                      }
-                      // Valid
-                      return null;
+    return ChangeNotifierProvider<PartnerStoreRegisterState>(
+      create: (context) {
+        return PartnerStoreRegisterState(onRegister: onRegister);
+      },
+      child: Consumer<PartnerStoreRegisterState>(
+        builder: (_, state, __) {
+          return Form(
+            key: state.formKey,
+            child: Column(
+              children: [
+                const FormTitle(
+                  title: 'Register',
+                ),
+                const TextHeader(label: 'Name'),
+                FormTextEntry(
+                  label: 'Name',
+                  controller: state.nameController,
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return 'Name can\'t be empty';
+                    }
+                    if (text.length < 3) {
+                      return 'Name needs to be at least 3 characters long';
+                    }
+                    if (text.length > 120) {
+                      return 'Name can be at max 120 characters long';
+                    }
+                    // Valid
+                    return null;
+                  },
+                ),
+                const TextHeader(label: 'CNPJ'),
+                FormTextEntry(
+                  label: 'CNPJ',
+                  controller: state.cnpjController,
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return 'CNPJ can\'t be empty';
+                    }
+                    if (text.length != 14) {
+                      return 'CNPJ needs to be exactly 14 characters long'
+                          ' (only digits)';
+                    }
+                    // Valid
+                    return null;
+                  },
+                ),
+                const TextHeader(label: 'Autonomy Level'),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: AutonomyLevelDropdown(
+                    items: state.autonomyLevels,
+                    controller: state.autonomyLevelController,
+                    selected: state.chosenAutonomyLevel,
+                    onSelected: (autonomyLevel) {
+                      state.chosenAutonomyLevel = autonomyLevel;
                     },
                   ),
-                  const TextHeader(label: 'CNPJ'),
-                  FormTextEntry(
-                    label: 'CNPJ',
-                    controller: state.cnpjController,
-                    validator: (text) {
-                      if (text == null || text.isEmpty) {
-                        return 'CNPJ can\'t be empty';
-                      }
-                      if (text.length != 14) {
-                        return 'CNPJ needs to be exactly 14 characters long'
-                            ' (only digits)';
-                      }
-                      // Valid
-                      return null;
-                    },
-                  ),
-                  const TextHeader(label: 'Autonomy Level'),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: AutonomyLevelDropdown(
-                      items: state.autonomyLevels,
-                      controller: state.autonomyLevelController,
-                      selected: state.chosenAutonomyLevel,
-                      onSelected: (autonomyLevel) {
-                        state.chosenAutonomyLevel = autonomyLevel;
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: SubmitButton(
-                      label: 'Register',
-                      onPressed: () async {
-                        // Try registering
-                        final result = await state.register();
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: SubmitButton(
+                    label: 'Register',
+                    onPressed: () async {
+                      // Validate inputs
+                      if (!state.formKey.currentState!.validate()) return;
 
-                        // Show dialog with register result
-                        if (context.mounted) {
-                          await registerDialog(context, result);
-                        }
-                      },
-                    ),
-                  )
-                ],
-              );
-            },
-          ),
-        ),
+                      // Try registering
+                      final result = await state.register();
+
+                      // Show dialog with register result
+                      if (context.mounted) {
+                        await registerDialog(context, result);
+                      }
+                    },
+                  ),
+                )
+              ],
+            ),
+          );
+        },
       ),
     );
   }

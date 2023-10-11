@@ -27,6 +27,11 @@ class VehicleRegisterState with ChangeNotifier {
   /// What [PartnerStore] is this provider linked to
   final PartnerStore partnerStore;
 
+  final _formKey = GlobalKey<FormState>();
+
+  /// Form key getter
+  GlobalKey<FormState> get formKey => _formKey;
+
   /// Callback function for when a vehicle gets registered
   final void Function(Vehicle)? onRegister;
 
@@ -69,9 +74,6 @@ class VehicleRegisterState with ChangeNotifier {
 
   /// Input vehicle purchase date
   DateTime? purchaseDate;
-
-  /// Vehicle that (eventually) got registered
-  Vehicle? _registeredVehicle;
 
   /// Initialize some lists
   Future<void> init() async {
@@ -299,16 +301,8 @@ class VehicleRegisterState with ChangeNotifier {
       onRegister!(vehicle);
     }
 
-    // Set registered vehicle
-    _registeredVehicle = vehicle;
-
     // Success
     return null;
-  }
-
-  /// Returns the registered vehicle, if it got registered already
-  Vehicle? getRegisteredVehicle() {
-    return _registeredVehicle;
   }
 
   @override
@@ -362,119 +356,123 @@ class VehicleRegisterForm extends StatelessWidget {
 
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const FormTitle(
-                  title: 'Register Vehicle',
-                ),
-                const TextHeader(label: 'Brand'),
-                FutureDropdown<FipeBrand>(
-                  initialSelected: state._currentBrand,
-                  future: state.brands,
-                  onChanged: state.setBrand,
-                  dropdownBuilder: (item) {
-                    return Text(item.name);
-                  },
-                ),
-                const TextHeader(label: 'Model'),
-                FutureDropdown<FipeModel>(
-                  future: state.models,
-                  onChanged: state.setModel,
-                  dropdownBuilder: (item) {
-                    return Text(item.name);
-                  },
-                ),
-                const TextHeader(label: 'Model year'),
-                FutureDropdown<FipeModelYear>(
-                  future: state.modelYears,
-                  onChanged: state.setModelYear,
-                  dropdownBuilder: (item) {
-                    return Text(item.name);
-                  },
-                ),
-                const TextHeader(label: 'FIPE price'),
-                FutureBuilder(
-                  future: state.currentVehicleInfo,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 12.0,
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-
-                    if (snapshot.data == null) {
-                      // Empty text entry
-                      return const FormTextEntry(
-                        enabled: false,
-                      );
-                    }
-
-                    return FormTextEntry(
-                      text: formatPrice(snapshot.data!.price),
-                      enabled: false,
-                    );
-                  },
-                ),
-                const TextHeader(label: 'Purchase price'),
-                FormTextEntry(
-                  label: 'Purchase price',
-                  controller: state.purchasePriceController,
-                ),
-                const TextHeader(label: 'Manufacture year'),
-                FormTextEntry(
-                  label: 'Manufacture year',
-                  controller: state.manufactureYearController,
-                ),
-                const TextHeader(label: 'Plate'),
-                FormTextEntry(
-                  label: 'Plate',
-                  controller: state.plateController,
-                ),
-                const TextHeader(label: 'Purchase date'),
-                DatePicker(
-                  initialDate: state.purchaseDate,
-                  onDatePicked: state.setDate,
-                ),
-                const TextHeader(label: 'Images'),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: VehicleImagesScrollView(
-                    addFromCamera: state.addImageFromCamera,
-                    addFromGallery: state.addImagesFromGallery,
-                    previewImages: previewImages,
+            child: Form(
+              key: state.formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const FormTitle(
+                    title: 'Register Vehicle',
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SubmitButton(
-                    label: 'Register',
-                    onPressed: () async {
-                      // Try registering
-                      final result = await state.register();
-
-                      // Show dialog with register result
-                      if (context.mounted) {
-                        await registerDialog(context, result);
-                      }
-
-                      // Return to list page
-                      if (result == null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pop(
-                          state.getRegisteredVehicle(),
-                        );
-                      }
+                  const TextHeader(label: 'Brand'),
+                  FutureDropdown<FipeBrand>(
+                    initialSelected: state._currentBrand,
+                    future: state.brands,
+                    onChanged: state.setBrand,
+                    dropdownBuilder: (item) {
+                      return Text(item.name);
                     },
                   ),
-                )
-              ],
+                  const TextHeader(label: 'Model'),
+                  FutureDropdown<FipeModel>(
+                    future: state.models,
+                    onChanged: state.setModel,
+                    dropdownBuilder: (item) {
+                      return Text(item.name);
+                    },
+                  ),
+                  const TextHeader(label: 'Model year'),
+                  FutureDropdown<FipeModelYear>(
+                    future: state.modelYears,
+                    onChanged: state.setModelYear,
+                    dropdownBuilder: (item) {
+                      return Text(item.name);
+                    },
+                  ),
+                  const TextHeader(label: 'FIPE price'),
+                  FutureBuilder(
+                    future: state.currentVehicleInfo,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 12.0,
+                          ),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.data == null) {
+                        // Empty text entry
+                        return const FormTextEntry(
+                          enabled: false,
+                        );
+                      }
+
+                      return FormTextEntry(
+                        text: formatPrice(snapshot.data!.price),
+                        enabled: false,
+                      );
+                    },
+                  ),
+                  const TextHeader(label: 'Purchase price'),
+                  FormTextEntry(
+                    label: 'Purchase price',
+                    controller: state.purchasePriceController,
+                  ),
+                  const TextHeader(label: 'Manufacture year'),
+                  FormTextEntry(
+                    label: 'Manufacture year',
+                    controller: state.manufactureYearController,
+                  ),
+                  const TextHeader(label: 'Plate'),
+                  FormTextEntry(
+                    label: 'Plate',
+                    controller: state.plateController,
+                  ),
+                  const TextHeader(label: 'Purchase date'),
+                  DatePicker(
+                    initialDate: state.purchaseDate,
+                    onDatePicked: state.setDate,
+                  ),
+                  const TextHeader(label: 'Images'),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: VehicleImagesScrollView(
+                      addFromCamera: state.addImageFromCamera,
+                      addFromGallery: state.addImagesFromGallery,
+                      previewImages: previewImages,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SubmitButton(
+                      label: 'Register',
+                      onPressed: () async {
+                        // Validate inputs
+                        if (!state.formKey.currentState!.validate()) return;
+
+                        // Try registering
+                        final result = await state.register();
+
+                        // Show dialog with register result
+                        if (context.mounted) {
+                          await registerDialog(context, result);
+                        }
+
+                        // Return to list page
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
           );
         },

@@ -1,5 +1,6 @@
 import '../entities/autonomy_level.dart';
 import '../repositories/autonomy_level_repository.dart';
+import '../utils/safety_percent.dart';
 
 /// Class to be used for [AutonomyLevel] operations
 class AutonomyLevelUseCase {
@@ -15,14 +16,18 @@ class AutonomyLevelUseCase {
 
   /// Method to insert a [AutonomyLevel] into database
   Future<void> insert(AutonomyLevel autonomyLevel) async {
-    // Check if store and network percents don't surpass 100%
-    final totalPercent =
-        autonomyLevel.storePercent + autonomyLevel.networkPercent;
-    if (totalPercent > 100) {
+    // Get total percent
+    final totalPercent = safetyPercent +
+        autonomyLevel.storePercent +
+        autonomyLevel.networkPercent;
+
+    // Check if total percent is roughly equal to 100
+    final diff = 100 - totalPercent;
+    if (diff.abs() < .001) {
       throw ArgumentError.value(
         autonomyLevel,
         'autonomyLevel',
-        'sum of storePercent and networkPercent surpass 100%.',
+        'safetyPercent + storePercent + networkPercent != 100%.',
       );
     }
 

@@ -232,25 +232,16 @@ class SaleTile extends StatelessWidget {
       elevation: 5,
       shadowColor: Colors.grey,
       child: ListTile(
+        onTap: () async {
+          await Navigator.of(context).pushNamed(
+            '/sale_info',
+            arguments: {
+              'sale': sale,
+            },
+          );
+        },
         title: Text('Customer: ${sale.customerName} (${sale.customerCpf})'),
         subtitle: Text('Sold on ${formatDate(sale.saleDate)}'),
-      ),
-    );
-  }
-}
-
-/// Widget for an image in a [SaleTile] with no images
-class NoSaleTile extends StatelessWidget {
-  /// Constructor
-  const NoSaleTile({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const CircleAvatar(
-      backgroundColor: Colors.transparent,
-      child: Icon(
-        Icons.attach_money,
-        color: Colors.grey,
       ),
     );
   }

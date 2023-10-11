@@ -21,6 +21,11 @@ class SaleRegisterState with ChangeNotifier {
   /// What [PartnerStore] is this provider linked to
   final PartnerStore partnerStore;
 
+  final _formKey = GlobalKey<FormState>();
+
+  /// Form key getter
+  GlobalKey<FormState> get formKey => _formKey;
+
   /// List of vehicles available for sale
   final availableVehicles = <Vehicle>[];
 
@@ -46,9 +51,6 @@ class SaleRegisterState with ChangeNotifier {
 
   /// Input sale date
   DateTime? saleDate;
-
-  /// Sale that (eventually) got registered
-  Sale? _registeredSale;
 
   /// Method to set sale date
   void setDate(DateTime date) {
@@ -126,16 +128,8 @@ class SaleRegisterState with ChangeNotifier {
       onRegister!(sale);
     }
 
-    // Set registered sale
-    _registeredSale = sale;
-
     // Success
     return null;
-  }
-
-  /// Returns the registered sale, if it got registered already
-  Sale? getRegisteredSale() {
-    return _registeredSale;
   }
 
   @override
@@ -175,83 +169,87 @@ class SaleRegisterForm extends StatelessWidget {
         builder: (_, state, __) {
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const FormTitle(
-                  title: 'Register Sale',
-                ),
-                const TextHeader(label: 'Vehicle'),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButtonFormField<Vehicle>(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
+            child: Form(
+              key: state.formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const FormTitle(
+                    title: 'Register Sale',
+                  ),
+                  const TextHeader(label: 'Vehicle'),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: DropdownButtonFormField<Vehicle>(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                       ),
+                      items: state.availableVehicles
+                          .map(
+                            (e) => DropdownMenuItem<Vehicle>(
+                              value: e,
+                              child: Text(e.model),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: state.setVehicle,
                     ),
-                    items: state.availableVehicles
-                        .map(
-                          (e) => DropdownMenuItem<Vehicle>(
-                            value: e,
-                            child: Text(e.model),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: state.setVehicle,
                   ),
-                ),
-                const TextHeader(label: 'Customer name'),
-                FormTextEntry(
-                  label: 'Customer Name',
-                  controller: state.customerNameController,
-                ),
-                const TextHeader(label: 'Customer CPF'),
-                FormTextEntry(
-                  label: 'Customer CPF',
-                  controller: state.customerCpfController,
-                ),
-                const TextHeader(label: 'Sale price'),
-                FormTextEntry(
-                  validator: (text) {
-                    final price = double.tryParse(text!);
-                    if (price == null) {
-                      return 'Price needs to be a number';
-                    }
-                    return null;
-                  },
-                  label: 'Price',
-                  controller: state.priceController,
-                ),
-                const TextHeader(label: 'Sale date'),
-                DatePicker(
-                  initialDate: state.saleDate,
-                  onDatePicked: state.setDate,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SubmitButton(
-                    label: 'Register',
-                    onPressed: () async {
-                      // Try registering
-                      final result = await state.register();
-
-                      // Show dialog with register result
-                      if (context.mounted) {
-                        await registerDialog(context, result);
+                  const TextHeader(label: 'Customer name'),
+                  FormTextEntry(
+                    label: 'Customer Name',
+                    controller: state.customerNameController,
+                  ),
+                  const TextHeader(label: 'Customer CPF'),
+                  FormTextEntry(
+                    label: 'Customer CPF',
+                    controller: state.customerCpfController,
+                  ),
+                  const TextHeader(label: 'Sale price'),
+                  FormTextEntry(
+                    validator: (text) {
+                      final price = double.tryParse(text!);
+                      if (price == null) {
+                        return 'Price needs to be a number';
                       }
-
-                      // Go back to sale listing
-                      if (result == null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pop(
-                          state.getRegisteredSale(),
-                        );
-                      }
+                      return null;
                     },
+                    label: 'Price',
+                    controller: state.priceController,
                   ),
-                )
-              ],
+                  const TextHeader(label: 'Sale date'),
+                  DatePicker(
+                    initialDate: state.saleDate,
+                    onDatePicked: state.setDate,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SubmitButton(
+                      label: 'Register',
+                      onPressed: () async {
+                        // Validate inputs
+                        if (!state.formKey.currentState!.validate()) return;
+
+                        // Try registering
+                        final result = await state.register();
+
+                        // Show dialog with register result
+                        if (context.mounted) {
+                          await registerDialog(context, result);
+                        }
+
+                        // Go back to sale listing
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
           );
         },

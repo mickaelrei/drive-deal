@@ -24,19 +24,16 @@ class MyApp extends StatelessWidget {
       routes: const {
         '/login': loginRoute,
         '/home': homeRoute,
-
         '/user_edit': userEditRoute,
-
         '/store_register': storeRegisterRoute,
         '/store_edit': storeEditRoute,
         '/store_info': storeInfoRoute,
-
         '/vehicle_register': vehicleRegisterRoute,
         '/vehicle_edit': vehicleEditRoute,
         '/vehicle_info': vehicleInfoRoute,
-
         '/sale_register': saleRegisterRoute,
-        // '/sale_info': saleInfoRoute,
+        '/sale_info': saleInfoRoute,
+        '/autonomy_level_register': autonomyLevelRegisterRoute
       },
     );
   }

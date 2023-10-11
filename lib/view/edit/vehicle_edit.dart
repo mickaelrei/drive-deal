@@ -529,6 +529,11 @@ class VehicleEditForm extends StatelessWidget {
                     );
                   },
                 ),
+                const TextHeader(label: 'Purchase price'),
+                FormTextEntry(
+                  label: 'Purchase price',
+                  controller: state.purchasePriceController,
+                ),
                 const TextHeader(label: 'Manufacture year'),
                 FormTextEntry(
                   label: 'Manufacture year',

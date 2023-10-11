@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
 import '../../entities/vehicle.dart';
+
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/vehicle_use_case.dart';
 
@@ -130,6 +131,7 @@ class VehicleListPage extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: VehicleTile(
                     vehicle: vehicle,
+                    // ignore: discarded_futures
                     images: state.getImages(vehicle),
                     onEdit: () async {
                       await Navigator.of(context).pushNamed(

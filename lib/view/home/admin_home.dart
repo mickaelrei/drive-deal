@@ -3,13 +3,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../entities/autonomy_level.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
+
+import '../../repositories/autonomy_level_repository.dart';
 import '../../repositories/partner_store_repository.dart';
+import '../../usecases/autonomy_level_use_case.dart';
 import '../../usecases/partner_store_use_case.dart';
 import '../../utils/forms.dart';
+
+import '../list/autonomy_level_list.dart';
 import '../list/partner_store_list.dart';
-import '../logout.dart';
 import '../unknown_page.dart';
 import '../user_settings.dart';
 
@@ -17,19 +22,33 @@ import '../user_settings.dart';
 class AdminHomeState with ChangeNotifier {
   /// Constructor
   AdminHomeState() {
-    unawaited(getLists());
+    unawaited(init());
   }
-
-  /// For [PartnerStore] operations
-  final PartnerStoreUseCase partnerStoreUseCase = PartnerStoreUseCase(
-    const PartnerStoreRepository(),
-  );
-
-  /// List of all [PartnerStore]s
-  late Future<List<PartnerStore>> partnerStores;
 
   /// Which page is selected in the navigation bar
   int navigationBarSelectedIndex = 0;
+
+  /// For getting all [AutonomyLevel]s
+  final _autonomyLevelUseCase = const AutonomyLevelUseCase(
+    AutonomyLevelRepository(),
+  );
+
+  /// List of [AutonomyLevel]s
+  late Future<List<AutonomyLevel>> autonomyLevels;
+
+  /// For getting all [PartnerStore]s
+  final _partnerStoreUseCase = PartnerStoreUseCase(
+    const PartnerStoreRepository(),
+  );
+
+  /// List of [PartnerStore]s
+  late Future<List<PartnerStore>> partnerStores;
+
+  /// Initialize data
+  Future<void> init() async {
+    partnerStores = _partnerStoreUseCase.select();
+    autonomyLevels = _autonomyLevelUseCase.select();
+  }
 
   /// Method to change NavBar selected item
   Future<void> changePage(int index) async {
@@ -39,10 +58,13 @@ class AdminHomeState with ChangeNotifier {
 
   /// Called when a PartnerStore gets registered
   Future<void> onPartnerStoreRegister(PartnerStore partnerStore) async {
-    // Add to list
-    await getLists();
+    partnerStores = _partnerStoreUseCase.select();
+    notifyListeners();
+  }
 
-    // Update widget
+  /// Called when an autonomy level gets registered
+  void onAutonomyLevelRegister(AutonomyLevel autonomyLevel) {
+    autonomyLevels = _autonomyLevelUseCase.select();
     notifyListeners();
   }
 
@@ -51,9 +73,14 @@ class AdminHomeState with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Method to update variables
-  Future<void> getLists() async {
-    partnerStores = partnerStoreUseCase.select();
+  /// Callback for when the theme setting is changed
+  void onThemeChanged(AppTheme newTheme) {
+    notifyListeners();
+  }
+
+  /// Callback for when the language setting is changed
+  void onLanguageChanged(AppLanguage newLanguage) {
+    notifyListeners();
   }
 }
 
@@ -87,12 +114,12 @@ class AdminHomePage extends StatelessWidget {
               page = AdminInfoPage(
                 user: user,
                 navBar: navBar,
+                theme: user.settings.appTheme,
                 onUserEdit: state.onUserEdit,
               );
             case 1:
               // Listing of partner stores
               page = PartnerStoreListPage(
-                user: user,
                 theme: user.settings.appTheme,
                 onPartnerStoreRegister: state.onPartnerStoreRegister,
                 navBar: navBar,
@@ -100,11 +127,22 @@ class AdminHomePage extends StatelessWidget {
               );
               break;
             case 2:
-              // Settings
-              page = UserSettingsPage(user: user);
+              // Listing of partner stores
+              page = AutonomyLevelListPage(
+                navBar: navBar,
+                theme: user.settings.appTheme,
+                onRegister: state.onAutonomyLevelRegister,
+                items: state.autonomyLevels,
+              );
+              break;
             case 3:
-              // Logout
-              page = LogoutPage(navBar: navBar);
+              // Settings
+              page = UserSettingsPage(
+                user: user,
+                navBar: navBar,
+                onThemeChanged: state.onThemeChanged,
+                onLanguageChanged: state.onLanguageChanged,
+              );
             default:
               // Error
               page = UnknownPage(navBar: navBar);
@@ -151,7 +189,7 @@ class AdminInfoPage extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Partner Home'),
+        title: const Text('Admin Home'),
       ),
       bottomNavigationBar: navBar,
       floatingActionButton: FloatingActionButton(
@@ -247,7 +285,14 @@ class AdminBottomNavigationBar extends StatelessWidget {
             Icons.add_business_outlined,
             color: destinationColor,
           ),
-          label: 'Register',
+          label: 'Stores',
+        ),
+        NavigationDestination(
+          icon: Icon(
+            Icons.stairs_outlined,
+            color: destinationColor,
+          ),
+          label: 'Autonomy',
         ),
         NavigationDestination(
           icon: Icon(
@@ -255,13 +300,6 @@ class AdminBottomNavigationBar extends StatelessWidget {
             color: destinationColor,
           ),
           label: 'Settings',
-        ),
-        NavigationDestination(
-          icon: Icon(
-            Icons.logout,
-            color: destinationColor,
-          ),
-          label: 'Logout',
         ),
       ],
     );
