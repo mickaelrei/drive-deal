@@ -33,7 +33,8 @@ class MyApp extends StatelessWidget {
         '/vehicle_info': vehicleInfoRoute,
         '/sale_register': saleRegisterRoute,
         '/sale_info': saleInfoRoute,
-        '/autonomy_level_register': autonomyLevelRegisterRoute
+        '/autonomy_level_register': autonomyLevelRegisterRoute,
+        '/autonomy_level_edit': autonomyLevelEditRoute,
       },
     );
   }

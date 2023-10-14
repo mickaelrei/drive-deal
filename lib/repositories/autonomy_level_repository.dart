@@ -65,6 +65,18 @@ class AutonomyLevelRepository {
     return null;
   }
 
+  /// Method to update a [AutonomyLevel] in the database
+  Future<void> update(AutonomyLevel autonomyLevel) async {
+    final database = await getDatabase();
+
+    await database.update(
+      AutonomyLevelTable.tableName,
+      autonomyLevel.toMap(),
+      where: '${AutonomyLevelTable.id} = ?',
+      whereArgs: [autonomyLevel.id],
+    );
+  }
+
   /// Method to delete a specific [AutonomyLevel] from database
   Future<void> delete(AutonomyLevel autonomyLevel) async {
     final database = await getDatabase();

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../entities/autonomy_level.dart';
 import '../entities/partner_store.dart';
 import '../entities/sale.dart';
 import '../entities/user.dart';
 import '../entities/vehicle.dart';
 
+import '../view/edit/autonomy_level_edit.dart';
 import '../view/edit/partner_store_edit.dart';
 import '../view/edit/user_edit.dart';
 import '../view/edit/vehicle_edit.dart';
@@ -33,6 +35,14 @@ Widget homeRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
+  if (args['user'] is! User) {
+    throw ArgumentError.value(
+      args['user'],
+      'args[\'user\']',
+      'field \'user\' in args should be of type \'User\'',
+    );
+  }
+
   // Get user
   final user = args['user'] as User?;
   if (user == null || user.id == null) {
@@ -55,6 +65,14 @@ Widget homeRoute(BuildContext context) {
 Widget userEditRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  if (args['user'] is! User) {
+    throw ArgumentError.value(
+      args['user'],
+      'args[\'user\']',
+      'field \'user\' in args should be of type \'User\'',
+    );
+  }
 
   // Check for valid args
   final user = args['user'] as User?;
@@ -113,6 +131,14 @@ Widget storeEditRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
+  if (args['user'] is! User) {
+    throw ArgumentError.value(
+      args['user'],
+      'args[\'user\']',
+      'field \'user\' in args should be of type \'User\'',
+    );
+  }
+
   // Check for valid args
   final user = args['user'] as User?;
   if (user == null || user.id == null) {
@@ -148,6 +174,14 @@ Widget storeInfoRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
+  if (args['partner_store'] is! PartnerStore) {
+    throw ArgumentError.value(
+      args['partner_store'],
+      'args[\'partner_store\']',
+      'field \'partner_store\' in args should be of type \'PartnerStore\'',
+    );
+  }
+
   // Check for valid args
   final partnerStore = args['partner_store'] as PartnerStore?;
   if (partnerStore == null || partnerStore.id == null) {
@@ -179,6 +213,14 @@ Widget storeInfoRoute(BuildContext context) {
 Widget vehicleRegisterRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  if (args['partner_store'] is! PartnerStore) {
+    throw ArgumentError.value(
+      args['partner_store'],
+      'args[\'partner_store\']',
+      'field \'partner_store\' in args should be of type \'PartnerStore\'',
+    );
+  }
 
   // Check for valid args
   final partnerStore = args['partner_store'] as PartnerStore?;
@@ -213,6 +255,14 @@ Widget vehicleEditRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
+  if (args['vehicle'] is! Vehicle) {
+    throw ArgumentError.value(
+      args['vehicle'],
+      'args[\'vehicle\']',
+      'field \'vehicle\' in args should be of type \'Sale\'',
+    );
+  }
+
   // Check for valid args
   final vehicle = args['vehicle'] as Vehicle?;
   if (vehicle == null || vehicle.id == null) {
@@ -246,6 +296,14 @@ Widget vehicleInfoRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
+  if (args['vehicle'] is! Vehicle) {
+    throw ArgumentError.value(
+      args['vehicle'],
+      'args[\'vehicle\']',
+      'field \'vehicle\' in args should be of type \'Sale\'',
+    );
+  }
+
   // Check for valid args
   final vehicle = args['vehicle'] as Vehicle?;
   if (vehicle == null || vehicle.id == null) {
@@ -277,6 +335,14 @@ Widget vehicleInfoRoute(BuildContext context) {
 Widget saleRegisterRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  if (args['partner_store'] is! PartnerStore) {
+    throw ArgumentError.value(
+      args['partner_store'],
+      'args[\'partner_store\']',
+      'field \'partner_store\' in args should be of type \'PartnerStore\'',
+    );
+  }
 
   // Check for valid args
   final partnerStore = args['partner_store'] as PartnerStore?;
@@ -310,6 +376,14 @@ Widget saleRegisterRoute(BuildContext context) {
 Widget saleInfoRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  if (args['sale'] is! Sale) {
+    throw ArgumentError.value(
+      args['sale'],
+      'args[\'sale\']',
+      'field \'sale\' in args should be of type \'Sale\'',
+    );
+  }
 
   // Check for valid args
   final sale = args['sale'] as Sale?;
@@ -355,6 +429,47 @@ Widget autonomyLevelRegisterRoute(BuildContext context) {
       ),
       body: AutonomyLevelRegisterForm(
         onRegister: args['on_register'],
+      ),
+    ),
+  );
+}
+
+/// Function to handle /autonomy_level_edit route
+Widget autonomyLevelEditRoute(BuildContext context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+  if (args['autonomy_level'] is! AutonomyLevel) {
+    throw ArgumentError.value(
+      args['autonomy_level'],
+      'args[\'autonomy_level\']',
+      'field \'autonomy_level\' in args should be of type \'AutonomyLevel\'',
+    );
+  }
+
+  // Check for valid args
+  final autonomyLevel = args['autonomy_level'] as AutonomyLevel?;
+  if (autonomyLevel == null || autonomyLevel.id == null) {
+    throw ArgumentError.value(
+      autonomyLevel,
+      'args[\'autonomy_level\']',
+      'field \'autonomy_level\' in args should be not null with a non-null id',
+    );
+  }
+
+  // Get theme
+  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
+
+  return Theme(
+    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
+    child: Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Edit autonomy level'),
+      ),
+      body: AutonomyLevelEditForm(
+        autonomyLevel: autonomyLevel,
+        onEdit: args['on_edit'],
       ),
     ),
   );

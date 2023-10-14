@@ -52,6 +52,9 @@ class SaleRegisterState with ChangeNotifier {
   /// Input sale date
   DateTime? saleDate;
 
+  /// Vehicle date to restrain sale date
+  DateTime? vehiclePurchaseDate;
+
   /// Method to set sale date
   void setDate(DateTime date) {
     saleDate = date;
@@ -62,7 +65,13 @@ class SaleRegisterState with ChangeNotifier {
 
   /// Method to set the [Vehicle] this [Sale] is linked to
   void setVehicle(Vehicle? vehicle) {
+    // Set vehicle
     _saleVehicle = vehicle!;
+
+    // Set first date and reset current input date
+    vehiclePurchaseDate = _saleVehicle!.purchaseDate;
+    saleDate = null;
+    notifyListeners();
   }
 
   /// Initialize some lists
@@ -231,6 +240,7 @@ class SaleRegisterForm extends StatelessWidget {
                   ),
                   const TextHeader(label: 'Sale date'),
                   DatePicker(
+                    firstDate: state.vehiclePurchaseDate,
                     initialDate: state.saleDate,
                     onDatePicked: state.setDate,
                   ),

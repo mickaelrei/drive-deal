@@ -39,6 +39,7 @@ class PartnerHomeState with ChangeNotifier {
   /// Callback for when a vehicle gets registered
   void onVehicleRegister(Vehicle vehicle) {
     // Add to list of vehicles
+    print('Adding new vehicle');
     partnerStore.vehicles.add(vehicle);
     notifyListeners();
   }

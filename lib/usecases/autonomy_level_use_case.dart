@@ -40,4 +40,9 @@ class AutonomyLevelUseCase {
   Future<AutonomyLevel?> selectById(int id) async {
     return _autonomyLevelRepository.selectById(id);
   }
+
+  /// Method to update a [AutonomyLevel] in the database
+  Future<void> update(AutonomyLevel autonomyLevel) async {
+    await _autonomyLevelRepository.update(autonomyLevel);
+  }
 }

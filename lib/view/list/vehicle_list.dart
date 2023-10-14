@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -31,31 +32,25 @@ class VehicleListState with ChangeNotifier {
   /// Method to initialize images for each vehicle
   void init() async {
     for (final vehicle in partnerStore.vehicles) {
-      // Get list of images for the vehicle
-      final images = _vehicleUseCase.getImages(vehicle);
-
-      // Add list to map
-      _vehicleImages[vehicle] = images;
+      await loadVehicleImages(vehicle);
     }
   }
 
-  /// Method to update list of cached images of the vehicles
-  Future<void> updateImages() async {
-    // Loop through every vehicle
-    for (final vehicle in partnerStore.vehicles) {
-      // Check if this vehicle doesn't have cached images
-      if (_vehicleImages[vehicle] == null) {
-        // Get list of images for the vehicle
-        final images = _vehicleUseCase.getImages(vehicle);
+  /// Initialize [vehicle] images
+  Future<void> loadVehicleImages(Vehicle vehicle) async {
+    // Get list of images for the vehicle
+    final images = _vehicleUseCase.getImages(vehicle);
 
-        // Add list to map
-        _vehicleImages[vehicle] = images;
-      }
-    }
+    // Add list to map
+    _vehicleImages[vehicle] = images;
   }
 
   /// Callback for vehicle edit
-  void onEdit(Vehicle vehicle) {
+  Future<void> onEdit(Vehicle vehicle) async {
+    // Load
+    await loadVehicleImages(vehicle);
+
+    // Update screen
     notifyListeners();
   }
 }

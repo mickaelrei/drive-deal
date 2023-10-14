@@ -11,8 +11,8 @@ import '../../repositories/autonomy_level_repository.dart';
 import '../../repositories/partner_store_repository.dart';
 import '../../usecases/autonomy_level_use_case.dart';
 import '../../usecases/partner_store_use_case.dart';
-import '../../utils/forms.dart';
 
+import '../info/admin_info.dart';
 import '../list/autonomy_level_list.dart';
 import '../list/partner_store_list.dart';
 import '../unknown_page.dart';
@@ -65,6 +65,11 @@ class AdminHomeState with ChangeNotifier {
   /// Called when an autonomy level gets registered
   Future<void> onAutonomyLevelRegister(AutonomyLevel autonomyLevel) async {
     autonomyLevels = _autonomyLevelUseCase.select();
+    notifyListeners();
+  }
+
+  /// Callback for when an autonomy level gets edited
+  void onAutonomyLevelEdit(AutonomyLevel autonomyLevel) {
     notifyListeners();
   }
 
@@ -132,6 +137,7 @@ class AdminHomePage extends StatelessWidget {
                 navBar: navBar,
                 theme: user.settings.appTheme,
                 onRegister: state.onAutonomyLevelRegister,
+                onAutonomyLevelEdit: state.onAutonomyLevelEdit,
                 items: state.autonomyLevels,
               );
               break;
@@ -156,65 +162,6 @@ class AdminHomePage extends StatelessWidget {
             child: page,
           );
         },
-      ),
-    );
-  }
-}
-
-/// Widget for info about [PartnerStore]
-class AdminInfoPage extends StatelessWidget {
-  /// Constructor
-  const AdminInfoPage({
-    required this.user,
-    this.navBar,
-    this.onUserEdit,
-    this.theme = UserSettings.defaultAppTheme,
-    super.key,
-  });
-
-  /// Reference to [User] object
-  final User user;
-
-  /// Page navigation bar
-  final Widget? navBar;
-
-  /// Optional callback for when the [PartnerStore] gets edited
-  final void Function()? onUserEdit;
-
-  /// Theme
-  final AppTheme theme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Admin Home'),
-      ),
-      bottomNavigationBar: navBar,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Go in edit route
-          await Navigator.of(context).pushNamed(
-            '/user_edit',
-            arguments: {
-              'user': user,
-              'theme': theme,
-              'on_edit': onUserEdit,
-            },
-          );
-        },
-        child: const Icon(Icons.edit),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const TextHeader(label: 'User name:'),
-            InfoText(user.name!),
-          ],
-        ),
       ),
     );
   }

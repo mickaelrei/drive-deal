@@ -60,14 +60,17 @@ class PartnerStoreListPage extends StatelessWidget {
           // No data
           if (!snapshot.hasData) {
             return const Center(
-              child: Text('No data found!'),
+              child: Text(
+                'No data found!',
+                style: TextStyle(fontSize: 17),
+              ),
             );
           }
 
           // No items in list
           if (snapshot.data!.isEmpty) {
-            const Center(
-              child: Text('No partner stores found!'),
+            return const Center(
+              child: Text('No partner stores registered'),
             );
           }
 

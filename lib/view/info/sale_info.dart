@@ -18,8 +18,10 @@ class SaleInfoPage extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.only(top: 8.0),
-          child: TextHeader(label: 'Customer name'),
+          child: TextHeader(label: 'Vehicle'),
         ),
+        InfoText(sale.vehicle.model),
+        const TextHeader(label: 'Customer name'),
         InfoText(sale.customerName),
         const TextHeader(label: 'Customer CPF'),
         InfoText(sale.customerCpf),

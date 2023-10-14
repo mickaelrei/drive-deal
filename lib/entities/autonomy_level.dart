@@ -16,13 +16,13 @@ class AutonomyLevel {
   int? id;
 
   /// Autonomy level label (beginner, intermediate, ...)
-  final String label;
+  String label;
 
   /// [Sale]'s percent for [PartnerStore]
-  final double storePercent;
+  double storePercent;
 
   /// [Sale]'s percent for network
-  final double networkPercent;
+  double networkPercent;
 
   /// Map representation of [AutonomyLevel]
   Map<String, dynamic> toMap() {
