@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../entities/user.dart';
 
@@ -9,7 +11,9 @@ import '../entities/user.dart';
 /// - App language
 class MainState with ChangeNotifier {
   /// Constructor
-  MainState();
+  MainState() {
+    unawaited(init());
+  }
 
   User? _loggedUser;
 
@@ -26,14 +30,30 @@ class MainState with ChangeNotifier {
       ? loggedUser!.settings.appTheme
       : UserSettings.defaultAppTheme;
 
+  /// Shared prefs to get/set user settings
+  late final SharedPreferences _sharedPreferences;
+
+  /// Initialize data
+  Future<void> init() async {
+    // Get shared prefs instance
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    // Update screen
+    notifyListeners();
+  }
+
   /// Set new app language
-  void setAppLanguage(AppLanguage language) {
+  Future<void> setAppLanguage(AppLanguage language) async {
     if (_loggedUser == null) {
       log('No logged user to set language');
       return;
     }
 
-    // TODO: Set on shared prefs
+    // Set on shared prefs
+    await _sharedPreferences.setString(
+      '${loggedUser!.id}_appLanguage',
+      language.name,
+    );
 
     // Change on user object
     _loggedUser!.settings.appLanguage = language;
@@ -41,13 +61,17 @@ class MainState with ChangeNotifier {
   }
 
   /// Set new app theme
-  void setAppTheme(AppTheme theme) {
+  Future<void> setAppTheme(AppTheme theme) async {
     if (_loggedUser == null) {
       log('No logged user to set theme');
       return;
     }
 
-    // TODO: Set on shared prefs
+    // Set on shared prefs
+    await _sharedPreferences.setString(
+      '${loggedUser!.id}_appTheme',
+      theme.name,
+    );
 
     // Change on user object
     _loggedUser!.settings.appTheme = theme;

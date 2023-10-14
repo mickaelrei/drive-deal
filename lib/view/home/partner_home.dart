@@ -126,12 +126,7 @@ class PartnerHomePage extends StatelessWidget {
               break;
           }
 
-          return Theme(
-            data: user.settings.appTheme == AppTheme.dark
-                ? ThemeData.dark()
-                : ThemeData.light(),
-            child: page,
-          );
+          return page;
         },
       ),
     );

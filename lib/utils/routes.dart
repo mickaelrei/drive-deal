@@ -80,21 +80,15 @@ Widget userEditRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Edit user'),
-      ),
-      body: Center(
-        child: UserEditPage(
-          user: user,
-          onEdit: args['on_edit'],
-        ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Edit user'),
+    ),
+    body: Center(
+      child: UserEditPage(
+        user: user,
+        onEdit: args['on_edit'],
       ),
     ),
   );
@@ -105,19 +99,13 @@ Widget storeRegisterRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      // resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Register store'),
-      ),
-      body: PartnerStoreRegisterForm(
-        onRegister: args['on_register'],
-      ),
+  return Scaffold(
+    // resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Register store'),
+    ),
+    body: PartnerStoreRegisterForm(
+      onRegister: args['on_register'],
     ),
   );
 }
@@ -162,22 +150,16 @@ Widget storeEditRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Edit store'),
-      ),
-      body: Center(
-        child: PartnerStoreEditPage(
-          user: user,
-          partnerStore: partnerStore,
-          onEdit: args['on_edit'],
-        ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Edit store'),
+    ),
+    body: Center(
+      child: PartnerStoreEditPage(
+        user: user,
+        partnerStore: partnerStore,
+        onEdit: args['on_edit'],
       ),
     ),
   );
@@ -206,19 +188,13 @@ Widget storeInfoRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Store info'),
-      ),
-      body: PartnerStoreInfoPage(
-        partnerStore: partnerStore,
-      ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Store info'),
+    ),
+    body: PartnerStoreInfoPage(
+      partnerStore: partnerStore,
     ),
   );
 }
@@ -246,20 +222,14 @@ Widget vehicleRegisterRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Register vehicle'),
-      ),
-      body: VehicleRegisterForm(
-        partnerStore: partnerStore,
-        onRegister: args['on_register'],
-      ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Register vehicle'),
+    ),
+    body: VehicleRegisterForm(
+      partnerStore: partnerStore,
+      onRegister: args['on_register'],
     ),
   );
 }
@@ -287,20 +257,14 @@ Widget vehicleEditRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Edit vehicle'),
-      ),
-      body: VehicleEditForm(
-        vehicle: vehicle,
-        onEdit: args['on_edit'],
-      ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Edit vehicle'),
+    ),
+    body: VehicleEditForm(
+      vehicle: vehicle,
+      onEdit: args['on_edit'],
     ),
   );
 }
@@ -328,19 +292,13 @@ Widget vehicleInfoRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Vehicle info'),
-      ),
-      body: VehicleInfoPage(
-        vehicle: vehicle,
-      ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Vehicle info'),
+    ),
+    body: VehicleInfoPage(
+      vehicle: vehicle,
     ),
   );
 }
@@ -368,20 +326,14 @@ Widget saleRegisterRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Register sale'),
-      ),
-      body: SaleRegisterForm(
-        partnerStore: partnerStore,
-        onRegister: args['on_register'],
-      ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Register sale'),
+    ),
+    body: SaleRegisterForm(
+      partnerStore: partnerStore,
+      onRegister: args['on_register'],
     ),
   );
 }
@@ -409,19 +361,13 @@ Widget saleInfoRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Sale info'),
-      ),
-      body: SaleInfoPage(
-        sale: args['sale'],
-      ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Sale info'),
+    ),
+    body: SaleInfoPage(
+      sale: args['sale'],
     ),
   );
 }
@@ -431,19 +377,13 @@ Widget autonomyLevelRegisterRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Register autonomy level'),
-      ),
-      body: AutonomyLevelRegisterForm(
-        onRegister: args['on_register'],
-      ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Register autonomy level'),
+    ),
+    body: AutonomyLevelRegisterForm(
+      onRegister: args['on_register'],
     ),
   );
 }
@@ -471,20 +411,14 @@ Widget autonomyLevelEditRoute(BuildContext context) {
     );
   }
 
-  // Get theme
-  final theme = args['theme'] as AppTheme? ?? UserSettings.defaultAppTheme;
-
-  return Theme(
-    data: theme == AppTheme.dark ? ThemeData.dark() : ThemeData.light(),
-    child: Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Edit autonomy level'),
-      ),
-      body: AutonomyLevelEditForm(
-        autonomyLevel: autonomyLevel,
-        onEdit: args['on_edit'],
-      ),
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      title: const Text('Edit autonomy level'),
+    ),
+    body: AutonomyLevelEditForm(
+      autonomyLevel: autonomyLevel,
+      onEdit: args['on_edit'],
     ),
   );
 }
