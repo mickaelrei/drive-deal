@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
+import '../../utils/formats.dart';
 import '../../utils/forms.dart';
 
 /// Widget for info about [PartnerStore]
@@ -11,6 +12,7 @@ class AdminInfoPage extends StatelessWidget {
     required this.user,
     this.navBar,
     this.onUserEdit,
+    this.totalNetworkProfit,
     this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
@@ -24,6 +26,9 @@ class AdminInfoPage extends StatelessWidget {
   /// Optional callback for when the [PartnerStore] gets edited
   final void Function()? onUserEdit;
 
+  /// Total network profit
+  final double? totalNetworkProfit;
+
   /// Theme
   final AppTheme theme;
 
@@ -33,22 +38,24 @@ class AdminInfoPage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Admin Home'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              // Go in edit route
+              await Navigator.of(context).pushNamed(
+                '/user_edit',
+                arguments: {
+                  'user': user,
+                  'theme': theme,
+                  'on_edit': onUserEdit,
+                },
+              );
+            },
+            icon: const Icon(Icons.edit),
+          )
+        ],
       ),
       bottomNavigationBar: navBar,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Go in edit route
-          await Navigator.of(context).pushNamed(
-            '/user_edit',
-            arguments: {
-              'user': user,
-              'theme': theme,
-              'on_edit': onUserEdit,
-            },
-          );
-        },
-        child: const Icon(Icons.edit),
-      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -58,7 +65,11 @@ class AdminInfoPage extends StatelessWidget {
           ),
           InfoText(user.name!),
           const TextHeader(label: 'Total network profit'),
-          const InfoText('TODO'),
+          InfoText(
+            totalNetworkProfit == null
+                ? 'Loading...'
+                : formatPrice(totalNetworkProfit!),
+          ),
         ],
       ),
     );

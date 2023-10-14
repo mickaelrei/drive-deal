@@ -137,9 +137,7 @@ class AutonomyLevelRegisterForm extends StatelessWidget {
             key: state.formKey,
             child: ListView(
               children: [
-                const FormTitle(
-                  title: 'Register',
-                ),
+                const FormTitle(title: 'Register'),
                 const TextHeader(label: 'Label'),
                 FormTextEntry(
                   label: 'Label',

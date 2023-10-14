@@ -193,9 +193,7 @@ class SaleRegisterForm extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const FormTitle(
-                    title: 'Register Sale',
-                  ),
+                  const FormTitle(title: 'Register'),
                   const TextHeader(label: 'Vehicle'),
                   Padding(
                     padding: const EdgeInsets.all(8.0),

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../entities/autonomy_level.dart';
@@ -24,7 +22,7 @@ class AutonomyLevelListPage extends StatelessWidget {
   final void Function(AutonomyLevel)? onRegister;
 
   /// List of [AutonomyLevel]s
-  final Future<List<AutonomyLevel>> items;
+  final List<AutonomyLevel>? items;
 
   /// Callback for when an autonomy level is edited
   final void Function(AutonomyLevel)? onAutonomyLevelEdit;
@@ -34,64 +32,56 @@ class AutonomyLevelListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get scaffold body based on list being null, empty or not empty
+    final Widget body;
+    if (items == null) {
+      body = const Center(
+        child: Text('Loading...'),
+      );
+    } else if (items!.isEmpty) {
+      body = const Center(
+        child: Text('No autonomy levels registered!'),
+      );
+    } else {
+      body = ListView.builder(
+        itemCount: items!.length,
+        itemBuilder: (context, index) {
+          final autonomyLevel = items![index];
+
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: AutonomyLevelTile(
+              autonomyLevel: autonomyLevel,
+              theme: theme,
+              onEdit: onAutonomyLevelEdit,
+            ),
+          );
+        },
+      );
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(title: const Text('Autonomy Levels')),
-      bottomNavigationBar: navBar,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Wait until finished registering stores
-          await Navigator.of(context).pushNamed(
-            '/autonomy_level_register',
-            arguments: {
-              'on_register': onRegister,
-              'theme': theme,
-            },
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: FutureBuilder(
-        future: items,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          }
-
-          if (snapshot.data == null) {
-            return const Center(
-              child: Text(
-                'No data',
-                style: TextStyle(fontSize: 17),
-              ),
-            );
-          }
-
-          // No items in list
-          if (snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No autonomy levels registered'),
-            );
-          }
-
-          final autonomyLevels = snapshot.data!;
-          return ListView.builder(
-            itemCount: autonomyLevels.length,
-            itemBuilder: (context, index) {
-              final autonomyLevel = autonomyLevels[index];
-
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: AutonomyLevelTile(
-                  autonomyLevel: autonomyLevel,
-                  theme: theme,
-                  onEdit: onAutonomyLevelEdit,
-                ),
+      appBar: AppBar(
+        title: const Text('Autonomy Levels'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              // Wait until finished registering stores
+              await Navigator.of(context).pushNamed(
+                '/autonomy_level_register',
+                arguments: {
+                  'on_register': onRegister,
+                  'theme': theme,
+                },
               );
             },
-          );
-        },
+            icon: const Icon(Icons.add),
+          )
+        ],
       ),
+      bottomNavigationBar: navBar,
+      body: body,
     );
   }
 }

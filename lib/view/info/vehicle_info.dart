@@ -117,6 +117,10 @@ class VehicleInfoPage extends StatelessWidget {
         InfoText(vehicle.model),
         const TextHeader(label: 'Model year'),
         InfoText(vehicle.modelYear),
+        const TextHeader(label: 'Manufacture year'),
+        InfoText(vehicle.year.toString()),
+        const TextHeader(label: 'FIPE price'),
+        InfoText(formatPrice(vehicle.fipePrice)),
         const TextHeader(label: 'Purchase price'),
         InfoText(formatPrice(vehicle.purchasePrice)),
         const TextHeader(label: 'Purchase date'),
@@ -125,8 +129,6 @@ class VehicleInfoPage extends StatelessWidget {
         InfoText(vehicle.sold ? 'Yes' : 'No'),
         const TextHeader(label: 'Plate'),
         InfoText(vehicle.plate),
-        const TextHeader(label: 'Manufacture year'),
-        InfoText(vehicle.year.toString()),
       ],
     );
   }

@@ -40,4 +40,18 @@ class AutonomyLevel {
   String toString() {
     return toMap().toString();
   }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    return other is AutonomyLevel &&
+        label == other.label &&
+        storePercent == other.storePercent &&
+        networkPercent == other.networkPercent;
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode =>
+      label.hashCode ^ storePercent.hashCode ^ networkPercent.hashCode;
 }

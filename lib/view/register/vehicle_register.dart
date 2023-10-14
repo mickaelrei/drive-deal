@@ -359,9 +359,7 @@ class VehicleRegisterForm extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const FormTitle(
-                    title: 'Register Vehicle',
-                  ),
+                  const FormTitle(title: 'Register'),
                   const TextHeader(label: 'Brand'),
                   FutureDropdown<FipeBrand>(
                     initialSelected: state._currentBrand,

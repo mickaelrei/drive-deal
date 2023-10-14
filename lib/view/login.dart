@@ -134,9 +134,7 @@ class LoginForm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const FormTitle(
-                  title: 'Login',
-                ),
+                const FormTitle(title: 'Login'),
                 const TextHeader(label: 'Name or CNPJ'),
                 FormTextEntry(
                   controller: state.nameOrCnpjController,

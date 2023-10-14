@@ -34,6 +34,7 @@ class VehicleListState with ChangeNotifier {
     for (final vehicle in partnerStore.vehicles) {
       await loadVehicleImages(vehicle);
     }
+    notifyListeners();
   }
 
   /// Initialize [vehicle] images
@@ -144,22 +145,24 @@ class VehicleListPage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Vehicles'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              // Wait until finished registering vehicles
+              await Navigator.of(context).pushNamed(
+                '/vehicle_register',
+                arguments: {
+                  'partner_store': partnerStore,
+                  'on_register': onVehicleRegister,
+                  'theme': theme,
+                },
+              );
+            },
+            icon: const Icon(Icons.add),
+          )
+        ],
       ),
       bottomNavigationBar: navBar,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Wait until finished registering vehicles
-          await Navigator.of(context).pushNamed(
-            '/vehicle_register',
-            arguments: {
-              'partner_store': partnerStore,
-              'on_register': onVehicleRegister,
-              'theme': theme,
-            },
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
       body: body,
     );
   }

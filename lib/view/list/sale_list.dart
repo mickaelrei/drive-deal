@@ -202,21 +202,23 @@ class SaleListPage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Sales'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await Navigator.of(context).pushNamed(
+                '/sale_register',
+                arguments: {
+                  'partner_store': partnerStore,
+                  'on_register': onSaleRegister,
+                  'theme': theme,
+                },
+              );
+            },
+            icon: const Icon(Icons.add),
+          )
+        ],
       ),
       bottomNavigationBar: navBar,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.of(context).pushNamed(
-            '/sale_register',
-            arguments: {
-              'partner_store': partnerStore,
-              'on_register': onSaleRegister,
-              'theme': theme,
-            },
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
       body: body,
     );
   }

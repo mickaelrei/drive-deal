@@ -255,7 +255,7 @@ class FutureDropdown<T> extends StatelessWidget {
   /// Callback for [DropdownButtonFormField] onChanged
   final void Function(T?)? onChanged;
 
-  /// Optional initial selected value
+  /// Optional initial initialSelection value
   final T? initialSelected;
 
   @override
@@ -329,7 +329,7 @@ class AutonomyLevelDropdown extends StatelessWidget {
     required this.items,
     this.controller,
     this.onSelected,
-    this.selected,
+    this.initialSelection,
     this.enabled = true,
     super.key,
   });
@@ -340,13 +340,13 @@ class AutonomyLevelDropdown extends StatelessWidget {
   /// Controller for text field
   final TextEditingController? controller;
 
-  /// Current selected item
-  final AutonomyLevel? selected;
+  /// Current initialSelection item
+  final AutonomyLevel? initialSelection;
 
   /// Whether the dropdown is enabled or not
   final bool enabled;
 
-  /// Callback for when an item is selected
+  /// Callback for when an item is initialSelection
   final void Function(AutonomyLevel?)? onSelected;
 
   @override
@@ -366,7 +366,7 @@ class AutonomyLevelDropdown extends StatelessWidget {
       enableSearch: true,
       width: MediaQuery.of(context).size.width - 16,
       onSelected: onSelected,
-      initialSelection: selected,
+      initialSelection: initialSelection,
       controller: controller,
       dropdownMenuEntries: entries,
       inputDecorationTheme: InputDecorationTheme(

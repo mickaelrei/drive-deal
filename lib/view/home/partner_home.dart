@@ -39,7 +39,6 @@ class PartnerHomeState with ChangeNotifier {
   /// Callback for when a vehicle gets registered
   void onVehicleRegister(Vehicle vehicle) {
     // Add to list of vehicles
-    print('Adding new vehicle');
     partnerStore.vehicles.add(vehicle);
     notifyListeners();
   }
@@ -235,39 +234,41 @@ class PartnerInfoPage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Partner Home'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              // Go in edit route
+              await Navigator.of(context).pushNamed(
+                '/store_edit',
+                arguments: {
+                  'user': user,
+                  'partner_store': user.store!,
+                  'theme': theme,
+                },
+              );
+
+              // Call edit callback
+              if (onStoreEdit != null) {
+                onStoreEdit!();
+              }
+            },
+            icon: const Icon(Icons.edit),
+          ),
+        ],
       ),
       bottomNavigationBar: navBar,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Go in edit route
-          await Navigator.of(context).pushNamed(
-            '/store_edit',
-            arguments: {
-              'user': user,
-              'theme': theme,
-            },
-          );
-
-          // Call edit callback
-          if (onStoreEdit != null) {
-            onStoreEdit!();
-          }
-        },
-        child: const Icon(Icons.edit),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const TextHeader(label: 'Store name:'),
-            InfoText(user.store!.name),
-            const TextHeader(label: 'CNPJ:'),
-            InfoText(user.store!.cnpj),
-            const TextHeader(label: 'Autonomy Level:'),
-            InfoText(user.store!.autonomyLevel.label),
-          ],
-        ),
+      body: ListView(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: TextHeader(label: 'Store name:'),
+          ),
+          InfoText(user.store!.name),
+          const TextHeader(label: 'CNPJ:'),
+          InfoText(user.store!.cnpj),
+          const TextHeader(label: 'Autonomy Level:'),
+          InfoText(user.store!.autonomyLevel.label),
+        ],
       ),
     );
   }

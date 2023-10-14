@@ -6,12 +6,10 @@ import 'package:provider/provider.dart';
 import '../../entities/autonomy_level.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
-
 import '../../repositories/autonomy_level_repository.dart';
 import '../../repositories/partner_store_repository.dart';
 import '../../usecases/autonomy_level_use_case.dart';
 import '../../usecases/partner_store_use_case.dart';
-
 import '../info/admin_info.dart';
 import '../list/autonomy_level_list.dart';
 import '../list/partner_store_list.dart';
@@ -33,21 +31,47 @@ class AdminHomeState with ChangeNotifier {
     AutonomyLevelRepository(),
   );
 
-  /// List of [AutonomyLevel]s
-  late Future<List<AutonomyLevel>> autonomyLevels;
-
   /// For getting all [PartnerStore]s
   final _partnerStoreUseCase = PartnerStoreUseCase(
     const PartnerStoreRepository(),
   );
 
+  /// List of [AutonomyLevel]s
+  List<AutonomyLevel>? autonomyLevels;
+
   /// List of [PartnerStore]s
-  late Future<List<PartnerStore>> partnerStores;
+  List<PartnerStore>? partnerStores;
+
+  /// Total network profit, accounting all sales from all stores
+  double? totalNetworkProfit;
 
   /// Initialize data
   Future<void> init() async {
-    partnerStores = _partnerStoreUseCase.select();
-    autonomyLevels = _autonomyLevelUseCase.select();
+    // Get stores from database
+    final dbStores = await _partnerStoreUseCase.select();
+    partnerStores = <PartnerStore>[];
+    partnerStores!
+      ..clear()
+      ..addAll(dbStores);
+
+    // Get autonomy levels
+    final dbAutonomyLevels = await _autonomyLevelUseCase.select();
+    autonomyLevels = <AutonomyLevel>[];
+    autonomyLevels!
+      ..clear()
+      ..addAll(dbAutonomyLevels);
+
+    // Calculate total network profit
+    var total = 0.0;
+    for (final store in partnerStores!) {
+      for (final sale in store.sales) {
+        total += sale.networkProfit;
+      }
+    }
+    totalNetworkProfit = total;
+
+    // Update to show loaded stores and autonomy levels
+    notifyListeners();
   }
 
   /// Method to change NavBar selected item
@@ -58,13 +82,20 @@ class AdminHomeState with ChangeNotifier {
 
   /// Called when a PartnerStore gets registered
   Future<void> onPartnerStoreRegister(PartnerStore partnerStore) async {
-    partnerStores = _partnerStoreUseCase.select();
+    partnerStores ??= <PartnerStore>[];
+    partnerStores!.add(partnerStore);
+    notifyListeners();
+  }
+
+  /// Called when a partner store is edited
+  void onPartnerStoreEdit(PartnerStore partnerStore) {
     notifyListeners();
   }
 
   /// Called when an autonomy level gets registered
   Future<void> onAutonomyLevelRegister(AutonomyLevel autonomyLevel) async {
-    autonomyLevels = _autonomyLevelUseCase.select();
+    autonomyLevels ??= <AutonomyLevel>[];
+    autonomyLevels!.add(autonomyLevel);
     notifyListeners();
   }
 
@@ -120,14 +151,17 @@ class AdminHomePage extends StatelessWidget {
                 user: user,
                 navBar: navBar,
                 theme: user.settings.appTheme,
+                totalNetworkProfit: state.totalNetworkProfit,
                 onUserEdit: state.onUserEdit,
               );
             case 1:
               // Listing of partner stores
               page = PartnerStoreListPage(
+                user: user,
                 theme: user.settings.appTheme,
                 onPartnerStoreRegister: state.onPartnerStoreRegister,
                 navBar: navBar,
+                onStoreEdit: state.onPartnerStoreEdit,
                 items: state.partnerStores,
               );
               break;

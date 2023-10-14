@@ -139,6 +139,14 @@ Widget storeEditRoute(BuildContext context) {
     );
   }
 
+  if (args['partner_store'] is! PartnerStore) {
+    throw ArgumentError.value(
+      args['partner_store'],
+      'args[\'partner_store\']',
+      'field \'partner_store\' in args should be of type \'PartnerStore\'',
+    );
+  }
+
   // Check for valid args
   final user = args['user'] as User?;
   if (user == null || user.id == null) {
@@ -146,6 +154,15 @@ Widget storeEditRoute(BuildContext context) {
       user,
       'args[\'user\']',
       'field \'user\' in args should be not null with a non-null id',
+    );
+  }
+
+  final partnerStore = args['partner_store'] as PartnerStore?;
+  if (partnerStore == null || partnerStore.id == null) {
+    throw ArgumentError.value(
+      partnerStore,
+      'args[\'partner_store\']',
+      'field \'partner_store\' in args should be not null with a non-null id',
     );
   }
 
@@ -162,6 +179,7 @@ Widget storeEditRoute(BuildContext context) {
       body: Center(
         child: PartnerStoreEditPage(
           user: user,
+          partnerStore: partnerStore,
           onEdit: args['on_edit'],
         ),
       ),

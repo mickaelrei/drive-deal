@@ -47,8 +47,11 @@ class PartnerStoreEditState with ChangeNotifier {
   /// Controller for CNPJ field
   final cnpjController = TextEditingController();
 
-  /// Get store's current autonomy level
-  AutonomyLevel get currentAutonomyLevel => partnerStore.autonomyLevel;
+  /// Currently selected autonomy level
+  late AutonomyLevel _selectedAutonomyLevel;
+
+  /// Get current selected autonomy level
+  AutonomyLevel get selectedAutonomyLevel => _selectedAutonomyLevel;
 
   /// List of all autonomy levels
   final autonomyLevels = <AutonomyLevel>[];
@@ -59,12 +62,21 @@ class PartnerStoreEditState with ChangeNotifier {
     nameController.text = partnerStore.name;
     cnpjController.text = partnerStore.cnpj;
 
+    // Initialize current autonomy level
+    _selectedAutonomyLevel = partnerStore.autonomyLevel;
+
     // Get all autonomy levels
     final items = await _autonomyLevelUseCase.select();
     autonomyLevels
       ..clear()
       ..addAll(items);
     notifyListeners();
+  }
+
+  /// Method to update selected autonomy level
+  void onAutonomyLevelChanged(AutonomyLevel? autonomyLevel) {
+    _selectedAutonomyLevel = autonomyLevel!;
+    // notifyListeners();
   }
 
   /// Method to submit an edit on the partner store
@@ -78,6 +90,7 @@ class PartnerStoreEditState with ChangeNotifier {
     }
 
     // Update info on partner store object
+    partnerStore.autonomyLevel = _selectedAutonomyLevel;
     partnerStore.name = nameController.text;
     partnerStore.cnpj = cnpj;
 
@@ -106,12 +119,16 @@ class PartnerStoreEditPage extends StatelessWidget {
   /// Constructor
   const PartnerStoreEditPage({
     required this.user,
+    required this.partnerStore,
     this.onEdit,
     super.key,
   });
 
-  /// Which [User] will be edited
+  /// To know if the user is an admin or not
   final User user;
+
+  /// Which store is getting edited
+  final PartnerStore partnerStore;
 
   /// Callback function for when the partner gets edited
   final void Function()? onEdit;
@@ -121,7 +138,7 @@ class PartnerStoreEditPage extends StatelessWidget {
     return ChangeNotifierProvider<PartnerStoreEditState>(
       create: (context) {
         return PartnerStoreEditState(
-          partnerStore: user.store!,
+          partnerStore: partnerStore,
           onEdit: onEdit,
         );
       },
@@ -130,9 +147,7 @@ class PartnerStoreEditPage extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const FormTitle(
-                title: 'Edit PartnerStore',
-              ),
+              const FormTitle(title: 'Edit'),
               const TextHeader(label: 'Name'),
               FormTextEntry(
                 label: 'Store name',
@@ -160,9 +175,10 @@ class PartnerStoreEditPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: AutonomyLevelDropdown(
+                  onSelected: state.onAutonomyLevelChanged,
                   enabled: user.isAdmin,
                   items: state.autonomyLevels,
-                  selected: state.currentAutonomyLevel,
+                  initialSelection: state.selectedAutonomyLevel,
                 ),
               ),
               Padding(

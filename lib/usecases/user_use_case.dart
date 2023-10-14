@@ -4,6 +4,10 @@ import 'dart:math';
 import '../entities/user.dart';
 import '../repositories/user_repository.dart';
 
+/// What characters can be used to generate a password
+const String passwordChars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ' 'abcdefghijklmnopqrstuvwxyz' '0123456789';
+
 /// Class to be used for [User] operations
 class UserUseCase {
   /// Constructor
@@ -94,8 +98,8 @@ class UserUseCase {
     // Generate password
     var password = '';
     for (var i = 0; i < 15; i++) {
-      final code = _random.nextInt(42) + 40;
-      password += String.fromCharCode(code);
+      final char = passwordChars[_random.nextInt(passwordChars.length)];
+      password += char;
     }
 
     dev.log('Generated password: $password');

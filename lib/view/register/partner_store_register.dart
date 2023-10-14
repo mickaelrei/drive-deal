@@ -164,9 +164,7 @@ class PartnerStoreRegisterForm extends StatelessWidget {
             key: state.formKey,
             child: ListView(
               children: [
-                const FormTitle(
-                  title: 'Register',
-                ),
+                const FormTitle(title: 'Register'),
                 const TextHeader(label: 'Name'),
                 FormTextEntry(
                   label: 'Name',
@@ -207,7 +205,7 @@ class PartnerStoreRegisterForm extends StatelessWidget {
                   child: AutonomyLevelDropdown(
                     items: state.autonomyLevels,
                     controller: state.autonomyLevelController,
-                    selected: state.chosenAutonomyLevel,
+                    initialSelection: state.chosenAutonomyLevel,
                     onSelected: (autonomyLevel) {
                       state.chosenAutonomyLevel = autonomyLevel;
                     },
@@ -227,6 +225,12 @@ class PartnerStoreRegisterForm extends StatelessWidget {
                       // Show dialog with register result
                       if (context.mounted) {
                         await registerDialog(context, result);
+                      }
+
+                      // Return to list page
+                      if (result == null) {
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
                       }
                     },
                   ),

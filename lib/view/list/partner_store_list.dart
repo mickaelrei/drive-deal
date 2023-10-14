@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../entities/partner_store.dart';
@@ -9,12 +7,17 @@ import '../../entities/user.dart';
 class PartnerStoreListPage extends StatelessWidget {
   /// Constructor
   const PartnerStoreListPage({
-    required this.items,
+    required this.user,
     this.navBar,
     this.onPartnerStoreRegister,
+    required this.items,
+    this.onStoreEdit,
     this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
+
+  /// User for authentication
+  final User user;
 
   /// Page navigation bar
   final Widget? navBar;
@@ -23,75 +26,81 @@ class PartnerStoreListPage extends StatelessWidget {
   final void Function(PartnerStore)? onPartnerStoreRegister;
 
   /// List of [PartnerStore]s
-  final Future<List<PartnerStore>> items;
+  final List<PartnerStore>? items;
+
+  /// Optional callback for store edit
+  final void Function(PartnerStore)? onStoreEdit;
 
   /// Theme
   final AppTheme theme;
 
   @override
   Widget build(BuildContext context) {
+    // Get scaffold body based on list being null, empty or not empty
+    final Widget body;
+    if (items == null) {
+      body = const Center(
+        child: Text('Loading...'),
+      );
+    } else if (items!.isEmpty) {
+      body = const Center(
+        child: Text('No partner stores registered!'),
+      );
+    } else {
+      body = ListView.builder(
+        itemCount: items!.length,
+        itemBuilder: (context, index) {
+          // Get partner store object
+          final partnerStore = items![index];
+
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: PartnerStoreTile(
+              partnerStore: partnerStore,
+              theme: theme,
+              onEdit: () async {
+                // Go in edit route
+                await Navigator.of(context).pushNamed(
+                  '/store_edit',
+                  arguments: {
+                    'user': user,
+                    'partner_store': partnerStore,
+                    'theme': theme,
+                  },
+                );
+
+                // Call edit callback
+                if (onStoreEdit != null) {
+                  onStoreEdit!(partnerStore);
+                }
+              },
+            ),
+          );
+        },
+      );
+    }
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Wait until finished registering stores
-          await Navigator.of(context).pushNamed(
-            '/store_register',
-            arguments: {
-              'on_register': onPartnerStoreRegister,
-              'theme': theme,
-            },
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-      bottomNavigationBar: navBar,
       appBar: AppBar(
         title: const Text('Partner Stores'),
-      ),
-      body: FutureBuilder<List<PartnerStore>>(
-        future: items,
-        builder: (context, snapshot) {
-          // Still waiting
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          }
-
-          // No data
-          if (!snapshot.hasData) {
-            return const Center(
-              child: Text(
-                'No data found!',
-                style: TextStyle(fontSize: 17),
-              ),
-            );
-          }
-
-          // No items in list
-          if (snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No partner stores registered'),
-            );
-          }
-
-          // List of items
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              // Get partner store object
-              final partnerStore = snapshot.data![index];
-
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: PartnerStoreTile(
-                  partnerStore: partnerStore,
-                  theme: theme,
-                ),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              // Wait until finished registering stores
+              await Navigator.of(context).pushNamed(
+                '/store_register',
+                arguments: {
+                  'on_register': onPartnerStoreRegister,
+                  'theme': theme,
+                },
               );
             },
-          );
-        },
+            icon: const Icon(Icons.add),
+          )
+        ],
       ),
+      bottomNavigationBar: navBar,
+      body: body,
     );
   }
 }
@@ -101,12 +110,16 @@ class PartnerStoreTile extends StatelessWidget {
   /// Constructor
   const PartnerStoreTile({
     required this.partnerStore,
+    this.onEdit,
     this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
   /// [PartnerStore] object to show
   final PartnerStore partnerStore;
+
+  /// Optional callback for edit button
+  final void Function()? onEdit;
 
   /// Theme
   final AppTheme theme;
@@ -132,6 +145,10 @@ class PartnerStoreTile extends StatelessWidget {
           'Autonomy Level: ${partnerStore.autonomyLevel.label}',
         ),
         isThreeLine: true,
+        trailing: IconButton(
+          onPressed: onEdit,
+          icon: const Icon(Icons.edit),
+        ),
       ),
     );
   }

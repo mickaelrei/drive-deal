@@ -105,9 +105,7 @@ class UserEditPage extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const FormTitle(
-                title: 'Edit User',
-              ),
+              const FormTitle(title: 'Edit'),
               const TextHeader(label: 'Name'),
               FormTextEntry(
                 label: 'Name',

@@ -149,9 +149,7 @@ class AutonomyLevelEditForm extends StatelessWidget {
             key: state.formKey,
             child: ListView(
               children: [
-                const FormTitle(
-                  title: 'Edit',
-                ),
+                const FormTitle(title: 'Edit'),
                 const TextHeader(label: 'Label'),
                 FormTextEntry(
                   label: 'Label',

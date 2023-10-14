@@ -468,9 +468,7 @@ class VehicleEditForm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const FormTitle(
-                  title: 'Edit Vehicle',
-                ),
+                const FormTitle(title: 'Edit'),
                 const TextHeader(label: 'Brand'),
                 FutureDropdown<FipeBrand>(
                   initialSelected: state._currentBrand,
