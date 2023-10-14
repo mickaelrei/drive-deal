@@ -1,0 +1,11 @@
+{
+    "nameOrCnpj": "Nome ou CNPJ",
+    "password": "Senha",
+    "enter": "Entrar",
+    
+    "settings": "Configurações",
+    "darkMode": "Modo escuro",
+    "appLanguage": "Linguagem",
+    "english": "Inglês",
+    "portuguese": "Português"
+}

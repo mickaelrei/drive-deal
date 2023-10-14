@@ -1,0 +1,11 @@
+{
+    "nameOrCnpj": "Name or CNPJ",
+    "password": "Password",
+    "enter": "Enter",
+    
+    "settings": "Settings",
+    "darkMode": "Dark mode",
+    "appLanguage": "App language",
+    "english": "English",
+    "portuguese": "Portuguese"
+}

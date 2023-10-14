@@ -1,18 +1,23 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../entities/user.dart';
 import '../utils/forms.dart';
+import 'main_state.dart';
 
 /// Provider for UserSettings page
 class UserSettingsState with ChangeNotifier {
   /// Constructor
-  UserSettingsState({required this.user}) {
+  UserSettingsState({required this.user, required this.mainState}) {
     unawaited(init());
   }
+
+  ///
+  final MainState mainState;
 
   /// [User] object to get/set settings
   final User user;
@@ -38,27 +43,32 @@ class UserSettingsState with ChangeNotifier {
   /// Method to change app theme
   Future<void> setAppTheme(AppTheme theme) async {
     // Set in shared prefs
-    await _sharedPreferences.setString(
-      '${user.id}_appTheme',
-      theme.name,
-    );
+    // await _sharedPreferences.setString(
+    //   '${user.id}_appTheme',
+    //   theme.name,
+    // );
+
+    // Update in main state provider
+    mainState.setAppTheme(theme);
 
     // Update in screen
-    user.settings.appTheme = theme;
-    notifyListeners();
+    // user.settings.appTheme = theme;
+    // notifyListeners();
   }
 
   /// Method to change app language
   Future<void> setAppLanguage(AppLanguage language) async {
     // Set in shared prefs
-    await _sharedPreferences.setString(
-      '${user.id}_appLanguage',
-      language.name,
-    );
+    // await _sharedPreferences.setString(
+    //   '${user.id}_appLanguage',
+    //   language.name,
+    // );
+
+    // Update in main state provider
+    mainState.setAppLanguage(language);
 
     // Update in screen
-    user.settings.appLanguage = language;
-    notifyListeners();
+    // user.settings.appLanguage = language;
   }
 }
 
@@ -87,9 +97,14 @@ class UserSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return ChangeNotifierProvider(
       create: (context) {
-        return UserSettingsState(user: user);
+        return UserSettingsState(
+          user: user,
+          mainState: Provider.of<MainState>(context, listen: false),
+        );
       },
       child: Consumer<UserSettingsState>(
         builder: (_, state, __) {
@@ -100,15 +115,15 @@ class UserSettingsPage extends StatelessWidget {
             child: Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
-                title: const Text('Settings'),
+                title: Text(localization.settings),
               ),
               bottomNavigationBar: navBar,
-              body: Column(
+              body: ListView(
                 children: [
-                  const FormTitle(title: 'Settings'),
+                  FormTitle(title: localization.settings),
                   Row(
                     children: [
-                      const TextHeader(label: 'Dark mode'),
+                      TextHeader(label: localization.darkMode),
                       Expanded(
                         child: Align(
                           alignment: Alignment.centerRight,
@@ -134,7 +149,7 @@ class UserSettingsPage extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      const TextHeader(label: 'App language'),
+                      TextHeader(label: localization.appLanguage),
                       Expanded(
                         child: Align(
                           alignment: Alignment.centerRight,
@@ -151,14 +166,14 @@ class UserSettingsPage extends StatelessWidget {
                                   onLanguageChanged!(language);
                                 }
                               },
-                              dropdownMenuEntries: const [
+                              dropdownMenuEntries: [
                                 DropdownMenuEntry<AppLanguage>(
                                   value: AppLanguage.english,
-                                  label: 'English',
+                                  label: localization.english,
                                 ),
                                 DropdownMenuEntry<AppLanguage>(
                                   value: AppLanguage.portuguese,
-                                  label: 'Portuguese',
+                                  label: localization.portuguese,
                                 )
                               ],
                             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../entities/user.dart';
@@ -8,6 +9,7 @@ import '../usecases/partner_store_use_case.dart';
 import '../usecases/user_use_case.dart';
 import '../utils/dialogs.dart';
 import '../utils/forms.dart';
+import 'main_state.dart';
 
 /// Provider for login page
 class LoginState with ChangeNotifier {
@@ -121,6 +123,9 @@ class LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+    final mainState = Provider.of<MainState>(context, listen: false);
+
     return ChangeNotifierProvider<LoginState>(
       create: (context) {
         return LoginState();
@@ -133,17 +138,17 @@ class LoginForm extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const FormTitle(title: 'Login'),
-                const TextHeader(label: 'Name or CNPJ'),
+                TextHeader(label: localization.nameOrCnpj),
                 FormTextEntry(
                   controller: state.nameOrCnpjController,
-                  label: 'Name or CNPJ',
+                  label: localization.nameOrCnpj,
                   prefixIcon: Icons.person,
                 ),
-                const TextHeader(label: 'Password'),
+                TextHeader(label: localization.password),
                 FormTextEntry(
                   controller: state.passwordController,
                   hidden: true,
-                  label: 'Password',
+                  label: localization.password,
                   prefixIcon: Icons.password,
                 ),
                 Padding(
@@ -152,7 +157,7 @@ class LoginForm extends StatelessWidget {
                     vertical: 15,
                   ),
                   child: SubmitButton(
-                    label: 'Enter',
+                    label: localization.enter,
                     onPressed: () async {
                       if (!state.formKey.currentState!.validate()) return;
 
@@ -169,6 +174,9 @@ class LoginForm extends StatelessWidget {
                         }
                         return;
                       }
+
+                      // User is valid, set logged user in main state
+                      mainState.setLoggedUser(user);
 
                       // Go to home page
                       if (context.mounted) {
