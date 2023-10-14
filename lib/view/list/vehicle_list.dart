@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
 import '../../entities/vehicle.dart';
-
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/vehicle_use_case.dart';
 

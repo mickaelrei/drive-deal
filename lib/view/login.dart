@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../entities/user.dart';
-
 import '../repositories/partner_store_repository.dart';
 import '../repositories/user_repository.dart';
 import '../usecases/partner_store_use_case.dart';
 import '../usecases/user_use_case.dart';
-
 import '../utils/dialogs.dart';
 import '../utils/forms.dart';
 

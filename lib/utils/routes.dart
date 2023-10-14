@@ -5,19 +5,15 @@ import '../entities/partner_store.dart';
 import '../entities/sale.dart';
 import '../entities/user.dart';
 import '../entities/vehicle.dart';
-
 import '../view/edit/autonomy_level_edit.dart';
 import '../view/edit/partner_store_edit.dart';
 import '../view/edit/user_edit.dart';
 import '../view/edit/vehicle_edit.dart';
-
 import '../view/home/admin_home.dart';
 import '../view/home/partner_home.dart';
-
 import '../view/info/partner_store_info.dart';
 import '../view/info/sale_info.dart';
 import '../view/info/vehicle_info.dart';
-
 import '../view/login.dart';
 import '../view/register/autonomy_level_register.dart';
 import '../view/register/partner_store_register.dart';

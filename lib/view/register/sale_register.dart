@@ -4,10 +4,8 @@ import 'package:provider/provider.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/sale.dart';
 import '../../entities/vehicle.dart';
-
 import '../../repositories/sale_repository.dart';
 import '../../usecases/sale_use_case.dart';
-
 import '../../utils/dialogs.dart';
 import '../../utils/forms.dart';
 

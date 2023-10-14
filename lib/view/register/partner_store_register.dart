@@ -6,17 +6,13 @@ import 'package:provider/provider.dart';
 import '../../entities/autonomy_level.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
-
 import '../../repositories/autonomy_level_repository.dart';
 import '../../repositories/partner_store_repository.dart';
 import '../../repositories/user_repository.dart';
-
 import '../../usecases/autonomy_level_use_case.dart';
 import '../../usecases/partner_store_use_case.dart';
 import '../../usecases/user_use_case.dart';
-
 import '../../utils/dialogs.dart';
-import '../../utils/exceptions.dart';
 import '../../utils/forms.dart';
 
 /// Provider for register partner store form
@@ -79,12 +75,6 @@ class PartnerStoreRegisterState with ChangeNotifier {
     // Check if autonomy level was chosen
     if (chosenAutonomyLevel == null) {
       return 'No Autonomy Level selected';
-    }
-
-    // autonomy level ID shouldn't be null, but check to prevent errors
-    if (chosenAutonomyLevel!.id == null) {
-      throw EntityNoIdException(
-          'Chosen Autonomy Level has no ID: $chosenAutonomyLevel');
     }
 
     // Check if CNPJ is in valid format

@@ -1,5 +1,4 @@
 import '../database/partner_store_table.dart';
-
 import 'autonomy_level.dart';
 import 'sale.dart';
 import 'vehicle.dart';

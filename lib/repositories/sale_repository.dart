@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import '../database/database.dart';
 import '../database/sale_table.dart';
-
 import '../entities/sale.dart';
 import 'vehicle_repository.dart';
 

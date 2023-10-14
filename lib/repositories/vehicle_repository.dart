@@ -1,7 +1,6 @@
 import '../database/database.dart';
 import '../database/vehicle_image_table.dart';
 import '../database/vehicle_table.dart';
-
 import '../entities/vehicle.dart';
 import '../usecases/vehicle_image_use_case.dart';
 import 'vehicle_image_repository.dart';

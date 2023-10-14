@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/user.dart';
-
 import '../../repositories/user_repository.dart';
 import '../../usecases/user_use_case.dart';
-
 import '../../utils/dialogs.dart';
 import '../../utils/forms.dart';
 

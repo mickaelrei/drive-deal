@@ -6,12 +6,10 @@ import 'package:provider/provider.dart';
 import '../../entities/autonomy_level.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
-
 import '../../repositories/autonomy_level_repository.dart';
 import '../../repositories/partner_store_repository.dart';
 import '../../usecases/autonomy_level_use_case.dart';
 import '../../usecases/partner_store_use_case.dart';
-
 import '../../utils/dialogs.dart';
 import '../../utils/forms.dart';
 

@@ -5,12 +5,9 @@ import '../../entities/partner_store.dart';
 import '../../entities/sale.dart';
 import '../../entities/user.dart';
 import '../../entities/vehicle.dart';
-
 import '../../utils/forms.dart';
-
 import '../list/sale_list.dart';
 import '../list/vehicle_list.dart';
-
 import '../unknown_page.dart';
 import '../user_settings.dart';
 

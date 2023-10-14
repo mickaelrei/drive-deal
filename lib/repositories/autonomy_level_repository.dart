@@ -1,6 +1,5 @@
 import '../database/autonomy_level_table.dart';
 import '../database/database.dart';
-
 import '../entities/autonomy_level.dart';
 
 /// Class for [AutonomyLevel] table operations
