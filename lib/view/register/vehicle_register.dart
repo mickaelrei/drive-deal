@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,7 @@ import '../../utils/forms.dart';
 
 /// Provider for vehicle register page
 class VehicleRegisterState with ChangeNotifier {
-  /// Constructor
+  /// uctor
   VehicleRegisterState({required this.partnerStore, this.onRegister}) {
     unawaited(init());
   }
@@ -230,52 +231,51 @@ class VehicleRegisterState with ChangeNotifier {
   }
 
   /// Method to try registering a vehicle
-  Future<String?> register() async {
+  Future<String?> register(BuildContext context) async {
+    final localization = AppLocalizations.of(context)!;
+
     // Check if all inputs are set
     if (_currentBrand == null) {
-      return 'Choose a brand';
+      return localization.chooseBrand;
     }
     if (_currentModel == null) {
-      return 'Choose a model';
+      return localization.chooseModel;
     }
     if (_currentModelYear == null) {
-      return 'Choose a model year';
+      return localization.chooseModelYear;
     }
     if (currentVehicleInfo == null) {
-      return 'Vehicle info not retrieved yet. Try again';
+      return localization.noVehicleInfo;
     }
 
     // Check if manufacture year input is a valid number
     final manufactureYear = int.tryParse(manufactureYearController.text);
     if (manufactureYear == null) {
-      return 'Manufacture year must be a valid number';
+      return localization.invalidManufactureYear;
     }
 
     // Check if plate is in valid format
     final plate = plateController.text.toUpperCase();
     final plateRegex = RegExp(r'[A-Z]{3}\d[A-Z]\d{2}');
     if (!plateRegex.hasMatch(plate)) {
-      return 'Plate needs to be in AAA0A00 format';
+      return localization.invalidPlate;
     }
 
     // Check for purchase date
     if (purchaseDate == null) {
-      return 'Choose a purchase date';
+      return localization.choosePurchaseDate;
     }
 
     // Check for purchase price
     final purchasePrice = double.tryParse(purchasePriceController.text);
-    if (purchasePrice == null) {
-      return 'Purchase price needs to be a valid number.';
-    }
-    if (purchasePrice < 0) {
-      return 'Purchase price can\'t be negative.';
+    if (purchasePrice == null || purchasePrice < 0) {
+      return localization.invalidPrice;
     }
 
     // Get price
     final vehicleInfo = await currentVehicleInfo;
     if (vehicleInfo == null) {
-      return 'No vehicle info. Try again later';
+      return localization.loadingVehicleDataError;
     }
     final currentPrice = vehicleInfo.price;
 
@@ -314,7 +314,7 @@ class VehicleRegisterState with ChangeNotifier {
 
 /// Form for [Vehicle] registering
 class VehicleRegisterForm extends StatelessWidget {
-  /// Constructor
+  /// uctor
   const VehicleRegisterForm({
     required this.partnerStore,
     this.onRegister,
@@ -329,6 +329,8 @@ class VehicleRegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return ChangeNotifierProvider<VehicleRegisterState>(
       create: (context) {
         return VehicleRegisterState(
@@ -359,8 +361,8 @@ class VehicleRegisterForm extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const FormTitle(title: 'Register'),
-                  const TextHeader(label: 'Brand'),
+                  FormTitle(title: localization.register),
+                  TextHeader(label: localization.brand),
                   FutureDropdown<FipeBrand>(
                     initialSelected: state._currentBrand,
                     future: state.brands,
@@ -369,7 +371,7 @@ class VehicleRegisterForm extends StatelessWidget {
                       return Text(item.name);
                     },
                   ),
-                  const TextHeader(label: 'Model'),
+                  TextHeader(label: localization.model),
                   FutureDropdown<FipeModel>(
                     future: state.models,
                     onChanged: state.setModel,
@@ -377,7 +379,7 @@ class VehicleRegisterForm extends StatelessWidget {
                       return Text(item.name);
                     },
                   ),
-                  const TextHeader(label: 'Model year'),
+                  TextHeader(label: localization.modelYear),
                   FutureDropdown<FipeModelYear>(
                     future: state.modelYears,
                     onChanged: state.setModelYear,
@@ -385,7 +387,7 @@ class VehicleRegisterForm extends StatelessWidget {
                       return Text(item.name);
                     },
                   ),
-                  const TextHeader(label: 'FIPE price'),
+                  TextHeader(label: localization.fipePrice),
                   FutureBuilder(
                     future: state.currentVehicleInfo,
                     builder: (context, snapshot) {
@@ -414,27 +416,28 @@ class VehicleRegisterForm extends StatelessWidget {
                       );
                     },
                   ),
-                  const TextHeader(label: 'Purchase price'),
+                  TextHeader(label: localization.purchasePrice),
                   FormTextEntry(
-                    label: 'Purchase price',
+                    label: localization.purchasePrice,
                     controller: state.purchasePriceController,
                   ),
-                  const TextHeader(label: 'Manufacture year'),
+                  TextHeader(label: localization.manufactureYear),
                   FormTextEntry(
-                    label: 'Manufacture year',
+                    label: localization.manufactureYear,
                     controller: state.manufactureYearController,
                   ),
-                  const TextHeader(label: 'Plate'),
+                  TextHeader(label: localization.plate),
                   FormTextEntry(
-                    label: 'Plate',
+                    label: localization.plate,
                     controller: state.plateController,
                   ),
-                  const TextHeader(label: 'Purchase date'),
+                  TextHeader(label: localization.purchaseDate),
                   DatePicker(
+                    hintText: localization.purchaseDate,
                     initialDate: state.purchaseDate,
                     onDatePicked: state.setDate,
                   ),
-                  const TextHeader(label: 'Images'),
+                  TextHeader(label: localization.images),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: VehicleImagesScrollView(
@@ -446,13 +449,13 @@ class VehicleRegisterForm extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SubmitButton(
-                      label: 'Register',
+                      label: localization.register,
                       onPressed: () async {
                         // Validate inputs
                         if (!state.formKey.currentState!.validate()) return;
 
                         // Try registering
-                        final result = await state.register();
+                        final result = await state.register(context);
 
                         // Show dialog with register result
                         if (context.mounted) {
@@ -479,7 +482,7 @@ class VehicleRegisterForm extends StatelessWidget {
 
 /// Widget for a scrollable with preview of vehicle images
 class VehicleImagesScrollView extends StatelessWidget {
-  /// Constructor
+  /// uctor
   const VehicleImagesScrollView({
     required this.addFromGallery,
     required this.addFromCamera,
@@ -543,7 +546,7 @@ class VehicleImagesScrollView extends StatelessWidget {
 
 /// Widget for displaying a preview of a vehicle image
 class VehicleImagePreview extends StatelessWidget {
-  /// Constructor
+  /// uctor
   const VehicleImagePreview({
     required this.imagePath,
     this.onDelete,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
@@ -12,7 +13,6 @@ class PartnerStoreListPage extends StatelessWidget {
     this.onPartnerStoreRegister,
     required this.items,
     this.onStoreEdit,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -31,20 +31,22 @@ class PartnerStoreListPage extends StatelessWidget {
   /// Optional callback for store edit
   final void Function(PartnerStore)? onStoreEdit;
 
-  /// Theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     // Get scaffold body based on list being null, empty or not empty
     final Widget body;
     if (items == null) {
-      body = const Center(
-        child: Text('Loading...'),
+      body = Center(
+        child: Text(localization.loading),
       );
     } else if (items!.isEmpty) {
-      body = const Center(
-        child: Text('No partner stores registered!'),
+      body = Center(
+        child: Text(
+          localization.noPartnerStores,
+          style: const TextStyle(fontSize: 25),
+        ),
       );
     } else {
       body = ListView.builder(
@@ -57,7 +59,6 @@ class PartnerStoreListPage extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: PartnerStoreTile(
               partnerStore: partnerStore,
-              theme: theme,
               onEdit: () async {
                 // Go in edit route
                 await Navigator.of(context).pushNamed(
@@ -65,7 +66,6 @@ class PartnerStoreListPage extends StatelessWidget {
                   arguments: {
                     'user': user,
                     'partner_store': partnerStore,
-                    'theme': theme,
                   },
                 );
 
@@ -82,7 +82,7 @@ class PartnerStoreListPage extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Partner Stores'),
+        title: Text(localization.partnerStore(2)),
         actions: [
           IconButton(
             onPressed: () async {
@@ -91,7 +91,6 @@ class PartnerStoreListPage extends StatelessWidget {
                 '/store_register',
                 arguments: {
                   'on_register': onPartnerStoreRegister,
-                  'theme': theme,
                 },
               );
             },
@@ -111,7 +110,6 @@ class PartnerStoreTile extends StatelessWidget {
   const PartnerStoreTile({
     required this.partnerStore,
     this.onEdit,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -121,11 +119,10 @@ class PartnerStoreTile extends StatelessWidget {
   /// Optional callback for edit button
   final void Function()? onEdit;
 
-  /// Theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return Card(
       elevation: 5,
       shadowColor: Colors.grey,
@@ -134,15 +131,15 @@ class PartnerStoreTile extends StatelessWidget {
           await Navigator.of(context).pushNamed(
             '/store_info',
             arguments: {
-              'theme': theme,
               'partner_store': partnerStore,
             },
           );
         },
-        title: Text('Name: ${partnerStore.name}'),
+        title: Text('${localization.name}: ${partnerStore.name}'),
         subtitle: Text(
-          'CNPJ: ${partnerStore.cnpj}\n'
-          'Autonomy Level: ${partnerStore.autonomyLevel.label}',
+          '${localization.cnpj}: ${partnerStore.cnpj}\n'
+          '${localization.autonomyLevel(1)}: '
+          '${partnerStore.autonomyLevel.label}',
         ),
         isThreeLine: true,
         trailing: IconButton(

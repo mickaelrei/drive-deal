@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/vehicle.dart';
@@ -49,14 +50,16 @@ class VehicleInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     // Load images
     final Widget images;
     if (vehicle.images.isEmpty) {
-      images = const Padding(
-        padding: EdgeInsets.only(left: 16.0),
+      images = Padding(
+        padding: const EdgeInsets.only(left: 16.0),
         child: Text(
-          'No images!',
-          style: TextStyle(fontSize: 25),
+          localization.noImages,
+          style: const TextStyle(fontSize: 25),
         ),
       );
     } else {
@@ -79,7 +82,7 @@ class VehicleInfoPage extends StatelessWidget {
                     }
 
                     if (snapshot.data == null) {
-                      return const Text('Failed to load image');
+                      return Text(localization.imageLoadFailed);
                     }
 
                     return Image.file(
@@ -103,31 +106,31 @@ class VehicleInfoPage extends StatelessWidget {
 
     return ListView(
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 8.0),
-          child: TextHeader(label: 'Images'),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: TextHeader(label: localization.images),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: images,
         ),
-        const TextHeader(label: 'Brand'),
+        TextHeader(label: localization.brand),
         InfoText(vehicle.brand),
-        const TextHeader(label: 'Model'),
+        TextHeader(label: localization.model),
         InfoText(vehicle.model),
-        const TextHeader(label: 'Model year'),
+        TextHeader(label: localization.modelYear),
         InfoText(vehicle.modelYear),
-        const TextHeader(label: 'Manufacture year'),
+        TextHeader(label: localization.manufactureYear),
         InfoText(vehicle.year.toString()),
-        const TextHeader(label: 'FIPE price'),
+        TextHeader(label: localization.fipePrice),
         InfoText(formatPrice(vehicle.fipePrice)),
-        const TextHeader(label: 'Purchase price'),
+        TextHeader(label: localization.purchasePrice),
         InfoText(formatPrice(vehicle.purchasePrice)),
-        const TextHeader(label: 'Purchase date'),
+        TextHeader(label: localization.purchaseDate),
         InfoText(formatDate(vehicle.purchaseDate)),
-        const TextHeader(label: 'Sold yet'),
-        InfoText(vehicle.sold ? 'Yes' : 'No'),
-        const TextHeader(label: 'Plate'),
+        TextHeader(label: localization.soldYet),
+        InfoText(vehicle.sold ? localization.yes : localization.no),
+        TextHeader(label: localization.plate),
         InfoText(vehicle.plate),
       ],
     );

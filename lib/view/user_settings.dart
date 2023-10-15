@@ -69,8 +69,6 @@ class UserSettingsPage extends StatelessWidget {
       create: (context) {
         return UserSettingsState(
           user: user,
-          // TODO: Dont use Provider.of()
-          //  just get both onThemeChanged and onLanguageChanged on parameters
           mainState: Provider.of<MainState>(context, listen: false),
         );
       },

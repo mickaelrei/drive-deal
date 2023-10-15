@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/user.dart';
@@ -25,6 +26,11 @@ class UserEditState with ChangeNotifier {
   /// Callback function for when the partner gets edited
   final void Function()? onEdit;
 
+  final _formKey = GlobalKey<FormState>();
+
+  /// Form key getter
+  GlobalKey<FormState> get formKey => _formKey;
+
   /// To make operations on [User] table
   final _userUseCase = UserUseCase(
     const UserRepository(),
@@ -46,7 +52,9 @@ class UserEditState with ChangeNotifier {
   }
 
   /// Method to submit an edit on the partner store
-  Future<String?> edit() async {
+  Future<String?> edit(BuildContext context) async {
+    final localization = AppLocalizations.of(context)!;
+
     // Update info on partner store object
     user.name = nameController.text;
     user.password = passwordController.text;
@@ -54,7 +62,7 @@ class UserEditState with ChangeNotifier {
     // Try to update in database
     final success = await _userUseCase.update(user);
     if (!success) {
-      return 'Failed to edit user. Name needs to be unique';
+      return localization.userEditFailed;
     }
 
     // Call onEdit callback
@@ -91,6 +99,8 @@ class UserEditPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return ChangeNotifierProvider<UserEditState>(
       create: (context) {
         return UserEditState(
@@ -100,52 +110,57 @@ class UserEditPage extends StatelessWidget {
       },
       child: Consumer<UserEditState>(
         builder: (_, state, __) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const FormTitle(title: 'Edit'),
-              const TextHeader(label: 'Name'),
-              FormTextEntry(
-                label: 'Name',
-                controller: state.nameController,
-                validator: (text) {
-                  if (text == null || text.isEmpty) {
-                    return 'Name can\'t be blank.';
-                  }
-                  if (text.length < 3) {
-                    return 'Name needs at least 3 characters.';
-                  }
-                  return null;
-                },
-              ),
-              const TextHeader(label: 'Password'),
-              FormTextEntry(
-                label: 'Password',
-                controller: state.passwordController,
-                hidden: true,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SubmitButton(
-                  label: 'Edit',
-                  onPressed: () async {
-                    // Try editing
-                    final result = await state.edit();
-
-                    // Show dialog with edit result
-                    if (context.mounted) {
-                      await editDialog(context, result);
+          return Form(
+            key: state.formKey,
+            child: ListView(
+              children: [
+                FormTitle(title: localization.edit),
+                TextHeader(label: localization.name),
+                FormTextEntry(
+                  label: localization.name,
+                  controller: state.nameController,
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return localization.nameNotEmpty;
                     }
-
-                    // Exit from edit page
-                    if (result == null) {
-                      // ignore: use_build_context_synchronously
-                      Navigator.of(context).pop();
+                    if (text.length < 3) {
+                      return localization.nameMinSize(3);
                     }
+                    return null;
                   },
                 ),
-              )
-            ],
+                TextHeader(label: localization.password),
+                FormTextEntry(
+                  label: localization.password,
+                  controller: state.passwordController,
+                  hidden: true,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SubmitButton(
+                    label: localization.edit,
+                    onPressed: () async {
+                      // Validate inputs
+                      if (!state.formKey.currentState!.validate()) return;
+
+                      // Try editing
+                      final result = await state.edit(context);
+
+                      // Show dialog with edit result
+                      if (context.mounted) {
+                        await editDialog(context, result);
+                      }
+
+                      // Exit from edit page
+                      if (result == null) {
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                )
+              ],
+            ),
           );
         },
       ),

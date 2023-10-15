@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/autonomy_level.dart';
@@ -136,6 +137,8 @@ class AutonomyLevelEditForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return ChangeNotifierProvider<AutonomyLevelEditState>(
       create: (context) {
         return AutonomyLevelEditState(
@@ -149,22 +152,22 @@ class AutonomyLevelEditForm extends StatelessWidget {
             key: state.formKey,
             child: ListView(
               children: [
-                const FormTitle(title: 'Edit'),
-                const TextHeader(label: 'Label'),
+                FormTitle(title: localization.edit),
+                TextHeader(label: localization.label),
                 FormTextEntry(
-                  label: 'Label',
+                  label: localization.label,
                   controller: state.labelController,
                   validator: (text) {
                     if (text == null || text.isEmpty) {
-                      return 'Label can\'t be blank.';
+                      return localization.labelNotEmpty;
                     }
                     if (text.length < 3) {
-                      return 'Label needs at least 3 characters.';
+                      return localization.labelMinSize(3);
                     }
                     return null;
                   },
                 ),
-                const TextHeader(label: 'Sale store profit (in %)'),
+                TextHeader(label: localization.saleStoreProfitRegister),
                 Slider(
                   max: 100.0,
                   value: state.storeProfitPercent,
@@ -172,7 +175,7 @@ class AutonomyLevelEditForm extends StatelessWidget {
                   label: '${state.storeProfitPercent.toStringAsFixed(0)}%',
                   divisions: 100,
                 ),
-                const TextHeader(label: 'Sale network profit (in %)'),
+                TextHeader(label: localization.saleNetworkProfitRegister),
                 Slider(
                   max: 100.0,
                   value: state.networkProfitPercent,
@@ -183,7 +186,7 @@ class AutonomyLevelEditForm extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SubmitButton(
-                    label: 'Edit',
+                    label: localization.edit,
                     onPressed: () async {
                       // Validate inputs
                       if (!state.formKey.currentState!.validate()) return;

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,11 @@ class VehicleEditState with ChangeNotifier {
 
   /// Callback function for when a vehicle gets edited
   final void Function(Vehicle)? onEdit;
+
+  final _formKey = GlobalKey<FormState>();
+
+  /// Form key getter
+  GlobalKey<FormState> get formKey => _formKey;
 
   /// Whether the vehicle infos are still being loaded or not
   bool loading = true;
@@ -307,56 +313,55 @@ class VehicleEditState with ChangeNotifier {
   }
 
   /// Method to try editing a vehicle
-  Future<String?> edit() async {
+  Future<String?> edit(BuildContext context) async {
+    final localization = AppLocalizations.of(context)!;
+
     // Check if this vehicle is already sold
     if (vehicle.sold) {
-      return 'This vehicle was already sold. No permission to make edits on it';
+      return localization.alreadySold;
     }
     // Check if all inputs are set
     if (_currentBrand == null) {
-      return 'Choose a brand';
+      return localization.chooseBrand;
     }
     if (_currentModel == null) {
-      return 'Choose a model';
+      return localization.chooseModel;
     }
     if (_currentModelYear == null) {
-      return 'Choose a model year';
+      return localization.chooseModelYear;
     }
     if (currentVehicleInfo == null) {
-      return 'Vehicle info not retrieved yet. Try again';
+      return localization.noVehicleInfo;
     }
 
     // Check if manufacture year input is a valid number
     final manufactureYear = int.tryParse(manufactureYearController.text);
     if (manufactureYear == null) {
-      return 'Manufacture year must be a valid number';
+      return localization.invalidManufactureYear;
     }
 
     // Check if plate is in valid format
     final plate = plateController.text.toUpperCase();
     final plateRegex = RegExp(r'[A-Z]{3}\d[A-Z]\d{2}');
     if (!plateRegex.hasMatch(plate)) {
-      return 'Plate needs to be in AAA0A00 format';
+      return localization.invalidPlate;
     }
 
     // Check for purchase date
     if (purchaseDate == null) {
-      return 'Choose a purchase date';
+      return localization.choosePurchaseDate;
     }
 
     // Check for purchase price
     final purchasePrice = double.tryParse(purchasePriceController.text);
-    if (purchasePrice == null) {
-      return 'Purchase price needs to be a valid number.';
-    }
-    if (purchasePrice < 0) {
-      return 'Purchase price can\'t be negative.';
+    if (purchasePrice == null || purchasePrice < 0) {
+      return localization.invalidPrice;
     }
 
     // Get price
     final vehicleInfo = await currentVehicleInfo;
     if (vehicleInfo == null) {
-      return 'No vehicle info. Try again later';
+      return localization.loadingVehicleDataError;
     }
     final fipePrice = vehicleInfo.price;
 
@@ -411,6 +416,8 @@ class VehicleEditForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return ChangeNotifierProvider<VehicleEditState>(
       create: (context) {
         return VehicleEditState(
@@ -422,16 +429,16 @@ class VehicleEditForm extends StatelessWidget {
         builder: (_, state, __) {
           // If still loading info
           if (state.loading) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator.adaptive(),
+                  const CircularProgressIndicator.adaptive(),
                   Padding(
-                    padding: EdgeInsets.only(top: 12.0),
+                    padding: const EdgeInsets.only(top: 12.0),
                     child: Text(
-                      'Loading vehicle data...',
-                      style: TextStyle(fontSize: 17),
+                      localization.loading,
+                      style: const TextStyle(fontSize: 17),
                     ),
                   ),
                 ],
@@ -441,10 +448,10 @@ class VehicleEditForm extends StatelessWidget {
 
           // If an error occured while loading
           if (state.error) {
-            return const Center(
+            return Center(
               child: Text(
-                'Error loading vehicle data. Try again later',
-                style: TextStyle(fontSize: 17),
+                localization.loadingVehicleDataError,
+                style: const TextStyle(fontSize: 17),
               ),
             );
           }
@@ -463,13 +470,12 @@ class VehicleEditForm extends StatelessWidget {
             ));
           }
 
-          return SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          return Form(
+            key: state.formKey,
+            child: ListView(
               children: [
-                const FormTitle(title: 'Edit'),
-                const TextHeader(label: 'Brand'),
+                FormTitle(title: localization.edit),
+                TextHeader(label: localization.brand),
                 FutureDropdown<FipeBrand>(
                   initialSelected: state._currentBrand,
                   future: state.brands,
@@ -478,7 +484,7 @@ class VehicleEditForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const TextHeader(label: 'Model'),
+                TextHeader(label: localization.model),
                 FutureDropdown<FipeModel>(
                   initialSelected: state._currentModel,
                   future: state.models,
@@ -487,7 +493,7 @@ class VehicleEditForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const TextHeader(label: 'Model year'),
+                TextHeader(label: localization.modelYear),
                 FutureDropdown<FipeModelYear>(
                   initialSelected: state._currentModelYear,
                   future: state.modelYears,
@@ -496,7 +502,7 @@ class VehicleEditForm extends StatelessWidget {
                     return Text(item.name);
                   },
                 ),
-                const TextHeader(label: 'FIPE price'),
+                TextHeader(label: localization.fipePrice),
                 FutureBuilder(
                   future: state.currentVehicleInfo,
                   builder: (context, snapshot) {
@@ -525,27 +531,28 @@ class VehicleEditForm extends StatelessWidget {
                     );
                   },
                 ),
-                const TextHeader(label: 'Purchase price'),
+                TextHeader(label: localization.purchasePrice),
                 FormTextEntry(
-                  label: 'Purchase price',
+                  label: localization.purchasePrice,
                   controller: state.purchasePriceController,
                 ),
-                const TextHeader(label: 'Manufacture year'),
+                TextHeader(label: localization.manufactureYear),
                 FormTextEntry(
-                  label: 'Manufacture year',
+                  label: localization.manufactureYear,
                   controller: state.manufactureYearController,
                 ),
-                const TextHeader(label: 'Plate'),
+                TextHeader(label: localization.plate),
                 FormTextEntry(
-                  label: 'Plate',
+                  label: localization.plate,
                   controller: state.plateController,
                 ),
-                const TextHeader(label: 'Purchase date'),
+                TextHeader(label: localization.purchaseDate),
                 DatePicker(
+                  hintText: localization.purchaseDate,
                   initialDate: state.purchaseDate,
                   onDatePicked: state.setDate,
                 ),
-                const TextHeader(label: 'Images'),
+                TextHeader(label: localization.images),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: VehicleImagesScrollView(
@@ -557,10 +564,13 @@ class VehicleEditForm extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SubmitButton(
-                    label: 'Edit',
+                    label: localization.edit,
                     onPressed: () async {
+                      // Validate inputs
+                      if (!state.formKey.currentState!.validate()) return;
+
                       // Try editing
-                      final result = await state.edit();
+                      final result = await state.edit(context);
 
                       // Show dialog with edit result
                       if (context.mounted) {

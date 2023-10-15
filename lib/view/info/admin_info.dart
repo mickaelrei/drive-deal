@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
@@ -13,7 +14,6 @@ class AdminInfoPage extends StatelessWidget {
     this.navBar,
     this.onUserEdit,
     this.totalNetworkProfit,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -29,15 +29,14 @@ class AdminInfoPage extends StatelessWidget {
   /// Total network profit
   final double? totalNetworkProfit;
 
-  /// Theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Admin Home'),
+        title: Text(localization.home),
         actions: [
           IconButton(
             onPressed: () async {
@@ -46,7 +45,6 @@ class AdminInfoPage extends StatelessWidget {
                 '/user_edit',
                 arguments: {
                   'user': user,
-                  'theme': theme,
                   'on_edit': onUserEdit,
                 },
               );
@@ -59,15 +57,15 @@ class AdminInfoPage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 8.0),
-            child: TextHeader(label: 'User name'),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: TextHeader(label: localization.userName),
           ),
           InfoText(user.name!),
-          const TextHeader(label: 'Total network profit'),
+          TextHeader(label: localization.totalNetworkProfit),
           InfoText(
             totalNetworkProfit == null
-                ? 'Loading...'
+                ? localization.loading
                 : formatPrice(totalNetworkProfit!),
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Widget for unknown page in home BottomNavigationBar
 class UnknownPage extends StatelessWidget {
@@ -10,14 +11,16 @@ class UnknownPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Unknown Page'),
+        title: const Text('?'),
       ),
       bottomNavigationBar: navBar,
-      body: const Center(
-        child: Text('Error: Unknown page'),
+      body: Center(
+        child: Text(localization.unknownPage),
       ),
     );
   }

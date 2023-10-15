@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../entities/autonomy_level.dart';
 import '../entities/partner_store.dart';
@@ -80,10 +81,12 @@ Widget userEditRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Edit user'),
+      title: Text(localization.editUser),
     ),
     body: Center(
       child: UserEditPage(
@@ -99,10 +102,11 @@ Widget storeRegisterRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
-    // resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Register store'),
+      title: Text(localization.registerPartnerStore),
     ),
     body: PartnerStoreRegisterForm(
       onRegister: args['on_register'],
@@ -150,10 +154,12 @@ Widget storeEditRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Edit store'),
+      title: Text(localization.editPartnerStore),
     ),
     body: Center(
       child: PartnerStoreEditPage(
@@ -188,10 +194,12 @@ Widget storeInfoRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Store info'),
+      title: Text(localization.partnerStoreInfo),
     ),
     body: PartnerStoreInfoPage(
       partnerStore: partnerStore,
@@ -222,10 +230,12 @@ Widget vehicleRegisterRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Register vehicle'),
+      title: Text(localization.registerVehicle),
     ),
     body: VehicleRegisterForm(
       partnerStore: partnerStore,
@@ -257,10 +267,12 @@ Widget vehicleEditRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Edit vehicle'),
+      title: Text(localization.editVehicle),
     ),
     body: VehicleEditForm(
       vehicle: vehicle,
@@ -292,10 +304,12 @@ Widget vehicleInfoRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Vehicle info'),
+      title: Text(localization.vehicleInfo),
     ),
     body: VehicleInfoPage(
       vehicle: vehicle,
@@ -326,10 +340,12 @@ Widget saleRegisterRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Register sale'),
+      title: Text(localization.registerSale),
     ),
     body: SaleRegisterForm(
       partnerStore: partnerStore,
@@ -361,10 +377,12 @@ Widget saleInfoRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Sale info'),
+      title: Text(localization.saleInfo),
     ),
     body: SaleInfoPage(
       sale: args['sale'],
@@ -377,10 +395,12 @@ Widget autonomyLevelRegisterRoute(BuildContext context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Register autonomy level'),
+      title: Text(localization.registerAutonomyLevel),
     ),
     body: AutonomyLevelRegisterForm(
       onRegister: args['on_register'],
@@ -411,10 +431,12 @@ Widget autonomyLevelEditRoute(BuildContext context) {
     );
   }
 
+  final localization = AppLocalizations.of(context)!;
+
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
-      title: const Text('Edit autonomy level'),
+      title: Text(localization.editAutonomyLevel),
     ),
     body: AutonomyLevelEditForm(
       autonomyLevel: autonomyLevel,

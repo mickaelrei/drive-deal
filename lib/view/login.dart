@@ -68,17 +68,6 @@ class LoginState with ChangeNotifier {
 
     // Return user object
     return user;
-    // // Invalid user
-    // if (user == null) {
-    //   return LoginType.invalid;
-    // }
-
-    // // Valid user
-    // if (user.isAdmin) {
-    //   return LoginType.admin;
-    // } else {
-    //   return LoginType.nonAdmin;
-    // }
   }
 
   /// Method to clear form inputs

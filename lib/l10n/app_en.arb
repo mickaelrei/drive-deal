@@ -1,11 +1,190 @@
 {
+    "register": "Register",
+    "enter": "Enter",
+    "edit": "Edit",
+    "yes": "Yes",
+    "no": "No",
+    "success": "Success",
+    "error": "Error",
+    "registerSuccess": "Successfully registered",
+    "editSuccess": "Successfully edited",
+    "invalidLogin": "Invalid login",
+    "reviewCredentials": "Review your credentials",
+    "loading": "Loading",
+
+    "registerAutonomyLevel": "Register Autonomy Level",
+    "editAutonomyLevel": "Edit Autonomy Level",
+    "autonomyLevel": "{count, plural, =1{Autonomy Level} other{Autonomy Levels}}",
+    "noAutonomyLevels": "No Autonomy Levels",
+    "@autonomyLevel": {
+        "description": "Autonomy Level",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "registerPartnerStore": "Register Partner Store",
+    "editPartnerStore": "Edit Partner Store",
+    "partnerStoreInfo": "Partner Store Info",
+    "noPartnerStores": "No Partner Stores",
+    "partnerStore": "{count, plural, =1{Partner Store} other{Partner Stores}}",
+    "@partnerStore": {
+        "description": "Partner Store",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "registerSale": "Register Sale",
+    "saleInfo": "Sale Info",
+    "sale": "{count, plural, =1{Sale} other{Sales}}",
+    "noSales": "No sales",
+    "@sale": {
+        "description": "Sale",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "editUser": "Edit User",
+    "userInfo": "User Info",
+    "user": "{count, plural, =1{User} other{Users}}",
+    "@user": {
+        "description": "User",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "vehicleImage": "{count, plural, =1{Vehicle Image} other{Vehicle Images}}",
+    "@vehicleImage": {
+        "description": "VehicleImage",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "registerVehicle": "Register Vehicle",
+    "editVehicle": "Edit Vehicle",
+    "vehicleInfo": "Vehicle Info",
+    "vehicle": "{count, plural, =1{Vehicle} other{Vehicles}}",
+    "noVehicles": "No vehicles",
+    "@vehicle": {
+        "description": "Vehicle",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+
     "nameOrCnpj": "Name or CNPJ",
     "password": "Password",
-    "enter": "Enter",
-    
+
+    "home": "Home",
+    "cnpj": "CNPJ",
+    "stores": "Stores",
+    "autonomy": "Autonomy",
     "settings": "Settings",
-    "darkMode": "Dark mode",
-    "appLanguage": "App language",
+
+    "label": "Label",
+    "labelNotEmpty": "Label can't be empty",
+    "labelMinSize": "Label needs at least {count} characters",
+    "@labelMinSize": {
+        "description": "Minimum characters needed for label",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "saleStoreProfitRegister": "Sale store profit (in %)",
+    "saleNetworkProfitRegister": "Sale network profit (in %)",
+    "saleStoreProfit": "Sale store profit",
+    "saleNetworkProfit": "Sale network profit",
+
+    "noAutonomyLevel": "No Autonomy Level selected",
+    "invalidCnpj": "Invalid CNPJ",
+    "cnpjInUse": "CNPJ already in use",
+    "name": "Name",
+    "storeName": "Store Name",
+    "nameNotEmpty": "Name can't be empty",
+    "nameMinSize": "Name needs at least {count} characters",
+    "@nameMinSize": {
+        "description": "Minimum characters needed for name",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "nameMaxSize": "Name can be at max {count} characters long",
+    "@nameMaxSize": {
+        "description": "Maximum characters needed for name",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "registeredVehicles": "Registered vehicles",
+    "registeredSales": "Registered sales",
+
+    "brand": "Brand",
+    "model": "Model",
+    "modelYear": "Model year",
+    "fipePrice": "FIPE Price",
+    "purchasePrice": "Purchase Price",
+    "manufactureYear": "Manufacture Year",
+    "plate": "Plate",
+    "purchaseDate": "Purchase Date",
+    "images": "Images",
+    "noImages": "No images",
+    "imageLoadFailed": "Failed to load image",
+    "soldYet": "Sold yet",
+    "chooseBrand": "Choose a brand",
+    "chooseModel": "Choose a model",
+    "chooseModelYear": "Choose a model year",
+    "noVehicleInfo": "Failed to retrieve vehicle info. Try again",
+    "invalidManufactureYear": "Invalid manufacture year",
+    "invalidPlate": "Plate needs to be in AAA0A00 format",
+    "choosePurchaseDate": "Choose a purchase date",
+    "invalidPurchasePrice": "Invalid purchase price",
+    "alreadySold": "This vehicle was already sold. No permission to make edits on it",
+    "loadingVehicleDataError": "Error loading vehicle data. Try again later",
+
+    "chooseVehicle": "Choose a vehicle",
+    "chooseSaleDate": "Choose the sale date",
+    "saleBeforePurchase": "Sale date needs to be after vehicle purchase date",
+    "invalidPrice": "Price is in invalid format",
+    "dateInterval": "Date Interval",
+    "customer": "Customer",
+    "customerName": "Customer name",
+    "customerCpf": "Customer CPF",
+    "salePrice": "Sale Price",
+    "saleDate": "Sale Date",
+    "soldOn": "Sold on",
+    "networkProfit": "Network Profit",
+    "storeProfit": "Store Profit",
+    "safetyProfit": "Safety Profit",
+    "totalPrice": "Total Price",
+
+    "userName": "User Name",
+    "userEditFailed": "Failed to edit user. Name already in use",
+
+    "totalNetworkProfit": "Total Network Profit",
+    "totalStoreProfit": "Total Store Profit",
+    "totalSafetyProfit": "Total Safety Profit",
+    
+    "darkMode": "Dark Mode",
+    "appLanguage": "App Language",
     "english": "English",
-    "portuguese": "Portuguese"
+    "portuguese": "Portuguese",
+
+    "unknownPage": "Error: Unknown page"
 }

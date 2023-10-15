@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
-import '../../entities/user.dart';
 import '../../entities/vehicle.dart';
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/vehicle_use_case.dart';
@@ -62,7 +62,6 @@ class VehicleListPage extends StatelessWidget {
     required this.partnerStore,
     this.navBar,
     this.onVehicleRegister,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -75,20 +74,19 @@ class VehicleListPage extends StatelessWidget {
   /// Optional callback for when a vehicle gets registered
   final void Function(Vehicle)? onVehicleRegister;
 
-  /// App theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     // Scaffold body
     late final Widget body;
 
     // Check if list of vehicles is empty
     if (partnerStore.vehicles.isEmpty) {
-      body = const Center(
+      body = Center(
         child: Text(
-          'No vehicles!',
-          style: TextStyle(fontSize: 25),
+          localization.noVehicles,
+          style: const TextStyle(fontSize: 25),
         ),
       );
     } else {
@@ -98,17 +96,6 @@ class VehicleListPage extends StatelessWidget {
         },
         child: Consumer<VehicleListState>(
           builder: (_, state, __) {
-            // TODO: Add a "sort-by" to sort by:
-            //  - All
-            //  - Sold
-            //  - Not sold
-            //  - Price
-            //  - Purchase date
-            //  -
-
-            // TODO: Sort order:
-            //  - Ascending
-            //  - Descending
             return ListView.builder(
               itemCount: partnerStore.vehicles.length,
               itemBuilder: (context, index) {
@@ -119,7 +106,6 @@ class VehicleListPage extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: VehicleTile(
                     vehicle: vehicle,
-                    theme: theme,
                     images: state._vehicleImages[vehicle],
                     onEdit: () async {
                       await Navigator.of(context).pushNamed(
@@ -127,7 +113,6 @@ class VehicleListPage extends StatelessWidget {
                         arguments: {
                           'vehicle': vehicle,
                           'on_edit': state.onEdit,
-                          'theme': theme,
                         },
                       );
                     },
@@ -143,7 +128,7 @@ class VehicleListPage extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Vehicles'),
+        title: Text(localization.vehicle(2)),
         actions: [
           IconButton(
             onPressed: () async {
@@ -153,7 +138,6 @@ class VehicleListPage extends StatelessWidget {
                 arguments: {
                   'partner_store': partnerStore,
                   'on_register': onVehicleRegister,
-                  'theme': theme,
                 },
               );
             },
@@ -174,7 +158,6 @@ class VehicleTile extends StatelessWidget {
     required this.vehicle,
     required this.images,
     required this.onEdit,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -187,9 +170,6 @@ class VehicleTile extends StatelessWidget {
   /// Callback for edit
   final void Function() onEdit;
 
-  /// Theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -200,7 +180,6 @@ class VehicleTile extends StatelessWidget {
           await Navigator.of(context).pushNamed(
             '/vehicle_info',
             arguments: {
-              'theme': theme,
               'vehicle': vehicle,
             },
           );

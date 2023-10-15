@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../entities/autonomy_level.dart';
+import 'formats.dart';
 
 /// Widget for form title
 class FormTitle extends StatelessWidget {
@@ -184,6 +185,7 @@ class DatePicker extends StatelessWidget {
     this.initialDate,
     this.firstDate,
     this.onDatePicked,
+    this.hintText,
     super.key,
   });
 
@@ -192,6 +194,9 @@ class DatePicker extends StatelessWidget {
 
   /// Optional first date
   final DateTime? firstDate;
+
+  /// Optional input hint text
+  final String? hintText;
 
   /// Optional callback for when a date is picked
   final void Function(DateTime)? onDatePicked;
@@ -203,13 +208,13 @@ class DatePicker extends StatelessWidget {
       child: InkWell(
         child: InputDecorator(
           decoration: InputDecoration(
-            hintText: 'Purchase date',
+            hintText: hintText,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
             ),
           ),
           child: Text(
-            initialDate != null ? getDateString(initialDate!) : 'Purchase date',
+            initialDate != null ? formatDate(initialDate!) : hintText ?? '',
           ),
         ),
         onTap: () async {
@@ -376,36 +381,6 @@ class AutonomyLevelDropdown extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Default [Widget] for a [Form] entry with no data
-class DefaultFormEntryNoData extends StatelessWidget {
-  /// Constructor
-  const DefaultFormEntryNoData({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      child: InputDecorator(
-        decoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Method to get String form of date
-String getDateString(DateTime date) {
-  final day = date.day.toString();
-  final month = date.month.toString();
-  return '${day.padLeft(2, '0')}'
-      '/'
-      '${month.padLeft(2, '0')}'
-      '/'
-      '${date.year}';
 }
 
 /// [TextInputFormatter] for either CNPJ or name

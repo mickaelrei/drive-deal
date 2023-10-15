@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/autonomy_level.dart';
@@ -71,18 +72,18 @@ class PartnerStoreRegisterState with ChangeNotifier {
   }
 
   /// Method for register attempt
-  Future<String?> register() async {
+  Future<String?> register(BuildContext context) async {
+    final localization = AppLocalizations.of(context)!;
+
     // Check if autonomy level was chosen
     if (chosenAutonomyLevel == null) {
-      return 'No Autonomy Level selected';
+      return localization.noAutonomyLevel;
     }
 
     // Check if CNPJ is in valid format
     final cnpj = cnpjController.text;
-    if (cnpj.length != 14) {
-      return 'Invalid CNPJ format: must be 14 digits';
-    } else if (int.tryParse(cnpj) == null) {
-      return 'Invalid CNPJ format: must be only numbers';
+    if (cnpj.length != 14 || int.tryParse(cnpj) == null) {
+      return localization.invalidCnpj;
     }
 
     // Generate random 15 chars password
@@ -92,7 +93,7 @@ class PartnerStoreRegisterState with ChangeNotifier {
     final partnerStores = await _partnerStoreUseCase.select();
     for (final store in partnerStores) {
       if (store.cnpj == cnpj) {
-        return 'CNPJ is already in use';
+        return localization.cnpjInUse;
       }
     }
 
@@ -129,7 +130,6 @@ class PartnerStoreRegisterForm extends StatelessWidget {
   const PartnerStoreRegisterForm({
     this.navBar,
     required this.onRegister,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -139,11 +139,10 @@ class PartnerStoreRegisterForm extends StatelessWidget {
   /// Callback to be called when a [PartnerStore] gets registered
   final void Function(PartnerStore)? onRegister;
 
-  /// App theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return ChangeNotifierProvider<PartnerStoreRegisterState>(
       create: (context) {
         return PartnerStoreRegisterState(onRegister: onRegister);
@@ -154,42 +153,38 @@ class PartnerStoreRegisterForm extends StatelessWidget {
             key: state.formKey,
             child: ListView(
               children: [
-                const FormTitle(title: 'Register'),
-                const TextHeader(label: 'Name'),
+                FormTitle(title: localization.register),
+                TextHeader(label: localization.name),
                 FormTextEntry(
-                  label: 'Name',
+                  label: localization.name,
                   controller: state.nameController,
                   validator: (text) {
                     if (text == null || text.isEmpty) {
-                      return 'Name can\'t be empty';
+                      return localization.nameNotEmpty;
                     }
                     if (text.length < 3) {
-                      return 'Name needs to be at least 3 characters long';
+                      return localization.nameMinSize(3);
                     }
                     if (text.length > 120) {
-                      return 'Name can be at max 120 characters long';
+                      return localization.nameMaxSize(120);
                     }
                     // Valid
                     return null;
                   },
                 ),
-                const TextHeader(label: 'CNPJ'),
+                TextHeader(label: localization.cnpj),
                 FormTextEntry(
-                  label: 'CNPJ',
+                  label: localization.cnpj,
                   controller: state.cnpjController,
                   validator: (text) {
-                    if (text == null || text.isEmpty) {
-                      return 'CNPJ can\'t be empty';
-                    }
-                    if (text.length != 14) {
-                      return 'CNPJ needs to be exactly 14 characters long'
-                          ' (only digits)';
+                    if (text == null || text.isEmpty || text.length != 14) {
+                      return localization.invalidCnpj;
                     }
                     // Valid
                     return null;
                   },
                 ),
-                const TextHeader(label: 'Autonomy Level'),
+                TextHeader(label: localization.autonomyLevel(1)),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, left: 8.0),
                   child: AutonomyLevelDropdown(
@@ -204,13 +199,13 @@ class PartnerStoreRegisterForm extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SubmitButton(
-                    label: 'Register',
+                    label: localization.register,
                     onPressed: () async {
                       // Validate inputs
                       if (!state.formKey.currentState!.validate()) return;
 
                       // Try registering
-                      final result = await state.register();
+                      final result = await state.register(context);
 
                       // Show dialog with register result
                       if (context.mounted) {

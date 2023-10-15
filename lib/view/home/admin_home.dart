@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/autonomy_level.dart';
@@ -150,7 +151,6 @@ class AdminHomePage extends StatelessWidget {
               page = AdminInfoPage(
                 user: user,
                 navBar: navBar,
-                theme: user.settings.appTheme,
                 totalNetworkProfit: state.totalNetworkProfit,
                 onUserEdit: state.onUserEdit,
               );
@@ -158,7 +158,6 @@ class AdminHomePage extends StatelessWidget {
               // Listing of partner stores
               page = PartnerStoreListPage(
                 user: user,
-                theme: user.settings.appTheme,
                 onPartnerStoreRegister: state.onPartnerStoreRegister,
                 navBar: navBar,
                 onStoreEdit: state.onPartnerStoreEdit,
@@ -169,7 +168,6 @@ class AdminHomePage extends StatelessWidget {
               // Listing of partner stores
               page = AutonomyLevelListPage(
                 navBar: navBar,
-                theme: user.settings.appTheme,
                 onRegister: state.onAutonomyLevelRegister,
                 onAutonomyLevelEdit: state.onAutonomyLevelEdit,
                 items: state.autonomyLevels,
@@ -217,6 +215,8 @@ class AdminBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     // Get icon color based on theme
     final destinationColor =
         theme == AppTheme.dark ? Colors.white : Colors.black;
@@ -232,28 +232,28 @@ class AdminBottomNavigationBar extends StatelessWidget {
             Icons.home_outlined,
             color: destinationColor,
           ),
-          label: 'Home',
+          label: localization.home,
         ),
         NavigationDestination(
           icon: Icon(
             Icons.add_business_outlined,
             color: destinationColor,
           ),
-          label: 'Stores',
+          label: localization.stores,
         ),
         NavigationDestination(
           icon: Icon(
             Icons.stairs_outlined,
             color: destinationColor,
           ),
-          label: 'Autonomy',
+          label: localization.autonomy,
         ),
         NavigationDestination(
           icon: Icon(
             Icons.settings,
             color: destinationColor,
           ),
-          label: 'Settings',
+          label: localization.settings,
         ),
       ],
     );

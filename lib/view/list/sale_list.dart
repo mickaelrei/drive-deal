@@ -2,11 +2,11 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/sale.dart';
-import '../../entities/user.dart';
 import '../../utils/formats.dart';
 
 /// Provider for sale listing page
@@ -118,7 +118,6 @@ class SaleListPage extends StatelessWidget {
     required this.partnerStore,
     this.navBar,
     this.onSaleRegister,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -131,20 +130,19 @@ class SaleListPage extends StatelessWidget {
   /// Optional callback for when a sale gets registered
   final void Function(Sale)? onSaleRegister;
 
-  /// Theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     // Scaffold body
     late final Widget body;
 
     // Check if list of sales is empty
     if (partnerStore.sales.isEmpty) {
-      body = const Center(
+      body = Center(
         child: Text(
-          'No sales!',
-          style: TextStyle(fontSize: 25),
+          localization.noSales,
+          style: const TextStyle(fontSize: 25),
         ),
       );
     } else {
@@ -158,11 +156,11 @@ class SaleListPage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 15.0),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0),
                       child: Text(
-                        'Sale date range:',
-                        style: TextStyle(fontSize: 15),
+                        localization.dateInterval,
+                        style: const TextStyle(fontSize: 15),
                       ),
                     ),
                     Expanded(
@@ -185,7 +183,6 @@ class SaleListPage extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: SaleTile(
                           sale: sale,
-                          theme: theme,
                         ),
                       );
                     },
@@ -201,7 +198,7 @@ class SaleListPage extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Sales'),
+        title: Text(localization.sale(2)),
         actions: [
           IconButton(
             onPressed: () async {
@@ -210,7 +207,6 @@ class SaleListPage extends StatelessWidget {
                 arguments: {
                   'partner_store': partnerStore,
                   'on_register': onSaleRegister,
-                  'theme': theme,
                 },
               );
             },
@@ -229,18 +225,16 @@ class SaleTile extends StatelessWidget {
   /// Constructor
   const SaleTile({
     required this.sale,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
   /// [Sale] object to show
   final Sale sale;
 
-  /// Theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return Card(
       elevation: 5,
       shadowColor: Colors.grey,
@@ -249,13 +243,15 @@ class SaleTile extends StatelessWidget {
           await Navigator.of(context).pushNamed(
             '/sale_info',
             arguments: {
-              'theme': theme,
               'sale': sale,
             },
           );
         },
-        title: Text('Customer: ${sale.customerName} (${sale.customerCpf})'),
-        subtitle: Text('Sold on ${formatDate(sale.saleDate)}'),
+        title: Text(
+          '${localization.customer}: '
+          '${sale.customerName} (${sale.customerCpf})',
+        ),
+        subtitle: Text('${localization.soldOn} ${formatDate(sale.saleDate)}'),
       ),
     );
   }

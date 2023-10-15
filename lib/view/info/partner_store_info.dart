@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../entities/partner_store.dart';
 import '../../utils/formats.dart';
@@ -14,6 +15,8 @@ class PartnerStoreInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     // Calculate total profits
     var totalNetworkProfit = 0.0;
     var totalStoreProfit = 0.0;
@@ -26,24 +29,24 @@ class PartnerStoreInfoPage extends StatelessWidget {
 
     return ListView(
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 8.0),
-          child: TextHeader(label: 'Store name'),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: TextHeader(label: localization.storeName),
         ),
         InfoText(partnerStore.name),
-        const TextHeader(label: 'CNPJ'),
+        TextHeader(label: localization.cnpj),
         InfoText(partnerStore.cnpj),
-        const TextHeader(label: 'Autonomy Level'),
+        TextHeader(label: localization.autonomyLevel(2)),
         InfoText(partnerStore.autonomyLevel.label),
-        const TextHeader(label: 'Registered vehicles'),
+        TextHeader(label: localization.registeredVehicles),
         InfoText(partnerStore.vehicles.length.toString()),
-        const TextHeader(label: 'Registered sales'),
+        TextHeader(label: localization.registeredSales),
         InfoText(partnerStore.sales.length.toString()),
-        const TextHeader(label: 'Total network profit'),
+        TextHeader(label: localization.totalNetworkProfit),
         InfoText(formatPrice(totalNetworkProfit)),
-        const TextHeader(label: 'Total store profit'),
+        TextHeader(label: localization.totalStoreProfit),
         InfoText(formatPrice(totalStoreProfit)),
-        const TextHeader(label: 'Total safety profit'),
+        TextHeader(label: localization.totalSafetyProfit),
         InfoText(formatPrice(totalSafetyProfit)),
       ],
     );

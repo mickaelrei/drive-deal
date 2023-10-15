@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
@@ -90,7 +91,6 @@ class PartnerHomePage extends StatelessWidget {
                 user: user,
                 navBar: navBar,
                 onStoreEdit: state.onStoreEdit,
-                theme: user.settings.appTheme,
               );
               break;
             case 1:
@@ -99,7 +99,6 @@ class PartnerHomePage extends StatelessWidget {
                 partnerStore: user.store!,
                 navBar: navBar,
                 onVehicleRegister: state.onVehicleRegister,
-                theme: user.settings.appTheme,
               );
               break;
             case 2:
@@ -108,7 +107,6 @@ class PartnerHomePage extends StatelessWidget {
                 partnerStore: user.store!,
                 navBar: navBar,
                 onSaleRegister: state.onSaleRegister,
-                theme: user.settings.appTheme,
               );
               break;
             case 3:
@@ -154,6 +152,8 @@ class PartnerBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     // Get icon color based on theme
     final destinationColor =
         theme == AppTheme.dark ? Colors.white : Colors.black;
@@ -169,28 +169,28 @@ class PartnerBottomNavigationBar extends StatelessWidget {
             Icons.home_outlined,
             color: destinationColor,
           ),
-          label: 'Home',
+          label: localization.home,
         ),
         NavigationDestination(
           icon: Icon(
             Icons.directions_car_filled_rounded,
             color: destinationColor,
           ),
-          label: 'Vehicles',
+          label: localization.vehicle(2),
         ),
         NavigationDestination(
           icon: Icon(
             Icons.attach_money,
             color: destinationColor,
           ),
-          label: 'Sales',
+          label: localization.sale(2),
         ),
         NavigationDestination(
           icon: Icon(
             Icons.settings,
             color: destinationColor,
           ),
-          label: 'Settings',
+          label: localization.settings,
         ),
       ],
     );
@@ -204,7 +204,6 @@ class PartnerInfoPage extends StatelessWidget {
     required this.user,
     this.navBar,
     this.onStoreEdit,
-    this.theme = UserSettings.defaultAppTheme,
     super.key,
   });
 
@@ -217,15 +216,14 @@ class PartnerInfoPage extends StatelessWidget {
   /// Optional callback for when the [PartnerStore] gets edited
   final void Function()? onStoreEdit;
 
-  /// Theme
-  final AppTheme theme;
-
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Partner Home'),
+        title: Text(localization.home),
         actions: [
           IconButton(
             onPressed: () async {
@@ -235,7 +233,6 @@ class PartnerInfoPage extends StatelessWidget {
                 arguments: {
                   'user': user,
                   'partner_store': user.store!,
-                  'theme': theme,
                 },
               );
 
@@ -251,14 +248,14 @@ class PartnerInfoPage extends StatelessWidget {
       bottomNavigationBar: navBar,
       body: ListView(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 8.0),
-            child: TextHeader(label: 'Store name:'),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: TextHeader(label: localization.storeName),
           ),
           InfoText(user.store!.name),
-          const TextHeader(label: 'CNPJ:'),
+          TextHeader(label: localization.cnpj),
           InfoText(user.store!.cnpj),
-          const TextHeader(label: 'Autonomy Level:'),
+          TextHeader(label: localization.autonomyLevel(1)),
           InfoText(user.store!.autonomyLevel.label),
         ],
       ),

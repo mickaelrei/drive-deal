@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../entities/sale.dart';
 import '../../utils/formats.dart';
@@ -14,26 +15,28 @@ class SaleInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return ListView(
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 8.0),
-          child: TextHeader(label: 'Vehicle'),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: TextHeader(label: localization.vehicle(1)),
         ),
         InfoText(sale.vehicle.model),
-        const TextHeader(label: 'Customer name'),
+        TextHeader(label: localization.customerName),
         InfoText(sale.customerName),
-        const TextHeader(label: 'Customer CPF'),
+        TextHeader(label: localization.customerCpf),
         InfoText(sale.customerCpf),
-        const TextHeader(label: 'Sale date'),
+        TextHeader(label: localization.saleDate),
         InfoText(formatDate(sale.saleDate)),
-        const TextHeader(label: 'Store profit'),
+        TextHeader(label: localization.storeProfit),
         InfoText(formatPrice(sale.storeProfit)),
-        const TextHeader(label: 'Network profit'),
+        TextHeader(label: localization.networkProfit),
         InfoText(formatPrice(sale.networkProfit)),
-        const TextHeader(label: 'Safety profit'),
+        TextHeader(label: localization.safetyProfit),
         InfoText(formatPrice(sale.safetyProfit)),
-        const TextHeader(label: 'Total price'),
+        TextHeader(label: localization.totalPrice),
         InfoText(formatPrice(sale.price)),
       ],
     );

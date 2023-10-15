@@ -1,11 +1,190 @@
 {
+    "register": "Registrar",
+    "enter": "Entrar",
+    "edit": "Editar",
+    "yes": "Sim",
+    "no": "Não",
+    "success": "Sucesso",
+    "error": "Erro",
+    "registerSuccess": "Registrado com sucesso",
+    "editSuccess": "Editado com sucesso",
+    "invalidLogin": "Login inválido",
+    "reviewCredentials": "Reveja seus dados",
+    "loading": "Carregando",
+
+    "registerAutonomyLevel": "Registrar Nível de Autonomia",
+    "editAutonomyLevel": "Editar Nível de Autonomia",
+    "autonomyLevel": "{count, plural, =1{Nível de Autonomia} other{Níveis de Autonomia}}",
+    "noAutonomyLevels": "Nenhum Nível de Autonomia",
+    "@autonomyLevel": {
+        "description": "Autonomy Level",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "registerPartnerStore": "Registrar Loja Parceira",
+    "editPartnerStore": "Editar Loja Parceira",
+    "partnerStoreInfo": "Dados de Loja Parceira",
+    "partnerStore": "{count, plural, =1{Loja Parceira} other{Lojas Parceiras}}",
+    "noPartnerStores": "Nenhuma Loja Parceira",
+    "@partnerStore": {
+        "description": "Partner Store",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "registerSale": "Registrar venda",
+    "saleInfo": "Dados de venda",
+    "sale": "{count, plural, =1{Venda} other{Vendas}}",
+    "noSales": "Nenhuma venda",
+    "@sale": {
+        "description": "Sale",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "editUser": "Editar usuário",
+    "userInfo": "Dados de usuário",
+    "user": "{count, plural, =1{Usuário} other{Usuários}}",
+    "@user": {
+        "description": "User",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "vehicleImage": "{count, plural, =1{Foto do veículo} other{Fotos do veículo}}",
+    "@vehicleImage": {
+        "description": "VehicleImage",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "registerVehicle": "Registar veículo",
+    "editVehicle": "Editar veículo",
+    "vehicleInfo": "Dados do veículo",
+    "vehicle": "{count, plural, =1{Veículo} other{Veículos}}",
+    "noVehicles": "Nenhum veículo",
+    "@vehicle": {
+        "description": "Vehicle",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+
     "nameOrCnpj": "Nome ou CNPJ",
     "password": "Senha",
-    "enter": "Entrar",
+
+    "home": "Início",
+    "cnpj": "CNPJ",
+    "stores": "Lojas",
+    "autonomy": "Autonomia",
+    "settings": "Opções",
+
+    "label": "Título",
+    "labelNotEmpty": "Título não pode ser vazio",
+    "labelMinSize": "Título precisa de no mínimo {count} caracteres",
+    "@labelMinSize": {
+        "description": "Minimum characters needed for label",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "saleStoreProfitRegister": "Lucro da loja (em %)",
+    "saleNetworkProfitRegister": "Lucro da rede (em %)",
+    "saleStoreProfit": "Lucro da loja",
+    "saleNetworkProfit": "Lucro da rede",
+
+    "noAutonomyLevel": "Nenhum Nível de Autonomia selecionado",
+    "invalidCnpj": "CNPJ inválido",
+    "cnpjInUse": "CNPJ já em uso",
+    "name": "Nome",
+    "storeName": "Nome da loja",
+    "nameNotEmpty": "Nome não pode ser vazio",
+    "nameMinSize": "Nome precisa de no mínimo {count} caracteres",
+    "@nameMinSize": {
+        "description": "Minimum characters needed for name",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "nameMaxSize": "Título pode ter no máximo {count} caracteres",
+    "@nameMaxSize": {
+        "description": "Maximum characters needed for name",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "registeredVehicles": "Veículos registrados",
+    "registeredSales": "Vendas registradas",
+
+    "brand": "Marca",
+    "model": "Modelo",
+    "modelYear": "Ano do modelo",
+    "fipePrice": "Preço FIPE",
+    "purchasePrice": "Preço de compra",
+    "manufactureYear": "Ano de fabricação",
+    "plate": "Placa",
+    "purchaseDate": "Data de compra",
+    "images": "Imagens",
+    "noImages": "Nenhuma imagem",
+    "imageLoadFailed": "Falha ao carregar imagem",
+    "soldYet": "Vendido",
+    "chooseBrand": "Escolha uma marca",
+    "chooseModel": "Escolha um modelo",
+    "chooseModelYear": "Escolha o ano do modelo",
+    "noVehicleInfo": "Falha ao carregar dados do veículo. Tente novamente",
+    "invalidManufactureYear": "Ano de fabricação inválido",
+    "invalidPlate": "A placa deve estar no formato AAA0A00",
+    "choosePurchaseDate": "Escolha a data de compra",
+    "invalidPurchasePrice": "Preço de compra inválido",
+    "alreadySold": "Esse veículo já foi vendido. Sem permissões para fazer alterações",
+    "loadingVehicleDataError": "Erro ao carregar dados do veículo. Tente novamente",
+
+    "chooseVehicle": "Escolha um veículo",
+    "chooseSaleDate": "Escolha a data da venda",
+    "saleBeforePurchase": "Data de venda deve ser após data de compra do veículo",
+    "invalidPrice": "Preço em formato inválido",
+    "dateInterval": "Intervalo de datas",
+    "customer": "Comprador",
+    "customerName": "Nome do comprador",
+    "customerCpf": "CPF do comprador",
+    "salePrice": "Preço de venda",
+    "saleDate": "Data de venda",
+    "soldOn": "Vendido em",
+    "networkProfit": "Lucro da rede",
+    "storeProfit": "Lucro da loja",
+    "safetyProfit": "Lucro do caixa de segurança",
+    "totalPrice": "Preço total",
+
+    "userName": "Nome de usuário",
+    "userEditFailed": "Falha ao editar usuário. Nome já está em uso",
+
+    "totalNetworkProfit": "Lucro total para a rede",
+    "totalStoreProfit": "Lucro total para a loja",
+    "totalSafetyProfit": "Lucro total para o caixa de segurança",
     
-    "settings": "Configurações",
-    "darkMode": "Modo escuro",
+    "darkMode": "Modo Escuro",
     "appLanguage": "Linguagem",
     "english": "Inglês",
-    "portuguese": "Português"
+    "portuguese": "Português",
+
+    "unknownPage": "Erro: Página Desconhecida"
 }

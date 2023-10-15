@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
@@ -11,7 +12,7 @@ import '../../utils/forms.dart';
 
 /// Provider for sale register page
 class SaleRegisterState with ChangeNotifier {
-  /// Constructor
+  /// ructor
   SaleRegisterState({required this.partnerStore, this.onRegister}) {
     init();
   }
@@ -91,26 +92,29 @@ class SaleRegisterState with ChangeNotifier {
   }
 
   /// Method to try registering a sale
-  Future<String?> register() async {
+  Future<String?> register(BuildContext context) async {
+    final localization = AppLocalizations.of(context)!;
+
     // Check if all inputs are set
     if (_saleVehicle == null) {
-      return 'Choose a vehicle';
+      return localization.chooseVehicle;
     }
 
     // Check if sale date is set
     if (saleDate == null) {
-      return 'Sale date is required';
+      // return localization.chooseSaleDate;
+      return 'Choose a sale date';
     }
 
     // Make sure that sale date is newer than vehicle purchase date
     if (saleDate!.compareTo(_saleVehicle!.purchaseDate) < 0) {
-      return 'Sale date needs to be after vehicle purchase date';
+      return localization.saleBeforePurchase;
     }
 
     // Get total price
     final price = double.tryParse(priceController.text);
     if (price == null) {
-      return 'Price is in invalid format';
+      return localization.invalidPrice;
     }
 
     // Calculate store, network and safety profit
@@ -175,6 +179,8 @@ class SaleRegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
     return ChangeNotifierProvider<SaleRegisterState>(
       create: (context) {
         return SaleRegisterState(
@@ -191,8 +197,8 @@ class SaleRegisterForm extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const FormTitle(title: 'Register'),
-                  const TextHeader(label: 'Vehicle'),
+                  FormTitle(title: localization.register),
+                  TextHeader(label: localization.vehicle(1)),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: DropdownButtonFormField<Vehicle>(
@@ -212,30 +218,40 @@ class SaleRegisterForm extends StatelessWidget {
                       onChanged: state.setVehicle,
                     ),
                   ),
-                  const TextHeader(label: 'Customer name'),
+                  TextHeader(label: localization.customerName),
                   FormTextEntry(
-                    label: 'Customer Name',
+                    label: localization.customerName,
                     controller: state.customerNameController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return localization.labelNotEmpty;
+                      }
+                      if (text.length < 3) {
+                        return localization.labelMinSize(3);
+                      }
+                      return null;
+                    },
                   ),
-                  const TextHeader(label: 'Customer CPF'),
+                  TextHeader(label: localization.customerCpf),
                   FormTextEntry(
-                    label: 'Customer CPF',
+                    label: localization.customerCpf,
                     controller: state.customerCpfController,
                   ),
-                  const TextHeader(label: 'Sale price'),
+                  TextHeader(label: localization.salePrice),
                   FormTextEntry(
                     validator: (text) {
                       final price = double.tryParse(text!);
                       if (price == null) {
-                        return 'Price needs to be a number';
+                        return localization.invalidPrice;
                       }
                       return null;
                     },
-                    label: 'Price',
+                    label: localization.salePrice,
                     controller: state.priceController,
                   ),
-                  const TextHeader(label: 'Sale date'),
+                  TextHeader(label: localization.saleDate),
                   DatePicker(
+                    hintText: localization.saleDate,
                     firstDate: state.vehiclePurchaseDate,
                     initialDate: state.saleDate,
                     onDatePicked: state.setDate,
@@ -243,13 +259,13 @@ class SaleRegisterForm extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SubmitButton(
-                      label: 'Register',
+                      label: localization.register,
                       onPressed: () async {
                         // Validate inputs
                         if (!state.formKey.currentState!.validate()) return;
 
                         // Try registering
-                        final result = await state.register();
+                        final result = await state.register(context);
 
                         // Show dialog with register result
                         if (context.mounted) {
