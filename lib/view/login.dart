@@ -34,6 +34,11 @@ class LoginState with ChangeNotifier {
   /// Form key getter
   GlobalKey<FormState> get formKey => _formKey;
 
+  /// Method to set last login
+  void setLastLogin(String? lastLogin) {
+    nameOrCnpjController.text = lastLogin ?? '';
+  }
+
   /// Method for login attempt
   Future<User?> login() async {
     // User object that will be either an admin or normal user (or null
@@ -165,7 +170,7 @@ class LoginForm extends StatelessWidget {
                       }
 
                       // User is valid, set logged user in main state
-                      mainState.setLoggedUser(user);
+                      await mainState.setLoggedUser(user);
 
                       // Go to home page
                       if (context.mounted) {
@@ -175,6 +180,9 @@ class LoginForm extends StatelessWidget {
                             'user': user,
                           },
                         );
+
+                        // After returning to login page, set last login
+                        state.setLastLogin(mainState.lastLogin);
                       }
                     },
                   ),

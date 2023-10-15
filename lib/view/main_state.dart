@@ -20,6 +20,11 @@ class MainState with ChangeNotifier {
   /// Current logged user
   User? get loggedUser => _loggedUser;
 
+  String? _lastLogin;
+
+  /// Last logged user info
+  String? get lastLogin => _lastLogin;
+
   /// Current app language
   AppLanguage get appLanguage => loggedUser != null
       ? loggedUser!.settings.appLanguage
@@ -79,8 +84,17 @@ class MainState with ChangeNotifier {
   }
 
   /// Set new logged user
-  void setLoggedUser(User user) {
+  Future<void> setLoggedUser(User user) async {
+    // Set variable
     _loggedUser = user;
+
+    // Change last login
+    _lastLogin =
+        _loggedUser!.isAdmin ? _loggedUser!.name! : _loggedUser!.store!.cnpj;
+    await _sharedPreferences.setString(
+      'lastLogin',
+      _lastLogin!,
+    );
     notifyListeners();
   }
 }
