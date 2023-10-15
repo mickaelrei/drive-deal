@@ -36,7 +36,7 @@ class PartnerStoreInfoPage extends StatelessWidget {
         InfoText(partnerStore.name),
         TextHeader(label: localization.cnpj),
         InfoText(partnerStore.cnpj),
-        TextHeader(label: localization.autonomyLevel(2)),
+        TextHeader(label: localization.autonomyLevel(1)),
         InfoText(partnerStore.autonomyLevel.label),
         TextHeader(label: localization.registeredVehicles),
         InfoText(partnerStore.vehicles.length.toString()),

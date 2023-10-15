@@ -176,7 +176,7 @@ class PartnerStoreEditPage extends StatelessWidget {
                   label: localization.cnpj,
                   controller: state.cnpjController,
                 ),
-                TextHeader(label: localization.autonomyLevel(2)),
+                TextHeader(label: localization.autonomyLevel(1)),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AutonomyLevelDropdown(
