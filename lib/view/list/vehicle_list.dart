@@ -10,6 +10,7 @@ import '../../entities/partner_store.dart';
 import '../../entities/vehicle.dart';
 import '../../repositories/vehicle_repository.dart';
 import '../../usecases/vehicle_use_case.dart';
+import '../main_state.dart';
 
 /// Provider for vehicle listing page
 class VehicleListState with ChangeNotifier {
@@ -77,6 +78,7 @@ class VehicleListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainState = Provider.of<MainState>(context, listen: false);
     final localization = AppLocalizations.of(context)!;
 
     // Scaffold body
@@ -109,10 +111,11 @@ class VehicleListPage extends StatelessWidget {
                     vehicle: vehicle,
                     images: state._vehicleImages[vehicle],
                     onEdit: () async {
-                      await context.pushNamed(
-                        'vehicle_edit',
+                      await context.push(
+                        '/vehicle/edit/${vehicle.id}',
                         extra: {
                           'vehicle': vehicle,
+                          'user_id': mainState.loggedUser?.id,
                           'on_edit': state.onEdit,
                         },
                       );
@@ -133,12 +136,12 @@ class VehicleListPage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () async {
-              // Wait until finished registering vehicles
-              await context.pushNamed(
-                'vehicle_register',
+              await context.push(
+                '/vehicle/register',
                 extra: {
                   'partner_store': partnerStore,
                   'on_register': onVehicleRegister,
+                  'user_id': mainState.loggedUser?.id,
                 },
               );
             },
@@ -173,15 +176,18 @@ class VehicleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainState = Provider.of<MainState>(context, listen: false);
+
     return Card(
       elevation: 5,
       shadowColor: Colors.grey,
       child: ListTile(
         onTap: () async {
-          await context.pushNamed(
-            'vehicle_info',
+          await context.push(
+            '/vehicle/info/${vehicle.id}',
             extra: {
               'vehicle': vehicle,
+              'user_id': mainState.loggedUser?.id,
             },
           );
         },

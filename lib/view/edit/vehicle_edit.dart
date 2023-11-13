@@ -418,177 +418,181 @@ class VehicleEditForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<VehicleEditState>(
-      create: (context) {
-        return VehicleEditState(
-          vehicle: vehicle,
-          onEdit: onEdit,
-        );
-      },
-      child: Consumer<VehicleEditState>(
-        builder: (_, state, __) {
-          // If still loading info
-          if (state.loading) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(title: Text(localization.editVehicle)),
+      body: ChangeNotifierProvider<VehicleEditState>(
+        create: (context) {
+          return VehicleEditState(
+            vehicle: vehicle,
+            onEdit: onEdit,
+          );
+        },
+        child: Consumer<VehicleEditState>(
+          builder: (_, state, __) {
+            // If still loading info
+            if (state.loading) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator.adaptive(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: Text(
+                        localization.loading,
+                        style: const TextStyle(fontSize: 17),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // If an error occured while loading
+            if (state.error) {
+              return Center(
+                child: Text(
+                  localization.loadingVehicleDataError,
+                  style: const TextStyle(fontSize: 17),
+                ),
+              );
+            }
+
+            // Create preview images
+            final previewImages = <Widget>[];
+            for (final path in state.imagePaths) {
+              previewImages.add(Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: VehicleImagePreview(
+                  imagePath: path,
+                  onDelete: () {
+                    state.removeImage(path);
+                  },
+                ),
+              ));
+            }
+
+            return Form(
+              key: state.formKey,
+              child: ListView(
                 children: [
-                  const CircularProgressIndicator.adaptive(),
+                  FormTitle(title: localization.edit),
+                  TextHeader(label: localization.brand),
+                  FutureDropdown<FipeBrand>(
+                    initialSelected: state._currentBrand,
+                    future: state.brands,
+                    onChanged: state.setBrand,
+                    dropdownBuilder: (item) {
+                      return Text(item.name);
+                    },
+                  ),
+                  TextHeader(label: localization.model),
+                  FutureDropdown<FipeModel>(
+                    initialSelected: state._currentModel,
+                    future: state.models,
+                    onChanged: state.setModel,
+                    dropdownBuilder: (item) {
+                      return Text(item.name);
+                    },
+                  ),
+                  TextHeader(label: localization.modelYear),
+                  FutureDropdown<FipeModelYear>(
+                    initialSelected: state._currentModelYear,
+                    future: state.modelYears,
+                    onChanged: state.setModelYear,
+                    dropdownBuilder: (item) {
+                      return Text(item.name);
+                    },
+                  ),
+                  TextHeader(label: localization.fipePrice),
+                  FutureBuilder(
+                    future: state.currentVehicleInfo,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 12.0,
+                          ),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.data == null) {
+                        // Empty text entry
+                        return const FormTextEntry(
+                          enabled: false,
+                        );
+                      }
+
+                      return FormTextEntry(
+                        text: formatPrice(snapshot.data!.price),
+                        enabled: false,
+                      );
+                    },
+                  ),
+                  TextHeader(label: localization.purchasePrice),
+                  FormTextEntry(
+                    label: localization.purchasePrice,
+                    controller: state.purchasePriceController,
+                  ),
+                  TextHeader(label: localization.manufactureYear),
+                  FormTextEntry(
+                    label: localization.manufactureYear,
+                    controller: state.manufactureYearController,
+                  ),
+                  TextHeader(label: localization.plate),
+                  FormTextEntry(
+                    label: localization.plate,
+                    controller: state.plateController,
+                  ),
+                  TextHeader(label: localization.purchaseDate),
+                  DatePicker(
+                    hintText: localization.purchaseDate,
+                    initialDate: state.purchaseDate,
+                    onDatePicked: state.setDate,
+                  ),
+                  TextHeader(label: localization.images),
                   Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: Text(
-                      localization.loading,
-                      style: const TextStyle(fontSize: 17),
+                    padding: const EdgeInsets.all(8.0),
+                    child: VehicleImagesScrollView(
+                      addFromCamera: state.addImageFromCamera,
+                      addFromGallery: state.addImagesFromGallery,
+                      previewImages: previewImages,
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SubmitButton(
+                      label: localization.edit,
+                      onPressed: () async {
+                        // Validate inputs
+                        if (!state.formKey.currentState!.validate()) return;
+
+                        // Try editing
+                        final result = await state.edit(context);
+
+                        // Show dialog with edit result
+                        if (context.mounted) {
+                          await editDialog(context, result);
+                        }
+
+                        // Exit from edit page
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
                 ],
               ),
             );
-          }
-
-          // If an error occured while loading
-          if (state.error) {
-            return Center(
-              child: Text(
-                localization.loadingVehicleDataError,
-                style: const TextStyle(fontSize: 17),
-              ),
-            );
-          }
-
-          // Create preview images
-          final previewImages = <Widget>[];
-          for (final path in state.imagePaths) {
-            previewImages.add(Padding(
-              padding: const EdgeInsets.only(left: 4.0),
-              child: VehicleImagePreview(
-                imagePath: path,
-                onDelete: () {
-                  state.removeImage(path);
-                },
-              ),
-            ));
-          }
-
-          return Form(
-            key: state.formKey,
-            child: ListView(
-              children: [
-                FormTitle(title: localization.edit),
-                TextHeader(label: localization.brand),
-                FutureDropdown<FipeBrand>(
-                  initialSelected: state._currentBrand,
-                  future: state.brands,
-                  onChanged: state.setBrand,
-                  dropdownBuilder: (item) {
-                    return Text(item.name);
-                  },
-                ),
-                TextHeader(label: localization.model),
-                FutureDropdown<FipeModel>(
-                  initialSelected: state._currentModel,
-                  future: state.models,
-                  onChanged: state.setModel,
-                  dropdownBuilder: (item) {
-                    return Text(item.name);
-                  },
-                ),
-                TextHeader(label: localization.modelYear),
-                FutureDropdown<FipeModelYear>(
-                  initialSelected: state._currentModelYear,
-                  future: state.modelYears,
-                  onChanged: state.setModelYear,
-                  dropdownBuilder: (item) {
-                    return Text(item.name);
-                  },
-                ),
-                TextHeader(label: localization.fipePrice),
-                FutureBuilder(
-                  future: state.currentVehicleInfo,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 12.0,
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-
-                    if (snapshot.data == null) {
-                      // Empty text entry
-                      return const FormTextEntry(
-                        enabled: false,
-                      );
-                    }
-
-                    return FormTextEntry(
-                      text: formatPrice(snapshot.data!.price),
-                      enabled: false,
-                    );
-                  },
-                ),
-                TextHeader(label: localization.purchasePrice),
-                FormTextEntry(
-                  label: localization.purchasePrice,
-                  controller: state.purchasePriceController,
-                ),
-                TextHeader(label: localization.manufactureYear),
-                FormTextEntry(
-                  label: localization.manufactureYear,
-                  controller: state.manufactureYearController,
-                ),
-                TextHeader(label: localization.plate),
-                FormTextEntry(
-                  label: localization.plate,
-                  controller: state.plateController,
-                ),
-                TextHeader(label: localization.purchaseDate),
-                DatePicker(
-                  hintText: localization.purchaseDate,
-                  initialDate: state.purchaseDate,
-                  onDatePicked: state.setDate,
-                ),
-                TextHeader(label: localization.images),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: VehicleImagesScrollView(
-                    addFromCamera: state.addImageFromCamera,
-                    addFromGallery: state.addImagesFromGallery,
-                    previewImages: previewImages,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SubmitButton(
-                    label: localization.edit,
-                    onPressed: () async {
-                      // Validate inputs
-                      if (!state.formKey.currentState!.validate()) return;
-
-                      // Try editing
-                      final result = await state.edit(context);
-
-                      // Show dialog with edit result
-                      if (context.mounted) {
-                        await editDialog(context, result);
-                      }
-
-                      // Exit from edit page
-                      if (result == null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                )
-              ],
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }

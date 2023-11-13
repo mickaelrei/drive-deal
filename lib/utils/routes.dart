@@ -21,6 +21,7 @@ import '../view/register/autonomy_level_register.dart';
 import '../view/register/partner_store_register.dart';
 import '../view/register/sale_register.dart';
 import '../view/register/vehicle_register.dart';
+import 'use_cases.dart';
 
 /// Application main router, using package go_router
 final router = GoRouter(
@@ -43,10 +44,12 @@ final router = GoRouter(
     GoRoute(
       path: '/vehicle',
       redirect: (context, state) {
+        print('redirect /vehicle');
         final fullPath = state.fullPath;
 
         // Route /vehicle is not supposed to be accessed
         if (fullPath == '/vehicle') {
+          print('wha');
           return '/';
         }
 
@@ -54,41 +57,200 @@ final router = GoRouter(
       },
       routes: [
         GoRoute(
-          path: ':id',
+          path: 'info/:id',
+          redirect: (context, state) async {
+            print('redirect /vehicle/info/:id');
+            // Get args
+            final args = state.extra as Map<String, dynamic>;
+            var vehicle = args['vehicle'] as Vehicle?;
+            final userId = args['user_id'] as int?;
+
+            // If vehicle object was not passed, get it from path arg
+            final vehicleId = state.pathParameters['id']!;
+            final id = int.tryParse(vehicleId);
+            if (id == null) {
+              throw 'Expected a not-null integer as vehicle id, got: $id';
+            }
+
+            // Load vehicle from db
+            vehicle = await vehicleUseCase.selectById(id);
+
+            // Check for valid args
+            if (vehicle == null || userId == null) {
+              return '/';
+            }
+
+            // Check if any of the permission rules are met:
+            // 1 - user is an admin
+            // 2 - user is owner of store in which the vehicle is registered in
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (user.isAdmin) {
+              // Can proceed
+              return null;
+            }
+
+            // Check if store id is the same
+            if (user.store?.id == vehicle.storeId) {
+              // Can proceed
+              return null;
+            }
+
+            // If all fails, then user doesn't have permission
+            return '/';
+          },
           builder: (context, state) {
-            final vehicle = state.extra as Vehicle?;
+            // Get path args
             final vehicleId = state.pathParameters['id']!;
 
-            final localization = AppLocalizations.of(context)!;
+            // Get args
+            final args = state.extra as Map<String, dynamic>;
+            final vehicle = args['vehicle'] as Vehicle?;
+            final userId = args['user_id'] as int?;
+
+            // Check for valid args
+            if (userId == null) {
+              throw 'Expected a valid not-null '
+                  'integer as user id, got: $userId';
+            }
 
             // If a vehicle object was passed, use it on widget
             if (vehicle != null) {
-              return Scaffold(
-                resizeToAvoidBottomInset: false,
-                appBar: AppBar(
-                  title: Text(localization.vehicleInfo),
-                ),
-                body: VehicleInfoPage(
-                  vehicle: vehicle,
-                ),
-              );
+              return VehicleInfoPage(vehicle: vehicle);
             }
 
-            // Check if id is a valid number
+            // Check if vehicle id is a valid number
             final id = int.tryParse(vehicleId);
             if (id == null) {
               throw 'Expected a valid integer as vehicle id, got: $vehicleId';
             }
 
             // If no vehicle object was passed, use path id
-            return Scaffold(
-              resizeToAvoidBottomInset: false,
-              appBar: AppBar(
-                title: Text(localization.vehicleInfo),
-              ),
-              body: VehicleInfoPage(
-                vehicleId: id,
-              ),
+            return VehicleInfoPage(vehicleId: id);
+          },
+        ),
+        GoRoute(
+          path: 'register',
+          redirect: (context, state) async {
+            print('redirect /vehicle/register');
+            // Get args
+            final args = state.extra as Map<String, dynamic>;
+            final userId = args['user_id'] as int?;
+            final partnerStore = args['partner_store'] as PartnerStore?;
+
+            // Check for valid args
+            if (userId == null || partnerStore == null) {
+              return '/';
+            }
+
+            // A vehicle can be registered on a store only by
+            // the owner of the store, so check if:
+            // 1 - user exists and is owner of the store
+            // 2 - user is not an admin
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (user.isAdmin) {
+              // Can't register
+              return '/';
+            }
+
+            // Check store id
+            if (user.store?.id != partnerStore.id) {
+              // Different id, not the owner
+              return '/';
+            }
+
+            // If reached here, user has permission to register
+            return null;
+          },
+          builder: (context, state) {
+            final args = state.extra as Map<String, dynamic>;
+            final partnerStore = args['partner_store'] as PartnerStore?;
+            if (partnerStore == null) {
+              throw 'Expected a not-null partner store, got: $partnerStore';
+            }
+
+            return VehicleRegisterForm(
+              partnerStore: partnerStore,
+              onRegister: args['on_register'],
+            );
+          },
+        ),
+        GoRoute(
+          path: 'edit/:id',
+          redirect: (context, state) async {
+            print('redirect /vehicle/edit/:id');
+            // Get args
+            final args = state.extra as Map<String, dynamic>;
+            var vehicle = args['vehicle'] as Vehicle?;
+            final userId = args['user_id'] as int?;
+
+            // If vehicle object was not passed, get it from path arg
+            final vehicleId = state.pathParameters['id']!;
+            final id = int.tryParse(vehicleId);
+            if (id == null) {
+              throw 'Expected a not-null integer as vehicle id, got: $id';
+            }
+
+            // Load vehicle from db
+            vehicle = await vehicleUseCase.selectById(id);
+
+            // Check for valid args
+            if (vehicle == null || userId == null) {
+              return '/';
+            }
+
+            // A vehicle registered in a store can be edited only by
+            // the owner of the store, so check if:
+            // 1 - user exists and is owner of the store
+            // 2 - user is not an admin
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (user.isAdmin) {
+              // Can't edit
+              return '/';
+            }
+
+            // Check store id
+            if (user.store?.id != vehicle.storeId) {
+              // Different id, not the owner
+              return '/';
+            }
+
+            // If reached here, user has permission to edit
+            return null;
+          },
+          builder: (context, state) {
+            final args = state.extra as Map<String, dynamic>;
+            final vehicle = args['vehicle'] as Vehicle?;
+            if (vehicle == null) {
+              throw 'Expected a not-null vehicle, got: $vehicle';
+            }
+
+            return VehicleEditForm(
+              vehicle: vehicle,
+              onEdit: args['on_edit'],
             );
           },
         ),
@@ -356,17 +518,9 @@ Widget vehicleRegisterRoute(BuildContext context, GoRouterState state) {
     );
   }
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    resizeToAvoidBottomInset: false,
-    appBar: AppBar(
-      title: Text(localization.registerVehicle),
-    ),
-    body: VehicleRegisterForm(
-      partnerStore: partnerStore,
-      onRegister: args['on_register'],
-    ),
+  return VehicleRegisterForm(
+    partnerStore: partnerStore,
+    onRegister: args['on_register'],
   );
 }
 
@@ -392,17 +546,9 @@ Widget vehicleEditRoute(BuildContext context, GoRouterState state) {
     );
   }
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    resizeToAvoidBottomInset: false,
-    appBar: AppBar(
-      title: Text(localization.editVehicle),
-    ),
-    body: VehicleEditForm(
-      vehicle: vehicle,
-      onEdit: args['on_edit'],
-    ),
+  return VehicleEditForm(
+    vehicle: vehicle,
+    onEdit: args['on_edit'],
   );
 }
 
@@ -428,17 +574,7 @@ Widget vehicleInfoRoute(BuildContext context, GoRouterState state) {
     );
   }
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    resizeToAvoidBottomInset: false,
-    appBar: AppBar(
-      title: Text(localization.vehicleInfo),
-    ),
-    body: VehicleInfoPage(
-      vehicle: vehicle,
-    ),
-  );
+  return VehicleInfoPage(vehicle: vehicle);
 }
 
 /// Function to handle /sale_register route

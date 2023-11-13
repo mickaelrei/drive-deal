@@ -22,6 +22,11 @@ class VehicleInfoState with ChangeNotifier {
     unawaited(init(vehicle));
   }
 
+  bool _loaded = false;
+
+  /// Whether the vehicle has loaded or not
+  bool get loaded => _loaded;
+
   /// From which vehicle to show info
   late final Vehicle? vehicle;
 
@@ -49,12 +54,14 @@ class VehicleInfoState with ChangeNotifier {
       this.vehicle = await _vehicleUseCase.selectById(vehicleId!);
     }
 
-    // Only load images if the vehicle was found
-    if (this.vehicle == null) return;
+    // Set loaded
+    _loaded = true;
 
-    // Load images
-    for (final vehicleImage in this.vehicle!.images) {
-      images.add(_vehicleImageUseCase.loadImage(vehicleImage.name));
+    // Only load images if the vehicle was found
+    if (this.vehicle != null) {
+      for (final vehicleImage in this.vehicle!.images) {
+        images.add(_vehicleImageUseCase.loadImage(vehicleImage.name));
+      }
     }
     notifyListeners();
   }
@@ -76,98 +83,113 @@ class VehicleInfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<VehicleInfoState>(
-      create: (context) {
-        return VehicleInfoState(vehicle: vehicle, vehicleId: vehicleId);
-      },
-      child: Consumer<VehicleInfoState>(
-        builder: (_, state, __) {
-          final vehicle = state.vehicle;
-
-          // Check if vehicle was found
-          if (vehicle == null) {
-            return const Center(
-              child: Text(
-                'Vehicle not found!',
-                style: TextStyle(fontSize: 25),
-              ),
-            );
-          }
-
-          // Load images
-          final Widget images;
-          if (vehicle.images.isEmpty) {
-            images = Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: Text(
-                localization.noImages,
-                style: const TextStyle(fontSize: 25),
-              ),
-            );
-          } else {
-            images = CarouselSlider.builder(
-              itemCount: vehicle.images.length,
-              itemBuilder: (context, index, realIndex) {
-                final width = MediaQuery.of(context).size.width;
-
-                return FutureBuilder(
-                  future: state.images[index],
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-
-                    if (snapshot.data == null) {
-                      return Text(localization.imageLoadFailed);
-                    }
-
-                    return Image.file(
-                      snapshot.data!,
-                      width: width,
-                      fit: BoxFit.contain,
-                    );
-                  },
-                );
-              },
-              options: CarouselOptions(
-                enlargeCenterPage: true,
-                autoPlay: true,
-                enableInfiniteScroll: false,
-              ),
-            );
-          }
-
-          return ListView(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: TextHeader(label: localization.images),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: images,
-              ),
-              TextHeader(label: localization.brand),
-              InfoText(vehicle.brand),
-              TextHeader(label: localization.model),
-              InfoText(vehicle.model),
-              TextHeader(label: localization.modelYear),
-              InfoText(vehicle.modelYear),
-              TextHeader(label: localization.manufactureYear),
-              InfoText(vehicle.year.toString()),
-              TextHeader(label: localization.fipePrice),
-              InfoText(formatPrice(vehicle.fipePrice)),
-              TextHeader(label: localization.purchasePrice),
-              InfoText(formatPrice(vehicle.purchasePrice)),
-              TextHeader(label: localization.purchaseDate),
-              InfoText(formatDate(vehicle.purchaseDate)),
-              TextHeader(label: localization.soldYet),
-              InfoText(vehicle.sold ? localization.yes : localization.no),
-              TextHeader(label: localization.plate),
-              InfoText(vehicle.plate),
-            ],
-          );
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(localization.vehicleInfo),
+      ),
+      resizeToAvoidBottomInset: false,
+      body: ChangeNotifierProvider<VehicleInfoState>(
+        create: (context) {
+          return VehicleInfoState(vehicle: vehicle, vehicleId: vehicleId);
         },
+        child: Consumer<VehicleInfoState>(
+          builder: (_, state, __) {
+            // Check if still loading
+            if (!state.loaded) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            // Get vehicle
+            final vehicle = state.vehicle;
+
+            // Check if vehicle was found
+            if (vehicle == null) {
+              return const Center(
+                child: Text(
+                  'Vehicle not found!',
+                  style: TextStyle(fontSize: 25),
+                ),
+              );
+            }
+
+            // Load images
+            final Widget images;
+            if (vehicle.images.isEmpty) {
+              images = Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Text(
+                  localization.noImages,
+                  style: const TextStyle(fontSize: 25),
+                ),
+              );
+            } else {
+              images = CarouselSlider.builder(
+                itemCount: vehicle.images.length,
+                itemBuilder: (context, index, realIndex) {
+                  final width = MediaQuery.of(context).size.width;
+
+                  return FutureBuilder(
+                    future: state.images[index],
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.data == null) {
+                        return Text(localization.imageLoadFailed);
+                      }
+
+                      return Image.file(
+                        snapshot.data!,
+                        width: width,
+                        fit: BoxFit.contain,
+                      );
+                    },
+                  );
+                },
+                options: CarouselOptions(
+                  enlargeCenterPage: true,
+                  autoPlay: true,
+                  enableInfiniteScroll: false,
+                ),
+              );
+            }
+
+            // Build main widget
+            return ListView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: TextHeader(label: localization.images),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: images,
+                ),
+                TextHeader(label: localization.brand),
+                InfoText(vehicle.brand),
+                TextHeader(label: localization.model),
+                InfoText(vehicle.model),
+                TextHeader(label: localization.modelYear),
+                InfoText(vehicle.modelYear),
+                TextHeader(label: localization.manufactureYear),
+                InfoText(vehicle.year.toString()),
+                TextHeader(label: localization.fipePrice),
+                InfoText(formatPrice(vehicle.fipePrice)),
+                TextHeader(label: localization.purchasePrice),
+                InfoText(formatPrice(vehicle.purchasePrice)),
+                TextHeader(label: localization.purchaseDate),
+                InfoText(formatDate(vehicle.purchaseDate)),
+                TextHeader(label: localization.soldYet),
+                InfoText(vehicle.sold ? localization.yes : localization.no),
+                TextHeader(label: localization.plate),
+                InfoText(vehicle.plate),
+              ],
+            );
+          },
+        ),
       ),
     );
 

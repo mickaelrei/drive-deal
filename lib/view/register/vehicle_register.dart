@@ -331,150 +331,155 @@ class VehicleRegisterForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<VehicleRegisterState>(
-      create: (context) {
-        return VehicleRegisterState(
-          partnerStore: partnerStore,
-          onRegister: onRegister,
-        );
-      },
-      child: Consumer<VehicleRegisterState>(
-        builder: (_, state, __) {
-          // Create preview images
-          final previewImages = <Widget>[];
-          for (final path in state.imagePaths) {
-            previewImages.add(Padding(
-              padding: const EdgeInsets.only(left: 4.0),
-              child: VehicleImagePreview(
-                imagePath: path,
-                onDelete: () {
-                  state.removeImage(path);
-                },
-              ),
-            ));
-          }
-
-          return SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Form(
-              key: state.formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  FormTitle(title: localization.register),
-                  TextHeader(label: localization.brand),
-                  FutureDropdown<FipeBrand>(
-                    initialSelected: state._currentBrand,
-                    future: state.brands,
-                    onChanged: state.setBrand,
-                    dropdownBuilder: (item) {
-                      return Text(item.name);
-                    },
-                  ),
-                  TextHeader(label: localization.model),
-                  FutureDropdown<FipeModel>(
-                    future: state.models,
-                    onChanged: state.setModel,
-                    dropdownBuilder: (item) {
-                      return Text(item.name);
-                    },
-                  ),
-                  TextHeader(label: localization.modelYear),
-                  FutureDropdown<FipeModelYear>(
-                    future: state.modelYears,
-                    onChanged: state.setModelYear,
-                    dropdownBuilder: (item) {
-                      return Text(item.name);
-                    },
-                  ),
-                  TextHeader(label: localization.fipePrice),
-                  FutureBuilder(
-                    future: state.currentVehicleInfo,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 12.0,
-                          ),
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-
-                      if (snapshot.data == null) {
-                        // Empty text entry
-                        return const FormTextEntry(
-                          enabled: false,
-                        );
-                      }
-
-                      return FormTextEntry(
-                        text: formatPrice(snapshot.data!.price),
-                        enabled: false,
-                      );
-                    },
-                  ),
-                  TextHeader(label: localization.purchasePrice),
-                  FormTextEntry(
-                    label: localization.purchasePrice,
-                    controller: state.purchasePriceController,
-                  ),
-                  TextHeader(label: localization.manufactureYear),
-                  FormTextEntry(
-                    label: localization.manufactureYear,
-                    controller: state.manufactureYearController,
-                  ),
-                  TextHeader(label: localization.plate),
-                  FormTextEntry(
-                    label: localization.plate,
-                    controller: state.plateController,
-                  ),
-                  TextHeader(label: localization.purchaseDate),
-                  DatePicker(
-                    hintText: localization.purchaseDate,
-                    initialDate: state.purchaseDate,
-                    onDatePicked: state.setDate,
-                  ),
-                  TextHeader(label: localization.images),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: VehicleImagesScrollView(
-                      addFromCamera: state.addImageFromCamera,
-                      addFromGallery: state.addImagesFromGallery,
-                      previewImages: previewImages,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SubmitButton(
-                      label: localization.register,
-                      onPressed: () async {
-                        // Validate inputs
-                        if (!state.formKey.currentState!.validate()) return;
-
-                        // Try registering
-                        final result = await state.register(context);
-
-                        // Show dialog with register result
-                        if (context.mounted) {
-                          await registerDialog(context, result);
-                        }
-
-                        // Return to list page
-                        if (result == null) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(title: Text(localization.registerVehicle)),
+      body: ChangeNotifierProvider<VehicleRegisterState>(
+        create: (context) {
+          return VehicleRegisterState(
+            partnerStore: partnerStore,
+            onRegister: onRegister,
           );
         },
+        child: Consumer<VehicleRegisterState>(
+          builder: (_, state, __) {
+            // Create preview images
+            final previewImages = <Widget>[];
+            for (final path in state.imagePaths) {
+              previewImages.add(Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: VehicleImagePreview(
+                  imagePath: path,
+                  onDelete: () {
+                    state.removeImage(path);
+                  },
+                ),
+              ));
+            }
+
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Form(
+                key: state.formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FormTitle(title: localization.register),
+                    TextHeader(label: localization.brand),
+                    FutureDropdown<FipeBrand>(
+                      initialSelected: state._currentBrand,
+                      future: state.brands,
+                      onChanged: state.setBrand,
+                      dropdownBuilder: (item) {
+                        return Text(item.name);
+                      },
+                    ),
+                    TextHeader(label: localization.model),
+                    FutureDropdown<FipeModel>(
+                      future: state.models,
+                      onChanged: state.setModel,
+                      dropdownBuilder: (item) {
+                        return Text(item.name);
+                      },
+                    ),
+                    TextHeader(label: localization.modelYear),
+                    FutureDropdown<FipeModelYear>(
+                      future: state.modelYears,
+                      onChanged: state.setModelYear,
+                      dropdownBuilder: (item) {
+                        return Text(item.name);
+                      },
+                    ),
+                    TextHeader(label: localization.fipePrice),
+                    FutureBuilder(
+                      future: state.currentVehicleInfo,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 12.0,
+                            ),
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+
+                        if (snapshot.data == null) {
+                          // Empty text entry
+                          return const FormTextEntry(
+                            enabled: false,
+                          );
+                        }
+
+                        return FormTextEntry(
+                          text: formatPrice(snapshot.data!.price),
+                          enabled: false,
+                        );
+                      },
+                    ),
+                    TextHeader(label: localization.purchasePrice),
+                    FormTextEntry(
+                      label: localization.purchasePrice,
+                      controller: state.purchasePriceController,
+                    ),
+                    TextHeader(label: localization.manufactureYear),
+                    FormTextEntry(
+                      label: localization.manufactureYear,
+                      controller: state.manufactureYearController,
+                    ),
+                    TextHeader(label: localization.plate),
+                    FormTextEntry(
+                      label: localization.plate,
+                      controller: state.plateController,
+                    ),
+                    TextHeader(label: localization.purchaseDate),
+                    DatePicker(
+                      hintText: localization.purchaseDate,
+                      initialDate: state.purchaseDate,
+                      onDatePicked: state.setDate,
+                    ),
+                    TextHeader(label: localization.images),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: VehicleImagesScrollView(
+                        addFromCamera: state.addImageFromCamera,
+                        addFromGallery: state.addImagesFromGallery,
+                        previewImages: previewImages,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SubmitButton(
+                        label: localization.register,
+                        onPressed: () async {
+                          // Validate inputs
+                          if (!state.formKey.currentState!.validate()) return;
+
+                          // Try registering
+                          final result = await state.register(context);
+
+                          // Show dialog with register result
+                          if (context.mounted) {
+                            await registerDialog(context, result);
+                          }
+
+                          // Return to list page
+                          if (result == null) {
+                            // ignore: use_build_context_synchronously
+                            Navigator.of(context).pop();
+                          }
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

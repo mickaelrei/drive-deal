@@ -6,9 +6,14 @@ import 'package:provider/provider.dart';
 
 import 'entities/user.dart';
 import 'utils/routes.dart';
+import 'utils/use_cases.dart';
 import 'view/main_state.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeUseCases();
+
   runApp(const MyApp());
 }
 
