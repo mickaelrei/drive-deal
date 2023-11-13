@@ -44,12 +44,10 @@ final router = GoRouter(
     GoRoute(
       path: '/vehicle',
       redirect: (context, state) {
-        print('redirect /vehicle');
         final fullPath = state.fullPath;
 
         // Route /vehicle is not supposed to be accessed
         if (fullPath == '/vehicle') {
-          print('wha');
           return '/';
         }
 
@@ -59,7 +57,6 @@ final router = GoRouter(
         GoRoute(
           path: 'info/:id',
           redirect: (context, state) async {
-            print('redirect /vehicle/info/:id');
             // Get args
             final args = state.extra as Map<String, dynamic>;
             var vehicle = args['vehicle'] as Vehicle?;
@@ -139,7 +136,6 @@ final router = GoRouter(
         GoRoute(
           path: 'register',
           redirect: (context, state) async {
-            print('redirect /vehicle/register');
             // Get args
             final args = state.extra as Map<String, dynamic>;
             final userId = args['user_id'] as int?;
@@ -193,7 +189,6 @@ final router = GoRouter(
         GoRoute(
           path: 'edit/:id',
           redirect: (context, state) async {
-            print('redirect /vehicle/edit/:id');
             // Get args
             final args = state.extra as Map<String, dynamic>;
             var vehicle = args['vehicle'] as Vehicle?;
@@ -256,22 +251,6 @@ final router = GoRouter(
         ),
       ],
     ),
-
-    // GoRoute(
-    //   name: 'vehicle_register',
-    //   path: '/vehicle_register',
-    //   builder: vehicleRegisterRoute,
-    // ),
-    // GoRoute(
-    //   name: 'vehicle_edit',
-    //   path: '/vehicle_edit',
-    //   builder: vehicleEditRoute,
-    // ),
-    // GoRoute(
-    //   name: 'vehicle_info',
-    //   path: '/vehicle_info',
-    //   builder: vehicleInfoRoute,
-    // ),
     GoRoute(
       name: 'user_edit',
       path: '/user_edit',
