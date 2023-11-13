@@ -25,6 +25,11 @@ class VehicleUseCase {
     return _vehicleRepository.select();
   }
 
+  /// Method to select from db by given id
+  Future<Vehicle?> selectById(int id) async {
+    return _vehicleRepository.selectById(id);
+  }
+
   /// Method to insert a [Vehicle] in the database
   Future<void> insert(Vehicle vehicle, [List<String>? imagePaths]) async {
     // Insert vehicle
