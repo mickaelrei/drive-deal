@@ -38,7 +38,8 @@ class MyApp extends StatelessWidget {
           log('Current language: ${state.appLanguage.name}');
           log('Current theme: ${state.appTheme.name}');
 
-          return MaterialApp(
+          return MaterialApp.router(
+            routerConfig: router,
             locale: locale,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
@@ -48,22 +49,6 @@ class MyApp extends StatelessWidget {
               ),
             ),
             debugShowCheckedModeBanner: false,
-            initialRoute: '/login',
-            routes: const {
-              '/login': loginRoute,
-              '/home': homeRoute,
-              '/user_edit': userEditRoute,
-              '/store_register': storeRegisterRoute,
-              '/store_edit': storeEditRoute,
-              '/store_info': storeInfoRoute,
-              '/vehicle_register': vehicleRegisterRoute,
-              '/vehicle_edit': vehicleEditRoute,
-              '/vehicle_info': vehicleInfoRoute,
-              '/sale_register': saleRegisterRoute,
-              '/sale_info': saleInfoRoute,
-              '/autonomy_level_register': autonomyLevelRegisterRoute,
-              '/autonomy_level_edit': autonomyLevelEditRoute,
-            },
           );
         },
       ),

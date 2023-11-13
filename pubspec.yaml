@@ -46,6 +46,7 @@ dependencies:
   carousel_slider: ^4.2.1
   flutter_localizations:
     sdk: flutter
+  go_router: ^12.1.1
 
 dev_dependencies:
   flutter_test:

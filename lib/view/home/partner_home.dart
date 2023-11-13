@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
@@ -228,9 +229,9 @@ class PartnerInfoPage extends StatelessWidget {
           IconButton(
             onPressed: () async {
               // Go in edit route
-              await Navigator.of(context).pushNamed(
-                '/store_edit',
-                arguments: {
+              await context.pushNamed(
+                'store_edit',
+                extra: {
                   'user': user,
                   'partner_store': user.store!,
                 },

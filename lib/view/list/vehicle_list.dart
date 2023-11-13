@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
@@ -108,9 +109,9 @@ class VehicleListPage extends StatelessWidget {
                     vehicle: vehicle,
                     images: state._vehicleImages[vehicle],
                     onEdit: () async {
-                      await Navigator.of(context).pushNamed(
-                        '/vehicle_edit',
-                        arguments: {
+                      await context.pushNamed(
+                        'vehicle_edit',
+                        extra: {
                           'vehicle': vehicle,
                           'on_edit': state.onEdit,
                         },
@@ -133,9 +134,9 @@ class VehicleListPage extends StatelessWidget {
           IconButton(
             onPressed: () async {
               // Wait until finished registering vehicles
-              await Navigator.of(context).pushNamed(
-                '/vehicle_register',
-                arguments: {
+              await context.pushNamed(
+                'vehicle_register',
+                extra: {
                   'partner_store': partnerStore,
                   'on_register': onVehicleRegister,
                 },
@@ -177,9 +178,9 @@ class VehicleTile extends StatelessWidget {
       shadowColor: Colors.grey,
       child: ListTile(
         onTap: () async {
-          await Navigator.of(context).pushNamed(
-            '/vehicle_info',
-            arguments: {
+          await context.pushNamed(
+            'vehicle_info',
+            extra: {
               'vehicle': vehicle,
             },
           );

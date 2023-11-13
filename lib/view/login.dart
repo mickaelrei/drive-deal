@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../entities/user.dart';
@@ -174,12 +175,9 @@ class LoginForm extends StatelessWidget {
 
                       // Go to home page
                       if (context.mounted) {
-                        await Navigator.of(context).pushNamed(
-                          '/home',
-                          arguments: {
-                            'user': user,
-                          },
-                        );
+                        await context.pushNamed('home', extra: {
+                          'user': user,
+                        });
 
                         // After returning to login page, set last login
                         state.setLastLogin(mainState.lastLogin);

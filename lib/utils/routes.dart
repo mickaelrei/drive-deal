@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 import '../entities/autonomy_level.dart';
 import '../entities/partner_store.dart';
@@ -21,16 +22,146 @@ import '../view/register/partner_store_register.dart';
 import '../view/register/sale_register.dart';
 import '../view/register/vehicle_register.dart';
 
+/// Application main router, using package go_router
+final router = GoRouter(
+  initialLocation: '/login',
+  routes: [
+    GoRoute(
+      path: '/',
+      redirect: (context, state) => '/login',
+    ),
+    GoRoute(
+      name: 'login',
+      path: '/login',
+      builder: loginRoute,
+    ),
+    GoRoute(
+      name: 'home',
+      path: '/home',
+      builder: homeRoute,
+    ),
+    GoRoute(
+      path: '/vehicle',
+      redirect: (context, state) {
+        final fullPath = state.fullPath;
+
+        // Route /vehicle is not supposed to be accessed
+        if (fullPath == '/vehicle') {
+          return '/';
+        }
+
+        return null;
+      },
+      routes: [
+        GoRoute(
+          path: ':id',
+          builder: (context, state) {
+            final vehicle = state.extra as Vehicle?;
+            final vehicleId = state.pathParameters['id']!;
+
+            final localization = AppLocalizations.of(context)!;
+
+            // If a vehicle object was passed, use it on widget
+            if (vehicle != null) {
+              return Scaffold(
+                resizeToAvoidBottomInset: false,
+                appBar: AppBar(
+                  title: Text(localization.vehicleInfo),
+                ),
+                body: VehicleInfoPage(
+                  vehicle: vehicle,
+                ),
+              );
+            }
+
+            // Check if id is a valid number
+            final id = int.tryParse(vehicleId);
+            if (id == null) {
+              throw 'Expected a valid integer as vehicle id, got: $vehicleId';
+            }
+
+            // If no vehicle object was passed, use path id
+            return Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                title: Text(localization.vehicleInfo),
+              ),
+              body: VehicleInfoPage(
+                vehicleId: id,
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+
+    // GoRoute(
+    //   name: 'vehicle_register',
+    //   path: '/vehicle_register',
+    //   builder: vehicleRegisterRoute,
+    // ),
+    // GoRoute(
+    //   name: 'vehicle_edit',
+    //   path: '/vehicle_edit',
+    //   builder: vehicleEditRoute,
+    // ),
+    // GoRoute(
+    //   name: 'vehicle_info',
+    //   path: '/vehicle_info',
+    //   builder: vehicleInfoRoute,
+    // ),
+    GoRoute(
+      name: 'user_edit',
+      path: '/user_edit',
+      builder: userEditRoute,
+    ),
+    GoRoute(
+      name: 'store_register',
+      path: '/store_register',
+      builder: storeRegisterRoute,
+    ),
+    GoRoute(
+      name: 'store_edit',
+      path: '/store_edit',
+      builder: storeEditRoute,
+    ),
+    GoRoute(
+      name: 'store_info',
+      path: '/store_info',
+      builder: storeInfoRoute,
+    ),
+    GoRoute(
+      name: 'sale_register',
+      path: '/sale_register',
+      builder: saleRegisterRoute,
+    ),
+    GoRoute(
+      name: 'sale_info',
+      path: '/sale_info',
+      builder: saleInfoRoute,
+    ),
+    GoRoute(
+      name: 'autonomy_level_register',
+      path: '/autonomy_level_register',
+      builder: autonomyLevelRegisterRoute,
+    ),
+    GoRoute(
+      name: 'autonomy_level_edit',
+      path: '/autonomy_level_edit',
+      builder: autonomyLevelEditRoute,
+    ),
+  ],
+);
+
 /// Function to handle /login route
-Widget loginRoute(BuildContext context) {
+Widget loginRoute(BuildContext context, GoRouterState state) {
   return const LoginPage();
 }
 
 /// Function to handle /home route
-Widget homeRoute(BuildContext context) {
+Widget homeRoute(BuildContext context, GoRouterState state) {
   // Get args to decide whether to open admin or partner home page
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['user'] is! User) {
     throw ArgumentError.value(
@@ -59,9 +190,8 @@ Widget homeRoute(BuildContext context) {
 }
 
 /// Function to handle /user_edit route
-Widget userEditRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget userEditRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['user'] is! User) {
     throw ArgumentError.value(
@@ -98,9 +228,8 @@ Widget userEditRoute(BuildContext context) {
 }
 
 /// Function to handle /store_register route
-Widget storeRegisterRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget storeRegisterRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   final localization = AppLocalizations.of(context)!;
 
@@ -115,9 +244,8 @@ Widget storeRegisterRoute(BuildContext context) {
 }
 
 /// Function to handle /store_edit route
-Widget storeEditRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget storeEditRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['user'] is! User) {
     throw ArgumentError.value(
@@ -172,9 +300,8 @@ Widget storeEditRoute(BuildContext context) {
 }
 
 /// Function to handle /store_info route
-Widget storeInfoRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget storeInfoRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['partner_store'] is! PartnerStore) {
     throw ArgumentError.value(
@@ -208,9 +335,8 @@ Widget storeInfoRoute(BuildContext context) {
 }
 
 /// Function to handle /vehicle_register route
-Widget vehicleRegisterRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget vehicleRegisterRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['partner_store'] is! PartnerStore) {
     throw ArgumentError.value(
@@ -245,9 +371,8 @@ Widget vehicleRegisterRoute(BuildContext context) {
 }
 
 /// Function to handle /vehicle_edit route
-Widget vehicleEditRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget vehicleEditRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['vehicle'] is! Vehicle) {
     throw ArgumentError.value(
@@ -282,9 +407,8 @@ Widget vehicleEditRoute(BuildContext context) {
 }
 
 /// Function to handle /vehicle_info route
-Widget vehicleInfoRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget vehicleInfoRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['vehicle'] is! Vehicle) {
     throw ArgumentError.value(
@@ -318,9 +442,8 @@ Widget vehicleInfoRoute(BuildContext context) {
 }
 
 /// Function to handle /sale_register route
-Widget saleRegisterRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget saleRegisterRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['partner_store'] is! PartnerStore) {
     throw ArgumentError.value(
@@ -355,9 +478,8 @@ Widget saleRegisterRoute(BuildContext context) {
 }
 
 /// Function to handle /sale_info route
-Widget saleInfoRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget saleInfoRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['sale'] is! Sale) {
     throw ArgumentError.value(
@@ -391,9 +513,8 @@ Widget saleInfoRoute(BuildContext context) {
 }
 
 /// Function to handle /autonomy_level_register route
-Widget autonomyLevelRegisterRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget autonomyLevelRegisterRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   final localization = AppLocalizations.of(context)!;
 
@@ -409,9 +530,8 @@ Widget autonomyLevelRegisterRoute(BuildContext context) {
 }
 
 /// Function to handle /autonomy_level_edit route
-Widget autonomyLevelEditRoute(BuildContext context) {
-  final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+Widget autonomyLevelEditRoute(BuildContext context, GoRouterState state) {
+  final args = state.extra as Map<String, dynamic>;
 
   if (args['autonomy_level'] is! AutonomyLevel) {
     throw ArgumentError.value(

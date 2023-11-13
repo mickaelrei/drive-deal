@@ -8,22 +8,31 @@ import 'package:provider/provider.dart';
 
 import '../../entities/vehicle.dart';
 import '../../repositories/vehicle_image_repository.dart';
+import '../../repositories/vehicle_repository.dart';
 import '../../usecases/vehicle_image_use_case.dart';
+import '../../usecases/vehicle_use_case.dart';
 import '../../utils/formats.dart';
 import '../../utils/forms.dart';
 
 /// Provider for vehicle info page
 class VehicleInfoState with ChangeNotifier {
   /// Constructor
-  VehicleInfoState({required this.vehicle}) {
-    unawaited(init());
+  VehicleInfoState({Vehicle? vehicle, this.vehicleId})
+      : assert(vehicle != null || vehicleId != null) {
+    unawaited(init(vehicle));
   }
 
   /// From which vehicle to show info
-  final Vehicle vehicle;
+  late final Vehicle? vehicle;
+
+  /// Vehicle ID in case no [Vehicle] is passed
+  final int? vehicleId;
 
   /// List of images of [vehicle]
   final images = <Future<File>>[];
+
+  /// To load vehicle
+  final _vehicleUseCase = const VehicleUseCase(VehicleRepository());
 
   /// To load vehicle images
   final _vehicleImageUseCase = const VehicleImageUseCase(
@@ -31,9 +40,20 @@ class VehicleInfoState with ChangeNotifier {
   );
 
   /// Initialize data
-  Future<void> init() async {
+  Future<void> init(Vehicle? vehicle) async {
+    // Initialize vehicle
+    if (vehicle != null) {
+      this.vehicle = vehicle;
+    } else {
+      // Get vehicle from given id
+      this.vehicle = await _vehicleUseCase.selectById(vehicleId!);
+    }
+
+    // Only load images if the vehicle was found
+    if (this.vehicle == null) return;
+
     // Load images
-    for (final vehicleImage in vehicle.images) {
+    for (final vehicleImage in this.vehicle!.images) {
       images.add(_vehicleImageUseCase.loadImage(vehicleImage.name));
     }
     notifyListeners();
@@ -43,33 +63,49 @@ class VehicleInfoState with ChangeNotifier {
 /// Widget to show detailed info about a [Vehicle]
 class VehicleInfoPage extends StatelessWidget {
   /// Constructor
-  const VehicleInfoPage({required this.vehicle, super.key});
+  const VehicleInfoPage({this.vehicle, this.vehicleId, super.key})
+      : assert(vehicle != null || vehicleId != null);
 
   /// Vehicle object
-  final Vehicle vehicle;
+  final Vehicle? vehicle;
+
+  /// Vehicle id
+  final int? vehicleId;
 
   @override
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    // Load images
-    final Widget images;
-    if (vehicle.images.isEmpty) {
-      images = Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: Text(
-          localization.noImages,
-          style: const TextStyle(fontSize: 25),
-        ),
-      );
-    } else {
-      images = ChangeNotifierProvider<VehicleInfoState>(
-        create: (context) {
-          return VehicleInfoState(vehicle: vehicle);
-        },
-        child: Consumer<VehicleInfoState>(
-          builder: (_, state, __) {
-            return CarouselSlider.builder(
+    return ChangeNotifierProvider<VehicleInfoState>(
+      create: (context) {
+        return VehicleInfoState(vehicle: vehicle, vehicleId: vehicleId);
+      },
+      child: Consumer<VehicleInfoState>(
+        builder: (_, state, __) {
+          final vehicle = state.vehicle;
+
+          // Check if vehicle was found
+          if (vehicle == null) {
+            return const Center(
+              child: Text(
+                'Vehicle not found!',
+                style: TextStyle(fontSize: 25),
+              ),
+            );
+          }
+
+          // Load images
+          final Widget images;
+          if (vehicle.images.isEmpty) {
+            images = Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Text(
+                localization.noImages,
+                style: const TextStyle(fontSize: 25),
+              ),
+            );
+          } else {
+            images = CarouselSlider.builder(
               itemCount: vehicle.images.length,
               itemBuilder: (context, index, realIndex) {
                 final width = MediaQuery.of(context).size.width;
@@ -99,40 +135,133 @@ class VehicleInfoPage extends StatelessWidget {
                 enableInfiniteScroll: false,
               ),
             );
-          },
-        ),
-      );
-    }
+          }
 
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: TextHeader(label: localization.images),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: images,
-        ),
-        TextHeader(label: localization.brand),
-        InfoText(vehicle.brand),
-        TextHeader(label: localization.model),
-        InfoText(vehicle.model),
-        TextHeader(label: localization.modelYear),
-        InfoText(vehicle.modelYear),
-        TextHeader(label: localization.manufactureYear),
-        InfoText(vehicle.year.toString()),
-        TextHeader(label: localization.fipePrice),
-        InfoText(formatPrice(vehicle.fipePrice)),
-        TextHeader(label: localization.purchasePrice),
-        InfoText(formatPrice(vehicle.purchasePrice)),
-        TextHeader(label: localization.purchaseDate),
-        InfoText(formatDate(vehicle.purchaseDate)),
-        TextHeader(label: localization.soldYet),
-        InfoText(vehicle.sold ? localization.yes : localization.no),
-        TextHeader(label: localization.plate),
-        InfoText(vehicle.plate),
-      ],
+          return ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: TextHeader(label: localization.images),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: images,
+              ),
+              TextHeader(label: localization.brand),
+              InfoText(vehicle.brand),
+              TextHeader(label: localization.model),
+              InfoText(vehicle.model),
+              TextHeader(label: localization.modelYear),
+              InfoText(vehicle.modelYear),
+              TextHeader(label: localization.manufactureYear),
+              InfoText(vehicle.year.toString()),
+              TextHeader(label: localization.fipePrice),
+              InfoText(formatPrice(vehicle.fipePrice)),
+              TextHeader(label: localization.purchasePrice),
+              InfoText(formatPrice(vehicle.purchasePrice)),
+              TextHeader(label: localization.purchaseDate),
+              InfoText(formatDate(vehicle.purchaseDate)),
+              TextHeader(label: localization.soldYet),
+              InfoText(vehicle.sold ? localization.yes : localization.no),
+              TextHeader(label: localization.plate),
+              InfoText(vehicle.plate),
+            ],
+          );
+        },
+      ),
     );
+
+    // Load images
+    // final Widget images;
+    // if (vehicle.images.isEmpty) {
+    //   images = Padding(
+    //     padding: const EdgeInsets.only(left: 16.0),
+    //     child: Text(
+    //       localization.noImages,
+    //       style: const TextStyle(fontSize: 25),
+    //     ),
+    //   );
+    // } else {
+    //   images = ChangeNotifierProvider<VehicleInfoState>(
+    //     create: (context) {
+    //       return VehicleInfoState(vehicle: vehicle);
+    //     },
+    //     child: Consumer<VehicleInfoState>(
+    //       builder: (_, state, __) {
+    //         return CarouselSlider.builder(
+    //           itemCount: vehicle.images.length,
+    //           itemBuilder: (context, index, realIndex) {
+    //             final width = MediaQuery.of(context).size.width;
+
+    //             return FutureBuilder(
+    //               future: state.images[index],
+    //               builder: (context, snapshot) {
+    //                 if (snapshot.connectionState == ConnectionState.waiting) {
+    //                   return const CircularProgressIndicator();
+    //                 }
+
+    //                 if (snapshot.data == null) {
+    //                   return Text(localization.imageLoadFailed);
+    //                 }
+
+    //                 return Image.file(
+    //                   snapshot.data!,
+    //                   width: width,
+    //                   fit: BoxFit.contain,
+    //                 );
+    //               },
+    //             );
+    //           },
+    //           options: CarouselOptions(
+    //             enlargeCenterPage: true,
+    //             autoPlay: true,
+    //             enableInfiniteScroll: false,
+    //           ),
+    //         );
+    //       },
+    //     ),
+    //   );
+    // }
+
+    // return ListView(
+    //   children: [
+    //     Padding(
+    //       padding: const EdgeInsets.only(top: 8.0),
+    //       child: TextHeader(label: localization.images),
+    //     ),
+    //     Padding(
+    //       padding: const EdgeInsets.symmetric(vertical: 8.0),
+    //       child: images,
+    //     ),
+    //     TextHeader(label: localization.brand),
+    //     InfoText(vehicle.brand),
+    //     TextHeader(label: localization.model),
+    //     InfoText(vehicle.model),
+    //     TextHeader(label: localization.modelYear),
+    //     InfoText(vehicle.modelYear),
+    //     TextHeader(label: localization.manufactureYear),
+    //     InfoText(vehicle.year.toString()),
+    //     TextHeader(label: localization.fipePrice),
+    //     InfoText(formatPrice(vehicle.fipePrice)),
+    //     TextHeader(label: localization.purchasePrice),
+    //     InfoText(formatPrice(vehicle.purchasePrice)),
+    //     TextHeader(label: localization.purchaseDate),
+    //     InfoText(formatDate(vehicle.purchaseDate)),
+    //     TextHeader(label: localization.soldYet),
+    //     InfoText(vehicle.sold ? localization.yes : localization.no),
+    //     TextHeader(label: localization.plate),
+    //     InfoText(vehicle.plate),
+    //   ],
+    // );
   }
 }
+
+/*
+
+/vehicles
+/vehicles/:id?user_id=$num
+/vehicles/register?user_id=$num
+/vehicles/edit?vehicle_id=$num&user_id=$num
+/vehicles/list?user_id=$num
+
+*/

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
@@ -61,9 +62,9 @@ class PartnerStoreListPage extends StatelessWidget {
               partnerStore: partnerStore,
               onEdit: () async {
                 // Go in edit route
-                await Navigator.of(context).pushNamed(
-                  '/store_edit',
-                  arguments: {
+                await context.pushNamed(
+                  'store_edit',
+                  extra: {
                     'user': user,
                     'partner_store': partnerStore,
                   },
@@ -87,9 +88,9 @@ class PartnerStoreListPage extends StatelessWidget {
           IconButton(
             onPressed: () async {
               // Wait until finished registering stores
-              await Navigator.of(context).pushNamed(
-                '/store_register',
-                arguments: {
+              await context.pushNamed(
+                'store_register',
+                extra: {
                   'on_register': onPartnerStoreRegister,
                 },
               );
@@ -128,9 +129,9 @@ class PartnerStoreTile extends StatelessWidget {
       shadowColor: Colors.grey,
       child: ListTile(
         onTap: () async {
-          await Navigator.of(context).pushNamed(
-            '/store_info',
-            arguments: {
+          await context.pushNamed(
+            'store_info',
+            extra: {
               'partner_store': partnerStore,
             },
           );

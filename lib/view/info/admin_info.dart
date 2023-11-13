@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
@@ -41,9 +42,9 @@ class AdminInfoPage extends StatelessWidget {
           IconButton(
             onPressed: () async {
               // Go in edit route
-              await Navigator.of(context).pushNamed(
-                '/user_edit',
-                arguments: {
+              await context.pushNamed(
+                'user_edit',
+                extra: {
                   'user': user,
                   'on_edit': onUserEdit,
                 },

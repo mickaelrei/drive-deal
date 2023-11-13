@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
@@ -202,9 +203,9 @@ class SaleListPage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () async {
-              await Navigator.of(context).pushNamed(
-                '/sale_register',
-                arguments: {
+              await context.pushNamed(
+                'sale_register',
+                extra: {
                   'partner_store': partnerStore,
                   'on_register': onSaleRegister,
                 },
@@ -240,9 +241,9 @@ class SaleTile extends StatelessWidget {
       shadowColor: Colors.grey,
       child: ListTile(
         onTap: () async {
-          await Navigator.of(context).pushNamed(
-            '/sale_info',
-            arguments: {
+          await context.pushNamed(
+            'sale_info',
+            extra: {
               'sale': sale,
             },
           );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../entities/autonomy_level.dart';
 
@@ -68,9 +69,9 @@ class AutonomyLevelListPage extends StatelessWidget {
           IconButton(
             onPressed: () async {
               // Wait until finished registering stores
-              await Navigator.of(context).pushNamed(
-                '/autonomy_level_register',
-                arguments: {
+              await context.pushNamed(
+                'autonomy_level_register',
+                extra: {
                   'on_register': onRegister,
                 },
               );
@@ -116,9 +117,9 @@ class AutonomyLevelTile extends StatelessWidget {
         trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () async {
-            await Navigator.of(context).pushNamed(
-              '/autonomy_level_edit',
-              arguments: {
+            await context.pushNamed(
+              'autonomy_level_edit',
+              extra: {
                 'on_edit': onEdit,
                 'autonomy_level': autonomyLevel,
               },
