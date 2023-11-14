@@ -293,7 +293,6 @@ final router = GoRouter(
             final args = state.extra as Map<String, dynamic>?;
             if (args == null) {
               // Args is needed to get user id
-              print('no args');
               return '/';
             }
             var store = args['partner_store'] as PartnerStore?;
