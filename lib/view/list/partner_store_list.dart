@@ -93,6 +93,7 @@ class PartnerStoreListPage extends StatelessWidget {
               await context.push(
                 '/store/register',
                 extra: {
+                  'user_id': user.id,
                   'on_register': onPartnerStoreRegister,
                 },
               );
