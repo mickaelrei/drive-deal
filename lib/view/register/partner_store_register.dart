@@ -128,13 +128,9 @@ class PartnerStoreRegisterState with ChangeNotifier {
 class PartnerStoreRegisterForm extends StatelessWidget {
   /// Constructor
   const PartnerStoreRegisterForm({
-    this.navBar,
     required this.onRegister,
     super.key,
   });
-
-  /// Page navigation bar
-  final Widget? navBar;
 
   /// Callback to be called when a [PartnerStore] gets registered
   final void Function(PartnerStore)? onRegister;
@@ -143,87 +139,91 @@ class PartnerStoreRegisterForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<PartnerStoreRegisterState>(
-      create: (context) {
-        return PartnerStoreRegisterState(onRegister: onRegister);
-      },
-      child: Consumer<PartnerStoreRegisterState>(
-        builder: (_, state, __) {
-          return Form(
-            key: state.formKey,
-            child: ListView(
-              children: [
-                FormTitle(title: localization.register),
-                TextHeader(label: localization.name),
-                FormTextEntry(
-                  label: localization.name,
-                  controller: state.nameController,
-                  validator: (text) {
-                    if (text == null || text.isEmpty) {
-                      return localization.nameNotEmpty;
-                    }
-                    if (text.length < 3) {
-                      return localization.nameMinSize(3);
-                    }
-                    if (text.length > 120) {
-                      return localization.nameMaxSize(120);
-                    }
-                    // Valid
-                    return null;
-                  },
-                ),
-                TextHeader(label: localization.cnpj),
-                FormTextEntry(
-                  label: localization.cnpj,
-                  controller: state.cnpjController,
-                  validator: (text) {
-                    if (text == null || text.isEmpty || text.length != 14) {
-                      return localization.invalidCnpj;
-                    }
-                    // Valid
-                    return null;
-                  },
-                ),
-                TextHeader(label: localization.autonomyLevel(1)),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, left: 8.0),
-                  child: AutonomyLevelDropdown(
-                    items: state.autonomyLevels,
-                    controller: state.autonomyLevelController,
-                    initialSelection: state.chosenAutonomyLevel,
-                    onSelected: (autonomyLevel) {
-                      state.chosenAutonomyLevel = autonomyLevel;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SubmitButton(
-                    label: localization.register,
-                    onPressed: () async {
-                      // Validate inputs
-                      if (!state.formKey.currentState!.validate()) return;
-
-                      // Try registering
-                      final result = await state.register(context);
-
-                      // Show dialog with register result
-                      if (context.mounted) {
-                        await registerDialog(context, result);
-                      }
-
-                      // Return to list page
-                      if (result == null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                )
-              ],
-            ),
-          );
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(title: Text(localization.registerPartnerStore)),
+      body: ChangeNotifierProvider<PartnerStoreRegisterState>(
+        create: (context) {
+          return PartnerStoreRegisterState(onRegister: onRegister);
         },
+        child: Consumer<PartnerStoreRegisterState>(
+          builder: (_, state, __) {
+            return Form(
+              key: state.formKey,
+              child: ListView(
+                children: [
+                  FormTitle(title: localization.register),
+                  TextHeader(label: localization.name),
+                  FormTextEntry(
+                    label: localization.name,
+                    controller: state.nameController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return localization.nameNotEmpty;
+                      }
+                      if (text.length < 3) {
+                        return localization.nameMinSize(3);
+                      }
+                      if (text.length > 120) {
+                        return localization.nameMaxSize(120);
+                      }
+                      // Valid
+                      return null;
+                    },
+                  ),
+                  TextHeader(label: localization.cnpj),
+                  FormTextEntry(
+                    label: localization.cnpj,
+                    controller: state.cnpjController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty || text.length != 14) {
+                        return localization.invalidCnpj;
+                      }
+                      // Valid
+                      return null;
+                    },
+                  ),
+                  TextHeader(label: localization.autonomyLevel(1)),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+                    child: AutonomyLevelDropdown(
+                      items: state.autonomyLevels,
+                      controller: state.autonomyLevelController,
+                      initialSelection: state.chosenAutonomyLevel,
+                      onSelected: (autonomyLevel) {
+                        state.chosenAutonomyLevel = autonomyLevel;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SubmitButton(
+                      label: localization.register,
+                      onPressed: () async {
+                        // Validate inputs
+                        if (!state.formKey.currentState!.validate()) return;
+
+                        // Try registering
+                        final result = await state.register(context);
+
+                        // Show dialog with register result
+                        if (context.mounted) {
+                          await registerDialog(context, result);
+                        }
+
+                        // Return to list page
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

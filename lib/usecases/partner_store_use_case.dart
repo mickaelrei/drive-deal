@@ -18,6 +18,11 @@ class PartnerStoreUseCase {
     return _partnerStoreRepository.select();
   }
 
+  /// Method to select by given id
+  Future<PartnerStore?> selectById(int id) async {
+    return _partnerStoreRepository.selectById(id);
+  }
+
   /// Method to select by given CNPJ
   Future<PartnerStore?> selectByCNPJ(String cnpj) async {
     return _partnerStoreRepository.selectByCNPJ(cnpj);

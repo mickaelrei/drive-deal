@@ -6,11 +6,12 @@ import 'package:provider/provider.dart';
 
 import '../../entities/autonomy_level.dart';
 import '../../entities/partner_store.dart';
-import '../../entities/user.dart';
 import '../../repositories/autonomy_level_repository.dart';
 import '../../repositories/partner_store_repository.dart';
+import '../../repositories/user_repository.dart';
 import '../../usecases/autonomy_level_use_case.dart';
 import '../../usecases/partner_store_use_case.dart';
+import '../../usecases/user_use_case.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/forms.dart';
 
@@ -18,11 +19,17 @@ import '../../utils/forms.dart';
 class PartnerStoreEditState with ChangeNotifier {
   /// Constructor
   PartnerStoreEditState({
+    required int userId,
     required this.partnerStore,
     this.onEdit,
   }) {
-    unawaited(init());
+    unawaited(init(userId));
   }
+
+  /// Whether this user can change the autonomy level for this store
+  bool get canChangeAutonomyLevel => _canChangeAutonomyLevel;
+
+  bool _canChangeAutonomyLevel = false;
 
   /// Reference to partner store object
   final PartnerStore partnerStore;
@@ -40,6 +47,9 @@ class PartnerStoreEditState with ChangeNotifier {
     const PartnerStoreRepository(),
   );
 
+  /// To get user from given userId
+  final _userUseCase = UserUseCase(const UserRepository());
+
   /// To get all [AutonomyLevel]s from database
   final _autonomyLevelUseCase = const AutonomyLevelUseCase(
     AutonomyLevelRepository(),
@@ -52,16 +62,24 @@ class PartnerStoreEditState with ChangeNotifier {
   final cnpjController = TextEditingController();
 
   /// Currently selected autonomy level
-  late AutonomyLevel _selectedAutonomyLevel;
+  AutonomyLevel? _selectedAutonomyLevel;
 
   /// Get current selected autonomy level
-  AutonomyLevel get selectedAutonomyLevel => _selectedAutonomyLevel;
+  AutonomyLevel? get selectedAutonomyLevel => _selectedAutonomyLevel;
 
   /// List of all autonomy levels
   final autonomyLevels = <AutonomyLevel>[];
 
   /// Initialize info
-  Future<void> init() async {
+  Future<void> init(int userId) async {
+    // Load user
+    final user = await _userUseCase.selectById(userId);
+
+    // Check if has permission to change autonomy level
+    if (user != null && user.isAdmin) {
+      _canChangeAutonomyLevel = true;
+    }
+
     // Initialize controllers
     nameController.text = partnerStore.name;
     cnpjController.text = partnerStore.cnpj;
@@ -84,6 +102,10 @@ class PartnerStoreEditState with ChangeNotifier {
 
   /// Method to submit an edit on the partner store
   Future<String?> edit(BuildContext context) async {
+    if (_selectedAutonomyLevel == null) {
+      return 'Select an autonomy level';
+    }
+
     final localization = AppLocalizations.of(context)!;
 
     // Check if CNPJ is in valid format
@@ -92,7 +114,7 @@ class PartnerStoreEditState with ChangeNotifier {
       return localization.invalidCnpj;
     }
     // Update info on partner store object
-    partnerStore.autonomyLevel = _selectedAutonomyLevel;
+    partnerStore.autonomyLevel = _selectedAutonomyLevel!;
     partnerStore.name = nameController.text;
     partnerStore.cnpj = cnpj;
 
@@ -120,14 +142,14 @@ class PartnerStoreEditState with ChangeNotifier {
 class PartnerStoreEditPage extends StatelessWidget {
   /// Constructor
   const PartnerStoreEditPage({
-    required this.user,
+    required this.userId,
     required this.partnerStore,
     this.onEdit,
     super.key,
   });
 
   /// To know if the user is an admin or not
-  final User user;
+  final int userId;
 
   /// Which store is getting edited
   final PartnerStore partnerStore;
@@ -139,81 +161,86 @@ class PartnerStoreEditPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<PartnerStoreEditState>(
-      create: (context) {
-        return PartnerStoreEditState(
-          partnerStore: partnerStore,
-          onEdit: onEdit,
-        );
-      },
-      child: Consumer<PartnerStoreEditState>(
-        builder: (_, state, __) {
-          return Form(
-            key: state.formKey,
-            child: ListView(
-              children: [
-                FormTitle(title: localization.edit),
-                TextHeader(label: localization.storeName),
-                FormTextEntry(
-                  label: localization.storeName,
-                  controller: state.nameController,
-                  validator: (text) {
-                    if (text == null || text.isEmpty) {
-                      return localization.nameNotEmpty;
-                    }
-                    if (text.length < 3) {
-                      return localization.nameMinSize(3);
-                    }
-                    if (text.length > 120) {
-                      return localization.nameMaxSize(120);
-                    }
-                    // Valid
-                    return null;
-                  },
-                ),
-                TextHeader(label: localization.cnpj),
-                FormTextEntry(
-                  label: localization.cnpj,
-                  controller: state.cnpjController,
-                ),
-                TextHeader(label: localization.autonomyLevel(1)),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: AutonomyLevelDropdown(
-                    onSelected: state.onAutonomyLevelChanged,
-                    enabled: user.isAdmin,
-                    items: state.autonomyLevels,
-                    initialSelection: state.selectedAutonomyLevel,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SubmitButton(
-                    label: localization.edit,
-                    onPressed: () async {
-                      // Validate inputs
-                      if (!state.formKey.currentState!.validate()) return;
-
-                      // Try editing
-                      final result = await state.edit(context);
-
-                      // Show dialog with edit result
-                      if (context.mounted) {
-                        await editDialog(context, result);
-                      }
-
-                      // Exit from edit page
-                      if (result == null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                )
-              ],
-            ),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(title: Text(localization.editPartnerStore)),
+      body: ChangeNotifierProvider<PartnerStoreEditState>(
+        create: (context) {
+          return PartnerStoreEditState(
+            userId: userId,
+            partnerStore: partnerStore,
+            onEdit: onEdit,
           );
         },
+        child: Consumer<PartnerStoreEditState>(
+          builder: (_, state, __) {
+            return Form(
+              key: state.formKey,
+              child: ListView(
+                children: [
+                  FormTitle(title: localization.edit),
+                  TextHeader(label: localization.storeName),
+                  FormTextEntry(
+                    label: localization.storeName,
+                    controller: state.nameController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return localization.nameNotEmpty;
+                      }
+                      if (text.length < 3) {
+                        return localization.nameMinSize(3);
+                      }
+                      if (text.length > 120) {
+                        return localization.nameMaxSize(120);
+                      }
+                      // Valid
+                      return null;
+                    },
+                  ),
+                  TextHeader(label: localization.cnpj),
+                  FormTextEntry(
+                    label: localization.cnpj,
+                    controller: state.cnpjController,
+                  ),
+                  TextHeader(label: localization.autonomyLevel(1)),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: AutonomyLevelDropdown(
+                      onSelected: state.onAutonomyLevelChanged,
+                      enabled: state.canChangeAutonomyLevel,
+                      items: state.autonomyLevels,
+                      initialSelection: state.selectedAutonomyLevel,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SubmitButton(
+                      label: localization.edit,
+                      onPressed: () async {
+                        // Validate inputs
+                        if (!state.formKey.currentState!.validate()) return;
+
+                        // Try editing
+                        final result = await state.edit(context);
+
+                        // Show dialog with edit result
+                        if (context.mounted) {
+                          await editDialog(context, result);
+                        }
+
+                        // Exit from edit page
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

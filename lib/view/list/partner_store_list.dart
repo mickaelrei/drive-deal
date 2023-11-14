@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../entities/partner_store.dart';
 import '../../entities/user.dart';
+import '../main_state.dart';
 
 /// Widget for listing [PartnerStore]s
 class PartnerStoreListPage extends StatelessWidget {
@@ -62,10 +64,10 @@ class PartnerStoreListPage extends StatelessWidget {
               partnerStore: partnerStore,
               onEdit: () async {
                 // Go in edit route
-                await context.pushNamed(
-                  'store_edit',
+                await context.push(
+                  '/store/edit/${partnerStore.id}',
                   extra: {
-                    'user': user,
+                    'user_id': user.id,
                     'partner_store': partnerStore,
                   },
                 );
@@ -88,8 +90,8 @@ class PartnerStoreListPage extends StatelessWidget {
           IconButton(
             onPressed: () async {
               // Wait until finished registering stores
-              await context.pushNamed(
-                'store_register',
+              await context.push(
+                '/store/register',
                 extra: {
                   'on_register': onPartnerStoreRegister,
                 },
@@ -122,6 +124,7 @@ class PartnerStoreTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainState = Provider.of<MainState>(context, listen: false);
     final localization = AppLocalizations.of(context)!;
 
     return Card(
@@ -129,9 +132,10 @@ class PartnerStoreTile extends StatelessWidget {
       shadowColor: Colors.grey,
       child: ListTile(
         onTap: () async {
-          await context.pushNamed(
-            'store_info',
+          await context.push(
+            '/store/info/${partnerStore.id}',
             extra: {
+              'user_id': mainState.loggedUser?.id,
               'partner_store': partnerStore,
             },
           );

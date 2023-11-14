@@ -42,6 +42,11 @@ final router = GoRouter(
       builder: homeRoute,
     ),
     GoRoute(
+      name: 'user_edit',
+      path: '/user_edit',
+      builder: userEditRoute,
+    ),
+    GoRoute(
       path: '/vehicle',
       redirect: (context, state) {
         final fullPath = state.fullPath;
@@ -58,19 +63,26 @@ final router = GoRouter(
           path: 'info/:id',
           redirect: (context, state) async {
             // Get args
-            final args = state.extra as Map<String, dynamic>;
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Args is needed to get user id
+              return '/';
+            }
             var vehicle = args['vehicle'] as Vehicle?;
             final userId = args['user_id'] as int?;
 
             // If vehicle object was not passed, get it from path arg
-            final vehicleId = state.pathParameters['id']!;
-            final id = int.tryParse(vehicleId);
-            if (id == null) {
-              throw 'Expected a not-null integer as vehicle id, got: $id';
-            }
+            if (vehicle == null) {
+              final vehicleId = state.pathParameters['id']!;
+              final id = int.tryParse(vehicleId);
+              if (id == null) {
+                throw 'Expected a not-null integer as '
+                    'vehicle id, got: $vehicleId';
+              }
 
-            // Load vehicle from db
-            vehicle = await vehicleUseCase.selectById(id);
+              // Load vehicle from db if needed
+              vehicle = await vehicleUseCase.selectById(id);
+            }
 
             // Check for valid args
             if (vehicle == null || userId == null) {
@@ -137,7 +149,11 @@ final router = GoRouter(
           path: 'register',
           redirect: (context, state) async {
             // Get args
-            final args = state.extra as Map<String, dynamic>;
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Need args to get user id
+              return '/';
+            }
             final userId = args['user_id'] as int?;
             final partnerStore = args['partner_store'] as PartnerStore?;
 
@@ -190,19 +206,25 @@ final router = GoRouter(
           path: 'edit/:id',
           redirect: (context, state) async {
             // Get args
-            final args = state.extra as Map<String, dynamic>;
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Need args to get user id
+              return '/';
+            }
             var vehicle = args['vehicle'] as Vehicle?;
             final userId = args['user_id'] as int?;
 
             // If vehicle object was not passed, get it from path arg
-            final vehicleId = state.pathParameters['id']!;
-            final id = int.tryParse(vehicleId);
-            if (id == null) {
-              throw 'Expected a not-null integer as vehicle id, got: $id';
-            }
+            if (vehicle == null) {
+              final vehicleId = state.pathParameters['id']!;
+              final id = int.tryParse(vehicleId);
+              if (id == null) {
+                throw 'Expected a not-null integer as vehicle id, got: $id';
+              }
 
-            // Load vehicle from db
-            vehicle = await vehicleUseCase.selectById(id);
+              // Load vehicle from db
+              vehicle = await vehicleUseCase.selectById(id);
+            }
 
             // Check for valid args
             if (vehicle == null || userId == null) {
@@ -252,9 +274,225 @@ final router = GoRouter(
       ],
     ),
     GoRoute(
-      name: 'user_edit',
-      path: '/user_edit',
-      builder: userEditRoute,
+      path: '/store',
+      redirect: (context, state) {
+        final fullPath = state.fullPath;
+
+        // Route /vehicle is not supposed to be accessed
+        if (fullPath == '/store') {
+          return '/';
+        }
+
+        return null;
+      },
+      routes: [
+        GoRoute(
+          path: 'info/:id',
+          redirect: (context, state) async {
+            // Get args
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Args is needed to get user id
+              print('no args');
+              return '/';
+            }
+            var store = args['partner_store'] as PartnerStore?;
+            final userId = args['user_id'] as int?;
+
+            // If partner store object was not passed, get it from path arg
+            if (store == null) {
+              final storeId = state.pathParameters['id']!;
+              final id = int.tryParse(storeId);
+              if (id == null) {
+                throw 'Expected a not-null integer as '
+                    'partner store id, got: $id';
+              }
+
+              // Load partner store from db
+              store = await partnerStoreUseCase.selectById(id);
+            }
+
+            // Check for valid args
+            if (store == null || userId == null) {
+              return '/';
+            }
+
+            // Check if any of the permission rules are met:
+            // 1 - user is an admin
+            // 2 - user is owner of the store
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (user.isAdmin) {
+              // Can proceed
+              return null;
+            }
+
+            // Check if store id is the same
+            if (user.store?.id == store.id) {
+              // Can proceed
+              return null;
+            }
+
+            // If all fails, then user doesn't have permission
+            return '/';
+          },
+          builder: (context, state) {
+            // Get path args
+            final storeId = state.pathParameters['id']!;
+
+            // Get args
+            final args = state.extra as Map<String, dynamic>;
+            final store = args['partner_store'] as PartnerStore?;
+            final userId = args['user_id'] as int?;
+
+            // Check for valid args
+            if (userId == null) {
+              throw 'Expected a valid not-null '
+                  'integer as user id, got: $userId';
+            }
+
+            // If a partner store object was passed, use it on widget
+            if (store != null) {
+              return PartnerStoreInfoPage(partnerStore: store);
+            }
+
+            // Check if partner store id is a valid number
+            final id = int.tryParse(storeId);
+            if (id == null) {
+              throw 'Expected a valid integer as '
+                  'partner store id, got: $storeId';
+            }
+
+            // If no partner store object was passed, use path id
+            return PartnerStoreInfoPage(partnerStoreId: id);
+          },
+        ),
+        GoRoute(
+          path: 'register',
+          redirect: (context, state) async {
+            // Get args
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Need args to get user id
+              return '/';
+            }
+            final userId = args['user_id'] as int?;
+
+            // Check for valid args
+            if (userId == null) {
+              return '/';
+            }
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // A partner store can only be registered by an admin
+            if (!user.isAdmin) {
+              return '/';
+            }
+
+            // If reached here, user has permission to register
+            return null;
+          },
+          builder: (context, state) {
+            final args = state.extra as Map<String, dynamic>;
+
+            return PartnerStoreRegisterForm(
+              onRegister: args['on_register'],
+            );
+          },
+        ),
+        GoRoute(
+          path: 'edit/:id',
+          redirect: (context, state) async {
+            // Get args
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Need args to get user id
+              return '/';
+            }
+            var partnerStore = args['partner_store'] as PartnerStore?;
+            final userId = args['user_id'] as int?;
+
+            // If partner store object was not passed, get it from path arg
+            if (partnerStore == null) {
+              final partnerStoreId = state.pathParameters['id']!;
+              final id = int.tryParse(partnerStoreId);
+              if (id == null) {
+                throw 'Expected a not-null integer as '
+                    'partner store id, got: $id';
+              }
+
+              // Load partner store from db
+              partnerStore = await partnerStoreUseCase.selectById(id);
+            }
+
+            // Check for valid args
+            if (partnerStore == null || userId == null) {
+              return '/';
+            }
+
+            // A partner store can be edited only by
+            // the owner of the store or by an admin, so check if any apply:
+            // 1 - user exists and is owner of the store
+            // 2 - user is an admin
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (user.isAdmin) {
+              // Can proceed
+              return null;
+            }
+
+            // Check store id
+            if (user.store?.id == partnerStore.id) {
+              // Same id, the owner can proceed
+              return null;
+            }
+
+            // If reached here, user doesn't have permission to edit
+            return null;
+          },
+          builder: (context, state) {
+            // Get args
+            final args = state.extra as Map<String, dynamic>;
+            final partnerStore = args['partner_store'] as PartnerStore?;
+            final userId = args['user_id'] as int?;
+
+            // Check for valid args
+            if (partnerStore == null) {
+              throw 'Expected a not-null partnerStore, got: $partnerStore';
+            }
+            if (userId == null) {
+              throw 'Expected a not-null integer'
+                  ' as user id, got: $userId';
+            }
+
+            return PartnerStoreEditPage(
+              userId: userId,
+              partnerStore: partnerStore,
+              onEdit: args['on_edit'],
+            );
+          },
+        ),
+      ],
     ),
     GoRoute(
       name: 'store_register',
@@ -372,16 +610,7 @@ Widget userEditRoute(BuildContext context, GoRouterState state) {
 Widget storeRegisterRoute(BuildContext context, GoRouterState state) {
   final args = state.extra as Map<String, dynamic>;
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(localization.registerPartnerStore),
-    ),
-    body: PartnerStoreRegisterForm(
-      onRegister: args['on_register'],
-    ),
-  );
+  return PartnerStoreRegisterForm(onRegister: args['on_register']);
 }
 
 /// Function to handle /store_edit route
@@ -423,20 +652,10 @@ Widget storeEditRoute(BuildContext context, GoRouterState state) {
     );
   }
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    resizeToAvoidBottomInset: false,
-    appBar: AppBar(
-      title: Text(localization.editPartnerStore),
-    ),
-    body: Center(
-      child: PartnerStoreEditPage(
-        user: user,
-        partnerStore: partnerStore,
-        onEdit: args['on_edit'],
-      ),
-    ),
+  return PartnerStoreEditPage(
+    userId: user.id!,
+    partnerStore: partnerStore,
+    onEdit: args['on_edit'],
   );
 }
 
@@ -462,17 +681,7 @@ Widget storeInfoRoute(BuildContext context, GoRouterState state) {
     );
   }
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    resizeToAvoidBottomInset: false,
-    appBar: AppBar(
-      title: Text(localization.partnerStoreInfo),
-    ),
-    body: PartnerStoreInfoPage(
-      partnerStore: partnerStore,
-    ),
-  );
+  return PartnerStoreInfoPage(partnerStore: partnerStore);
 }
 
 /// Function to handle /vehicle_register route
