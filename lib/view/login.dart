@@ -38,6 +38,7 @@ class LoginState with ChangeNotifier {
   /// Method to set last login
   void setLastLogin(String? lastLogin) {
     nameOrCnpjController.text = lastLogin ?? '';
+    notifyListeners();
   }
 
   /// Method for login attempt
