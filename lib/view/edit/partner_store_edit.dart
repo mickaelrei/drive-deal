@@ -97,6 +97,8 @@ class PartnerStoreEditState with ChangeNotifier {
 
   /// Method to update selected autonomy level
   void onAutonomyLevelChanged(AutonomyLevel? autonomyLevel) {
+    if (!_canChangeAutonomyLevel) return;
+
     _selectedAutonomyLevel = autonomyLevel!;
   }
 
