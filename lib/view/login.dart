@@ -175,9 +175,10 @@ class LoginForm extends StatelessWidget {
 
                       // Go to home page
                       if (context.mounted) {
-                        await context.pushNamed('home', extra: {
-                          'user': user,
-                        });
+                        await context.push(
+                          '/home',
+                          extra: {'user': user},
+                        );
 
                         // After returning to login page, set last login
                         state.setLastLogin(mainState.lastLogin);
