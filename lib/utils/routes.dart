@@ -467,7 +467,7 @@ final router = GoRouter(
             }
 
             // If reached here, user doesn't have permission to edit
-            return null;
+            return '/';
           },
           builder: (context, state) {
             // Get args
@@ -595,7 +595,6 @@ final router = GoRouter(
         GoRoute(
           path: 'register',
           redirect: (context, state) async {
-            print('/sale/register redirect');
             // Get args
             final args = state.extra as Map<String, dynamic>?;
             if (args == null) {
@@ -638,7 +637,6 @@ final router = GoRouter(
             return null;
           },
           builder: (context, state) {
-            print('/sale/register build');
             final args = state.extra as Map<String, dynamic>;
             final partnerStore = args['partner_store'] as PartnerStore?;
             if (partnerStore == null) {
@@ -654,14 +652,130 @@ final router = GoRouter(
       ],
     ),
     GoRoute(
-      name: 'autonomy_level_register',
-      path: '/autonomy_level_register',
-      builder: autonomyLevelRegisterRoute,
-    ),
-    GoRoute(
-      name: 'autonomy_level_edit',
-      path: '/autonomy_level_edit',
-      builder: autonomyLevelEditRoute,
+      path: '/autonomy_level',
+      redirect: (context, state) {
+        final fullPath = state.fullPath;
+
+        // Route /autonomy_level is not supposed to be accessed
+        if (fullPath == '/autonomy_level') {
+          return '/';
+        }
+
+        return null;
+      },
+      routes: [
+        GoRoute(
+          path: 'register',
+          redirect: (context, state) async {
+            // Get args
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Need args to get user id
+              return '/';
+            }
+            final userId = args['user_id'] as int?;
+
+            // Check for valid args
+            if (userId == null) {
+              return '/';
+            }
+
+            // A sale can only be registered by an admin
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (!user.isAdmin) {
+              // Can't register
+              return '/';
+            }
+
+            // If reached here, user has permission to register
+            return null;
+          },
+          builder: (context, state) {
+            final args = state.extra as Map<String, dynamic>;
+
+            return AutonomyLevelRegisterForm(
+              onRegister: args['on_register'],
+            );
+          },
+        ),
+        GoRoute(
+          path: 'edit/:id',
+          redirect: (context, state) async {
+            // Get args
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Need args to get user id
+              return '/';
+            }
+            var autonomyLevel = args['autonomy_level'] as AutonomyLevel?;
+            final userId = args['user_id'] as int?;
+
+            // If autonomy level object was not passed, get it from path arg
+            if (autonomyLevel == null) {
+              final autonomyLevelId = state.pathParameters['id']!;
+              final id = int.tryParse(autonomyLevelId);
+              if (id == null) {
+                throw 'Expected a not-null integer as '
+                    'autonomy level id, got: $id';
+              }
+
+              // Load autonomy level from db
+              autonomyLevel = await autonomyLevelUseCase.selectById(id);
+            }
+
+            // Check for valid args
+            if (autonomyLevel == null || userId == null) {
+              return '/';
+            }
+
+            // An autonomy level can only be edited by an admin
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (!user.isAdmin) {
+              // Can't edit
+              return '/';
+            }
+
+            // If reached here, user has permission to edit
+            return null;
+          },
+          builder: (context, state) {
+            // Get args
+            final args = state.extra as Map<String, dynamic>;
+            final autonomyLevel = args['autonomy_level'] as AutonomyLevel?;
+            final userId = args['user_id'] as int?;
+
+            // Check for valid args
+            if (autonomyLevel == null) {
+              throw 'Expected a not-null autonomyLevel, got: $autonomyLevel';
+            }
+            if (userId == null) {
+              throw 'Expected a not-null integer'
+                  ' as user id, got: $userId';
+            }
+
+            return AutonomyLevelEditForm(
+              autonomyLevel: autonomyLevel,
+              onEdit: args['on_edit'],
+            );
+          },
+        ),
+      ],
     ),
   ],
 );
@@ -955,16 +1069,7 @@ Widget saleInfoRoute(BuildContext context, GoRouterState state) {
 Widget autonomyLevelRegisterRoute(BuildContext context, GoRouterState state) {
   final args = state.extra as Map<String, dynamic>;
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(localization.registerAutonomyLevel),
-    ),
-    body: AutonomyLevelRegisterForm(
-      onRegister: args['on_register'],
-    ),
-  );
+  return AutonomyLevelRegisterForm(onRegister: args['on_register']);
 }
 
 /// Function to handle /autonomy_level_edit route
@@ -989,15 +1094,8 @@ Widget autonomyLevelEditRoute(BuildContext context, GoRouterState state) {
     );
   }
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(localization.editAutonomyLevel),
-    ),
-    body: AutonomyLevelEditForm(
-      autonomyLevel: autonomyLevel,
-      onEdit: args['on_edit'],
-    ),
+  return AutonomyLevelEditForm(
+    autonomyLevel: autonomyLevel,
+    onEdit: args['on_edit'],
   );
 }
