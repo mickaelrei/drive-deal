@@ -10,6 +10,7 @@ import '../../entities/vehicle.dart';
 import '../../utils/forms.dart';
 import '../list/sale_list.dart';
 import '../list/vehicle_list.dart';
+import '../main_state.dart';
 import '../unknown_page.dart';
 import '../user_settings.dart';
 
@@ -219,20 +220,20 @@ class PartnerInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainState = Provider.of<MainState>(context, listen: false);
     final localization = AppLocalizations.of(context)!;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(localization.home),
         actions: [
           IconButton(
             onPressed: () async {
               // Go in edit route
-              await context.pushNamed(
-                'store_edit',
+              await context.push(
+                '/store/edit/${user.store!.id}',
                 extra: {
-                  'user': user,
+                  'user_id': mainState.loggedUser?.id,
                   'partner_store': user.store!,
                 },
               );

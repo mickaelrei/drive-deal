@@ -130,7 +130,6 @@ class VehicleListPage extends StatelessWidget {
     }
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(localization.vehicle(2)),
         actions: [

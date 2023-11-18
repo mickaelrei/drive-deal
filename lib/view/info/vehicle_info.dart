@@ -87,7 +87,6 @@ class VehicleInfoPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(localization.vehicleInfo),
       ),
-      resizeToAvoidBottomInset: false,
       body: ChangeNotifierProvider<VehicleInfoState>(
         create: (context) {
           return VehicleInfoState(vehicle: vehicle, vehicleId: vehicleId);

@@ -199,7 +199,6 @@ class SaleListPage extends StatelessWidget {
     }
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(localization.sale(2)),
         actions: [

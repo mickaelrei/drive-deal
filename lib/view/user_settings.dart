@@ -75,7 +75,6 @@ class UserSettingsPage extends StatelessWidget {
       child: Consumer<UserSettingsState>(
         builder: (_, state, __) {
           return Scaffold(
-            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               title: Text(localization.settings),
             ),

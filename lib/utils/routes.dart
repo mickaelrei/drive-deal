@@ -727,7 +727,6 @@ Widget userEditRoute(BuildContext context, GoRouterState state) {
   final localization = AppLocalizations.of(context)!;
 
   return Scaffold(
-    resizeToAvoidBottomInset: false,
     appBar: AppBar(
       title: Text(localization.editUser),
     ),
@@ -959,7 +958,6 @@ Widget autonomyLevelRegisterRoute(BuildContext context, GoRouterState state) {
   final localization = AppLocalizations.of(context)!;
 
   return Scaffold(
-    resizeToAvoidBottomInset: false,
     appBar: AppBar(
       title: Text(localization.registerAutonomyLevel),
     ),
@@ -994,7 +992,6 @@ Widget autonomyLevelEditRoute(BuildContext context, GoRouterState state) {
   final localization = AppLocalizations.of(context)!;
 
   return Scaffold(
-    resizeToAvoidBottomInset: false,
     appBar: AppBar(
       title: Text(localization.editAutonomyLevel),
     ),

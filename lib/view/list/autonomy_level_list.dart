@@ -62,7 +62,6 @@ class AutonomyLevelListPage extends StatelessWidget {
     }
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(localization.autonomyLevel(2)),
         actions: [

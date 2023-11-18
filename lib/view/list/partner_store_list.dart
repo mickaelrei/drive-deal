@@ -83,7 +83,6 @@ class PartnerStoreListPage extends StatelessWidget {
       );
     }
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(localization.partnerStore(2)),
         actions: [

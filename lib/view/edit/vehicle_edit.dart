@@ -419,7 +419,6 @@ class VehicleEditForm extends StatelessWidget {
     final localization = AppLocalizations.of(context)!;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(title: Text(localization.editVehicle)),
       body: ChangeNotifierProvider<VehicleEditState>(
         create: (context) {
