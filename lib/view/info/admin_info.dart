@@ -41,8 +41,8 @@ class AdminInfoPage extends StatelessWidget {
           IconButton(
             onPressed: () async {
               // Go in edit route
-              await context.pushNamed(
-                'user_edit',
+              await context.push(
+                '/user/edit/${user.id}',
                 extra: {
                   'user': user,
                   'on_edit': onUserEdit,
