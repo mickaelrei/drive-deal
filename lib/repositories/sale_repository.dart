@@ -29,6 +29,28 @@ class SaleRepository {
     return saleId;
   }
 
+  /// Method to create a [Sale] object from a database query
+  Future<Sale> fromQuery(Map<String, dynamic> query) async {
+    // Get vehicle
+    final vehicle =
+        await _vehicleRepository.selectById(query[SaleTable.vehicleId]);
+
+    // Create vehicle object
+    final sale = Sale(
+      id: query[SaleTable.id],
+      storeId: query[SaleTable.storeId],
+      customerCpf: query[SaleTable.customerCpf],
+      customerName: query[SaleTable.customerName],
+      saleDate: DateTime.fromMillisecondsSinceEpoch(query[SaleTable.saleDate]),
+      storeProfit: query[SaleTable.storeProfit],
+      networkProfit: query[SaleTable.networkProfit],
+      safetyProfit: query[SaleTable.safetyProfit],
+      vehicle: vehicle!,
+    );
+
+    return sale;
+  }
+
   /// Method to get all [Sale] objects in [SaleTable]
   Future<List<Sale>> select() async {
     final database = await getDatabase();
@@ -41,24 +63,29 @@ class SaleRepository {
     // Convert query items to [Sale] objects
     final list = <Sale>[];
     for (final item in result) {
-      final vehicle =
-          await _vehicleRepository.selectById(item[SaleTable.vehicleId]);
-
-      // Add object to list
-      list.add(Sale(
-        id: item[SaleTable.id],
-        storeId: item[SaleTable.storeId],
-        customerCpf: item[SaleTable.customerCpf],
-        customerName: item[SaleTable.customerName],
-        vehicle: vehicle!,
-        saleDate: DateTime.fromMillisecondsSinceEpoch(item[SaleTable.saleDate]),
-        storeProfit: item[SaleTable.storeProfit],
-        networkProfit: item[SaleTable.networkProfit],
-        safetyProfit: item[SaleTable.safetyProfit],
-      ));
+      list.add(await fromQuery(item));
     }
 
     return list;
+  }
+
+  /// Method to select a [Sale] with a given id
+  Future<Sale?> selectById(int id) async {
+    final database = await getDatabase();
+
+    // Query
+    final query = await database.query(
+      SaleTable.tableName,
+      where: '${SaleTable.id} = ?',
+      whereArgs: [id],
+    );
+
+    // Check if exists
+    if (query.isNotEmpty) {
+      return fromQuery(query.first);
+    }
+
+    return null;
   }
 
   /// Method to delete a specific [Sale] from database

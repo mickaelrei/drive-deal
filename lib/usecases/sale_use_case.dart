@@ -15,6 +15,11 @@ class SaleUseCase {
     return _saleRepository.select();
   }
 
+  /// Method to select a sale by given id
+  Future<Sale?> selectById(int id) async {
+    return _saleRepository.selectById(id);
+  }
+
   /// Method to insert a [Sale] in the database
   Future<void> insert(Sale sale) async {
     // Insert sale
