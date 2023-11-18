@@ -190,8 +190,7 @@ class AutonomyLevelRegisterForm extends StatelessWidget {
                         }
 
                         // Go back to autonomy level listing
-                        if (result == null) {
-                          // ignore: use_build_context_synchronously
+                        if (result == null && context.mounted) {
                           Navigator.of(context).pop();
                         }
                       },
