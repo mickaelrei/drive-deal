@@ -101,68 +101,70 @@ class UserEditPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<UserEditState>(
-      create: (context) {
-        return UserEditState(
-          user: user,
-          onEdit: onEdit,
-        );
-      },
-      child: Consumer<UserEditState>(
-        builder: (_, state, __) {
-          return Form(
-            key: state.formKey,
-            child: ListView(
-              children: [
-                FormTitle(title: localization.edit),
-                TextHeader(label: localization.name),
-                FormTextEntry(
-                  label: localization.name,
-                  controller: state.nameController,
-                  validator: (text) {
-                    if (text == null || text.isEmpty) {
-                      return localization.nameNotEmpty;
-                    }
-                    if (text.length < 3) {
-                      return localization.nameMinSize(3);
-                    }
-                    return null;
-                  },
-                ),
-                TextHeader(label: localization.password),
-                FormTextEntry(
-                  label: localization.password,
-                  controller: state.passwordController,
-                  hidden: true,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SubmitButton(
-                    label: localization.edit,
-                    onPressed: () async {
-                      // Validate inputs
-                      if (!state.formKey.currentState!.validate()) return;
-
-                      // Try editing
-                      final result = await state.edit(context);
-
-                      // Show dialog with edit result
-                      if (context.mounted) {
-                        await editDialog(context, result);
-                      }
-
-                      // Exit from edit page
-                      if (result == null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                )
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(title: Text(localization.editUser)),
+      body: ChangeNotifierProvider<UserEditState>(
+        create: (context) {
+          return UserEditState(
+            user: user,
+            onEdit: onEdit,
           );
         },
+        child: Consumer<UserEditState>(
+          builder: (_, state, __) {
+            return Form(
+              key: state.formKey,
+              child: ListView(
+                children: [
+                  FormTitle(title: localization.edit),
+                  TextHeader(label: localization.name),
+                  FormTextEntry(
+                    label: localization.name,
+                    controller: state.nameController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return localization.nameNotEmpty;
+                      }
+                      if (text.length < 3) {
+                        return localization.nameMinSize(3);
+                      }
+                      return null;
+                    },
+                  ),
+                  TextHeader(label: localization.password),
+                  FormTextEntry(
+                    label: localization.password,
+                    controller: state.passwordController,
+                    hidden: true,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SubmitButton(
+                      label: localization.edit,
+                      onPressed: () async {
+                        // Validate inputs
+                        if (!state.formKey.currentState!.validate()) return;
+
+                        // Try editing
+                        final result = await state.edit(context);
+
+                        // Show dialog with edit result
+                        if (context.mounted) {
+                          await editDialog(context, result);
+                        }
+
+                        // Exit from edit page
+                        if (result == null && context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
