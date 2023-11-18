@@ -181,110 +181,113 @@ class SaleRegisterForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<SaleRegisterState>(
-      create: (context) {
-        return SaleRegisterState(
-          partnerStore: partnerStore,
-          onRegister: onRegister,
-        );
-      },
-      child: Consumer<SaleRegisterState>(
-        builder: (_, state, __) {
-          return SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Form(
-              key: state.formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  FormTitle(title: localization.register),
-                  TextHeader(label: localization.vehicle(1)),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField<Vehicle>(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      items: state.availableVehicles
-                          .map(
-                            (e) => DropdownMenuItem<Vehicle>(
-                              value: e,
-                              child: Text(e.model),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: state.setVehicle,
-                    ),
-                  ),
-                  TextHeader(label: localization.customerName),
-                  FormTextEntry(
-                    label: localization.customerName,
-                    controller: state.customerNameController,
-                    validator: (text) {
-                      if (text == null || text.isEmpty) {
-                        return localization.labelNotEmpty;
-                      }
-                      if (text.length < 3) {
-                        return localization.labelMinSize(3);
-                      }
-                      return null;
-                    },
-                  ),
-                  TextHeader(label: localization.customerCpf),
-                  FormTextEntry(
-                    label: localization.customerCpf,
-                    controller: state.customerCpfController,
-                  ),
-                  TextHeader(label: localization.salePrice),
-                  FormTextEntry(
-                    validator: (text) {
-                      final price = double.tryParse(text!);
-                      if (price == null) {
-                        return localization.invalidPrice;
-                      }
-                      return null;
-                    },
-                    label: localization.salePrice,
-                    controller: state.priceController,
-                  ),
-                  TextHeader(label: localization.saleDate),
-                  DatePicker(
-                    hintText: localization.saleDate,
-                    firstDate: state.vehiclePurchaseDate,
-                    initialDate: state.saleDate,
-                    onDatePicked: state.setDate,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SubmitButton(
-                      label: localization.register,
-                      onPressed: () async {
-                        // Validate inputs
-                        if (!state.formKey.currentState!.validate()) return;
-
-                        // Try registering
-                        final result = await state.register(context);
-
-                        // Show dialog with register result
-                        if (context.mounted) {
-                          await registerDialog(context, result);
-                        }
-
-                        // Go back to sale listing
-                        if (result == null) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
+    return Scaffold(
+      appBar: AppBar(title: Text(localization.registerSale)),
+      body: ChangeNotifierProvider<SaleRegisterState>(
+        create: (context) {
+          return SaleRegisterState(
+            partnerStore: partnerStore,
+            onRegister: onRegister,
           );
         },
+        child: Consumer<SaleRegisterState>(
+          builder: (_, state, __) {
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Form(
+                key: state.formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FormTitle(title: localization.register),
+                    TextHeader(label: localization.vehicle(1)),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: DropdownButtonFormField<Vehicle>(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        items: state.availableVehicles
+                            .map(
+                              (e) => DropdownMenuItem<Vehicle>(
+                                value: e,
+                                child: Text(e.model),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: state.setVehicle,
+                      ),
+                    ),
+                    TextHeader(label: localization.customerName),
+                    FormTextEntry(
+                      label: localization.customerName,
+                      controller: state.customerNameController,
+                      validator: (text) {
+                        if (text == null || text.isEmpty) {
+                          return localization.labelNotEmpty;
+                        }
+                        if (text.length < 3) {
+                          return localization.labelMinSize(3);
+                        }
+                        return null;
+                      },
+                    ),
+                    TextHeader(label: localization.customerCpf),
+                    FormTextEntry(
+                      label: localization.customerCpf,
+                      controller: state.customerCpfController,
+                    ),
+                    TextHeader(label: localization.salePrice),
+                    FormTextEntry(
+                      validator: (text) {
+                        final price = double.tryParse(text!);
+                        if (price == null) {
+                          return localization.invalidPrice;
+                        }
+                        return null;
+                      },
+                      label: localization.salePrice,
+                      controller: state.priceController,
+                    ),
+                    TextHeader(label: localization.saleDate),
+                    DatePicker(
+                      hintText: localization.saleDate,
+                      firstDate: state.vehiclePurchaseDate,
+                      initialDate: state.saleDate,
+                      onDatePicked: state.setDate,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SubmitButton(
+                        label: localization.register,
+                        onPressed: () async {
+                          // Validate inputs
+                          if (!state.formKey.currentState!.validate()) return;
+
+                          // Try registering
+                          final result = await state.register(context);
+
+                          // Show dialog with register result
+                          if (context.mounted) {
+                            await registerDialog(context, result);
+                          }
+
+                          // Go back to sale listing
+                          if (result == null) {
+                            // ignore: use_build_context_synchronously
+                            Navigator.of(context).pop();
+                          }
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

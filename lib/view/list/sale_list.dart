@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../entities/partner_store.dart';
 import '../../entities/sale.dart';
 import '../../utils/formats.dart';
+import '../main_state.dart';
 
 /// Provider for sale listing page
 class SaleListState with ChangeNotifier {
@@ -133,6 +134,7 @@ class SaleListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainState = Provider.of<MainState>(context, listen: false);
     final localization = AppLocalizations.of(context)!;
 
     // Scaffold body
@@ -203,9 +205,10 @@ class SaleListPage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () async {
-              await context.pushNamed(
-                'sale_register',
+              await context.push(
+                '/sale/register',
                 extra: {
+                  'user_id': mainState.loggedUser?.id,
                   'partner_store': partnerStore,
                   'on_register': onSaleRegister,
                 },
@@ -234,6 +237,7 @@ class SaleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainState = Provider.of<MainState>(context, listen: false);
     final localization = AppLocalizations.of(context)!;
 
     return Card(
@@ -241,9 +245,10 @@ class SaleTile extends StatelessWidget {
       shadowColor: Colors.grey,
       child: ListTile(
         onTap: () async {
-          await context.pushNamed(
-            'sale_info',
+          await context.push(
+            '/sale/info/${sale.id}',
             extra: {
+              'user_id': mainState.loggedUser?.id,
               'sale': sale,
             },
           );
