@@ -130,75 +130,78 @@ class AutonomyLevelRegisterForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<AutonomyLevelRegisterState>(
-      create: (context) {
-        return AutonomyLevelRegisterState(onRegister: onRegister);
-      },
-      child: Consumer<AutonomyLevelRegisterState>(
-        builder: (_, state, __) {
-          return Form(
-            key: state.formKey,
-            child: ListView(
-              children: [
-                FormTitle(title: localization.register),
-                TextHeader(label: localization.label),
-                FormTextEntry(
-                  label: localization.label,
-                  controller: state.labelController,
-                  validator: (text) {
-                    if (text == null || text.isEmpty) {
-                      return localization.labelNotEmpty;
-                    }
-                    if (text.length < 3) {
-                      return localization.labelMinSize(3);
-                    }
-                    return null;
-                  },
-                ),
-                TextHeader(label: localization.saleStoreProfitRegister),
-                Slider(
-                  max: 100.0,
-                  value: state.storeProfitPercent,
-                  onChanged: state.onStoreProfitPercentChanged,
-                  label: '${state.storeProfitPercent.toStringAsFixed(0)}%',
-                  divisions: 100,
-                ),
-                TextHeader(label: localization.saleNetworkProfitRegister),
-                Slider(
-                  max: 100.0,
-                  value: state.networkProfitPercent,
-                  onChanged: state.onNetworkProfitPercentChanged,
-                  label: '${state.networkProfitPercent.toStringAsFixed(0)}%',
-                  divisions: 100,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SubmitButton(
-                    label: localization.register,
-                    onPressed: () async {
-                      // Validate inputs
-                      if (!state.formKey.currentState!.validate()) return;
-
-                      // Try registering
-                      final result = await state.register();
-
-                      // Show dialog with register result
-                      if (context.mounted) {
-                        await registerDialog(context, result);
+    return Scaffold(
+      appBar: AppBar(title: Text(localization.registerAutonomyLevel)),
+      body: ChangeNotifierProvider<AutonomyLevelRegisterState>(
+        create: (context) {
+          return AutonomyLevelRegisterState(onRegister: onRegister);
+        },
+        child: Consumer<AutonomyLevelRegisterState>(
+          builder: (_, state, __) {
+            return Form(
+              key: state.formKey,
+              child: ListView(
+                children: [
+                  FormTitle(title: localization.register),
+                  TextHeader(label: localization.label),
+                  FormTextEntry(
+                    label: localization.label,
+                    controller: state.labelController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return localization.labelNotEmpty;
                       }
-
-                      // Go back to autonomy level listing
-                      if (result == null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pop();
+                      if (text.length < 3) {
+                        return localization.labelMinSize(3);
                       }
+                      return null;
                     },
                   ),
-                )
-              ],
-            ),
-          );
-        },
+                  TextHeader(label: localization.saleStoreProfitRegister),
+                  Slider(
+                    max: 100.0,
+                    value: state.storeProfitPercent,
+                    onChanged: state.onStoreProfitPercentChanged,
+                    label: '${state.storeProfitPercent.toStringAsFixed(0)}%',
+                    divisions: 100,
+                  ),
+                  TextHeader(label: localization.saleNetworkProfitRegister),
+                  Slider(
+                    max: 100.0,
+                    value: state.networkProfitPercent,
+                    onChanged: state.onNetworkProfitPercentChanged,
+                    label: '${state.networkProfitPercent.toStringAsFixed(0)}%',
+                    divisions: 100,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SubmitButton(
+                      label: localization.register,
+                      onPressed: () async {
+                        // Validate inputs
+                        if (!state.formKey.currentState!.validate()) return;
+
+                        // Try registering
+                        final result = await state.register();
+
+                        // Show dialog with register result
+                        if (context.mounted) {
+                          await registerDialog(context, result);
+                        }
+
+                        // Go back to autonomy level listing
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

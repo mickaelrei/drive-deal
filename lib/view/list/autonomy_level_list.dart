@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../entities/autonomy_level.dart';
+import '../main_state.dart';
 
 /// Widget for listing [AutonomyLevel]s
 class AutonomyLevelListPage extends StatelessWidget {
@@ -29,6 +31,7 @@ class AutonomyLevelListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainState = Provider.of<MainState>(context, listen: false);
     final localization = AppLocalizations.of(context)!;
 
     // Get scaffold body based on list being null, empty or not empty
@@ -53,6 +56,7 @@ class AutonomyLevelListPage extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: AutonomyLevelTile(
+              userId: mainState.loggedUser?.id,
               autonomyLevel: autonomyLevel,
               onEdit: onAutonomyLevelEdit,
             ),
@@ -68,9 +72,10 @@ class AutonomyLevelListPage extends StatelessWidget {
           IconButton(
             onPressed: () async {
               // Wait until finished registering stores
-              await context.pushNamed(
-                'autonomy_level_register',
+              await context.push(
+                '/autonomy_level/register',
                 extra: {
+                  'user_id': mainState.loggedUser?.id,
                   'on_register': onRegister,
                 },
               );
@@ -89,10 +94,14 @@ class AutonomyLevelListPage extends StatelessWidget {
 class AutonomyLevelTile extends StatelessWidget {
   /// Constructor
   const AutonomyLevelTile({
+    this.userId,
     required this.autonomyLevel,
     this.onEdit,
     super.key,
   });
+
+  /// User id
+  final int? userId;
 
   /// [AutonomyLevel] object to show
   final AutonomyLevel autonomyLevel;
@@ -116,11 +125,12 @@ class AutonomyLevelTile extends StatelessWidget {
         trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () async {
-            await context.pushNamed(
-              'autonomy_level_edit',
+            await context.push(
+              '/autonomy_level/edit/${autonomyLevel.id}',
               extra: {
-                'on_edit': onEdit,
+                'user_id': userId,
                 'autonomy_level': autonomyLevel,
+                'on_edit': onEdit,
               },
             );
           },

@@ -139,78 +139,81 @@ class AutonomyLevelEditForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
-    return ChangeNotifierProvider<AutonomyLevelEditState>(
-      create: (context) {
-        return AutonomyLevelEditState(
-          autonomyLevel: autonomyLevel,
-          onEdit: onEdit,
-        );
-      },
-      child: Consumer<AutonomyLevelEditState>(
-        builder: (_, state, __) {
-          return Form(
-            key: state.formKey,
-            child: ListView(
-              children: [
-                FormTitle(title: localization.edit),
-                TextHeader(label: localization.label),
-                FormTextEntry(
-                  label: localization.label,
-                  controller: state.labelController,
-                  validator: (text) {
-                    if (text == null || text.isEmpty) {
-                      return localization.labelNotEmpty;
-                    }
-                    if (text.length < 3) {
-                      return localization.labelMinSize(3);
-                    }
-                    return null;
-                  },
-                ),
-                TextHeader(label: localization.saleStoreProfitRegister),
-                Slider(
-                  max: 100.0,
-                  value: state.storeProfitPercent,
-                  onChanged: state.onStoreProfitPercentChanged,
-                  label: '${state.storeProfitPercent.toStringAsFixed(0)}%',
-                  divisions: 100,
-                ),
-                TextHeader(label: localization.saleNetworkProfitRegister),
-                Slider(
-                  max: 100.0,
-                  value: state.networkProfitPercent,
-                  onChanged: state.onNetworkProfitPercentChanged,
-                  label: '${state.networkProfitPercent.toStringAsFixed(0)}%',
-                  divisions: 100,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SubmitButton(
-                    label: localization.edit,
-                    onPressed: () async {
-                      // Validate inputs
-                      if (!state.formKey.currentState!.validate()) return;
-
-                      // Try editing
-                      final result = await state.edit();
-
-                      // Show dialog with edit result
-                      if (context.mounted) {
-                        await editDialog(context, result);
-                      }
-
-                      // Go back to autonomy level listing
-                      if (result == null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                )
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(title: Text(localization.editAutonomyLevel)),
+      body: ChangeNotifierProvider<AutonomyLevelEditState>(
+        create: (context) {
+          return AutonomyLevelEditState(
+            autonomyLevel: autonomyLevel,
+            onEdit: onEdit,
           );
         },
+        child: Consumer<AutonomyLevelEditState>(
+          builder: (_, state, __) {
+            return Form(
+              key: state.formKey,
+              child: ListView(
+                children: [
+                  FormTitle(title: localization.edit),
+                  TextHeader(label: localization.label),
+                  FormTextEntry(
+                    label: localization.label,
+                    controller: state.labelController,
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return localization.labelNotEmpty;
+                      }
+                      if (text.length < 3) {
+                        return localization.labelMinSize(3);
+                      }
+                      return null;
+                    },
+                  ),
+                  TextHeader(label: localization.saleStoreProfitRegister),
+                  Slider(
+                    max: 100.0,
+                    value: state.storeProfitPercent,
+                    onChanged: state.onStoreProfitPercentChanged,
+                    label: '${state.storeProfitPercent.toStringAsFixed(0)}%',
+                    divisions: 100,
+                  ),
+                  TextHeader(label: localization.saleNetworkProfitRegister),
+                  Slider(
+                    max: 100.0,
+                    value: state.networkProfitPercent,
+                    onChanged: state.onNetworkProfitPercentChanged,
+                    label: '${state.networkProfitPercent.toStringAsFixed(0)}%',
+                    divisions: 100,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SubmitButton(
+                      label: localization.edit,
+                      onPressed: () async {
+                        // Validate inputs
+                        if (!state.formKey.currentState!.validate()) return;
+
+                        // Try editing
+                        final result = await state.edit();
+
+                        // Show dialog with edit result
+                        if (context.mounted) {
+                          await editDialog(context, result);
+                        }
+
+                        // Go back to autonomy level listing
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
