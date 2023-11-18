@@ -164,7 +164,6 @@ class PartnerStoreEditPage extends StatelessWidget {
     final localization = AppLocalizations.of(context)!;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(title: Text(localization.editPartnerStore)),
       body: ChangeNotifierProvider<PartnerStoreEditState>(
         create: (context) {
