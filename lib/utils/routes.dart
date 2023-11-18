@@ -494,29 +494,164 @@ final router = GoRouter(
       ],
     ),
     GoRoute(
-      name: 'store_register',
-      path: '/store_register',
-      builder: storeRegisterRoute,
-    ),
-    GoRoute(
-      name: 'store_edit',
-      path: '/store_edit',
-      builder: storeEditRoute,
-    ),
-    GoRoute(
-      name: 'store_info',
-      path: '/store_info',
-      builder: storeInfoRoute,
-    ),
-    GoRoute(
-      name: 'sale_register',
-      path: '/sale_register',
-      builder: saleRegisterRoute,
-    ),
-    GoRoute(
-      name: 'sale_info',
-      path: '/sale_info',
-      builder: saleInfoRoute,
+      path: '/sale',
+      redirect: (context, state) {
+        final fullPath = state.fullPath;
+
+        // Route /sale is not supposed to be accessed
+        if (fullPath == '/sale') {
+          return '/';
+        }
+
+        return null;
+      },
+      routes: [
+        GoRoute(
+          path: 'info/:id',
+          redirect: (context, state) async {
+            // Get args
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Args is needed to get user id
+              return '/';
+            }
+            var sale = args['sale'] as Sale?;
+            final userId = args['user_id'] as int?;
+
+            // If sale object was not passed, get it from path arg
+            if (sale == null) {
+              final saleId = state.pathParameters['id']!;
+              final id = int.tryParse(saleId);
+              if (id == null) {
+                throw 'Expected a not-null integer as '
+                    'sale id, got: $saleId';
+              }
+
+              // Load sale from db if needed
+              sale = await saleUseCase.selectById(id);
+            }
+
+            // Check for valid args
+            if (sale == null || userId == null) {
+              return '/';
+            }
+
+            // Check if any of the permission rules are met:
+            // 1 - user is an admin
+            // 2 - user is owner of store in which the sale is registered in
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (user.isAdmin) {
+              // Can proceed
+              return null;
+            }
+
+            // Check if store id is the same
+            if (user.store?.id == sale.storeId) {
+              // Can proceed
+              return null;
+            }
+
+            // If all fails, then user doesn't have permission
+            return '/';
+          },
+          builder: (context, state) {
+            // Get path args
+            final saleId = state.pathParameters['id']!;
+
+            // Get args
+            final args = state.extra as Map<String, dynamic>;
+            final sale = args['sale'] as Sale?;
+            final userId = args['user_id'] as int?;
+
+            // Check for valid args
+            if (userId == null) {
+              throw 'Expected a valid not-null '
+                  'integer as user id, got: $userId';
+            }
+
+            // If a sale object was passed, use it on widget
+            if (sale != null) {
+              return SaleInfoPage(sale: sale);
+            }
+
+            // Check if sale id is a valid number
+            final id = int.tryParse(saleId);
+            if (id == null) {
+              throw 'Expected a valid integer as sale id, got: $saleId';
+            }
+
+            // If no sale object was passed, use path id
+            return SaleInfoPage(saleId: id);
+          },
+        ),
+        GoRoute(
+          path: 'register',
+          redirect: (context, state) async {
+            print('/sale/register redirect');
+            // Get args
+            final args = state.extra as Map<String, dynamic>?;
+            if (args == null) {
+              // Need args to get user id
+              return '/';
+            }
+            final userId = args['user_id'] as int?;
+            final partnerStore = args['partner_store'] as PartnerStore?;
+
+            // Check for valid args
+            if (userId == null || partnerStore == null) {
+              return '/';
+            }
+
+            // A sale can be registered on a store only by
+            // the owner of the store, so check if:
+            // 1 - user exists and is owner of the store
+            // 2 - user is not an admin
+
+            // Get user
+            final user = await userUseCase.selectById(userId);
+            if (user == null) {
+              // Invalid user
+              return '/';
+            }
+
+            // Check if is admin
+            if (user.isAdmin) {
+              // Can't register
+              return '/';
+            }
+
+            // Check store id
+            if (user.store?.id != partnerStore.id) {
+              // Different id, not the owner
+              return '/';
+            }
+
+            // If reached here, user has permission to register
+            return null;
+          },
+          builder: (context, state) {
+            print('/sale/register build');
+            final args = state.extra as Map<String, dynamic>;
+            final partnerStore = args['partner_store'] as PartnerStore?;
+            if (partnerStore == null) {
+              throw 'Expected a not-null partner store, got: $partnerStore';
+            }
+
+            return SaleRegisterForm(
+              partnerStore: partnerStore,
+              onRegister: args['on_register'],
+            );
+          },
+        ),
+      ],
     ),
     GoRoute(
       name: 'autonomy_level_register',
@@ -786,17 +921,9 @@ Widget saleRegisterRoute(BuildContext context, GoRouterState state) {
     );
   }
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    resizeToAvoidBottomInset: false,
-    appBar: AppBar(
-      title: Text(localization.registerSale),
-    ),
-    body: SaleRegisterForm(
-      partnerStore: partnerStore,
-      onRegister: args['on_register'],
-    ),
+  return SaleRegisterForm(
+    partnerStore: partnerStore,
+    onRegister: args['on_register'],
   );
 }
 
@@ -822,17 +949,7 @@ Widget saleInfoRoute(BuildContext context, GoRouterState state) {
     );
   }
 
-  final localization = AppLocalizations.of(context)!;
-
-  return Scaffold(
-    resizeToAvoidBottomInset: false,
-    appBar: AppBar(
-      title: Text(localization.saleInfo),
-    ),
-    body: SaleInfoPage(
-      sale: args['sale'],
-    ),
-  );
+  return SaleInfoPage(sale: args['sale']);
 }
 
 /// Function to handle /autonomy_level_register route
