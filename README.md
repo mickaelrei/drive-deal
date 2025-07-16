@@ -14,25 +14,22 @@ This application was made as an academic project during the Lince Tech Academy.
 
 ## Screenshots
 
-<div style="display: flex; flex-wrap: wrap; gap: 16px;">
-    <div>
-        <strong>Login page:</strong><br>
-        <img src="docs/login.png" alt="Login page" height="400">
-    </div>
-    <div>
-        <strong>Partner store details:</strong><br>
-        <img src="docs/partner_store_details.png" alt="Partner store details" height="400">
-    </div>
-    <div>
-        <strong>Autonomy levels listing:</strong><br>
-        <img src="docs/autonomy_levels.png" alt="Autonomy levels" height="400">
-    </div>
-    <div>
-        <strong>Partner's vehicle listing:</strong><br>
-        <img src="docs/vehicles.png" alt="Vehicles" height="400">
-    </div>
-    <div>
-        <strong>Vehicle info:</strong><br>
-        <img src="docs/vehicle_info.png" alt="Vehicle info" height="400">
-    </div>
-</div>
+Login page:
+
+![Login page](docs/login.png)
+
+Partner store details:
+
+![Partner store details](docs/partner_store_details.png)
+
+Autonomy levels listing:
+
+![Autonomy levels](docs/autonomy_levels.png)
+
+Partner's vehicle listing:
+
+![Vehicles](docs/vehicles.png)
+
+Vehicle info:
+
+![Vehicle info](docs/vehicle_info.png)
